@@ -248,13 +248,7 @@ contract Baal is CloneFactory, Module {
         bool actionFailed
     ); /*emits when proposal is processed & executed*/
     event ProcessingFailed(uint256 indexed proposal); /*emits when proposal is processed & executed*/
-    event Ragequit(
-        address indexed member,
-        address to,
-        uint256 indexed lootToBurn,
-        uint256 indexed sharesToBurn,
-        address[] tokens
-    ); /*emits when users burn Baal `shares` and/or `loot` for given `to` account*/
+
     event Approval(
         address indexed owner,
         address indexed spender,
@@ -302,10 +296,11 @@ contract Baal is CloneFactory, Module {
             address _lootSingleton, /*template contract to clone for loot ERC20 token*/
             address _multisendLibrary, /*address of multisend library*/
             address _avatar, /*Safe contract address*/
+            address _ragequitManager,
             bytes memory _initializationMultisendData /*here you call BaalOnly functions to set up initial shares, loot, shamans, periods, etc.*/
         ) = abi.decode(
                 _initializationParams,
-                (string, string, address, address, address, bytes)
+                (string, string, address, address, address, address, bytes)
             );
 
         __Ownable_init();
@@ -325,6 +320,10 @@ contract Baal is CloneFactory, Module {
         ); /*TODO this naming feels too opinionated*/
 
         multisendLibrary = _multisendLibrary; /*Set address of Gnosis multisend library to use for all execution*/
+
+        if(_ragequitManager != address(0)){
+          //setShamans([_ragequitManager], [2]);
+        }
 
         // Execute all setups including but not limited to
         // * mint shares
@@ -638,88 +637,15 @@ contract Baal is CloneFactory, Module {
         address _to,
         uint256 _value,
         bytes calldata _data
-    ) external baalOnly {
-        (bool success, ) = _to.call{value: _value}(_data);
+    ) external baalOrManagerOnly returns(bool success, bytes memory data) {
+        (success, data) = _to.call{value: _value}(_data);
         require(success, "call failure");
     }
 
     // ****************
     // MEMBER FUNCTIONS
     // ****************
-    /// @notice Process member burn of `shares` and/or `loot` to claim 'fair share' of `guildTokens`.
-    /// @param to Account that receives 'fair share'.
-    /// @param lootToBurn Baal pure economic weight to burn.
-    /// @param sharesToBurn Baal voting weight to burn.
-    function ragequit(
-        address to,
-        uint256 sharesToBurn,
-        uint256 lootToBurn
-    ) external nonReentrant {
-        _ragequit(to, sharesToBurn, lootToBurn, guildTokens);
-    }
-
-    /// @notice Process member burn of `shares` and/or `loot` to claim 'fair share' of specified `tokens`
-    /// @dev Useful to omit malicious treasury tokens, or include tokens the DAO has not voted into guild tokens
-    /// @param to Account that receives 'fair share'.
-    /// @param lootToBurn Baal pure economic weight to burn.
-    /// @param sharesToBurn Baal voting weight to burn.
-    /// @param tokens Array of tokens to include in rage quit calculation
-    function advancedRagequit(
-        address to,
-        uint256 sharesToBurn,
-        uint256 lootToBurn,
-        address[] calldata tokens
-    ) external nonReentrant {
-        for (uint256 i; i < tokens.length; i++) {
-            if (i > 0) {
-                require(tokens[i] > tokens[i - 1], "!order");
-            }
-        }
-
-        _ragequit(to, sharesToBurn, lootToBurn, tokens);
-    }
-
-    /// @notice Internal execution of rage quite
-    /// @param to Account that receives 'fair share'.
-    /// @param lootToBurn Baal pure economic weight to burn.
-    /// @param sharesToBurn Baal voting weight to burn.
-    /// @param tokens Array of tokens to include in rage quit calculation
-    function _ragequit(
-        address to,
-        uint256 sharesToBurn,
-        uint256 lootToBurn,
-        address[] memory tokens
-    ) internal {
-        uint256 totalShares = totalSupply;
-        uint256 _totalLoot = totalLoot();
-
-        if (lootToBurn != 0) {
-            /*gas optimization*/
-            _burnLoot(msg.sender, lootToBurn); /*subtract `loot` from user account & Baal totals*/
-        }
-
-        if (sharesToBurn != 0) {
-            /*gas optimization*/
-            _burnShares(msg.sender, sharesToBurn); /*subtract `shares` from user account & Baal totals with erc20 accounting*/
-        }
-
-        for (uint256 i; i < tokens.length; i++) {
-            (, bytes memory balanceData) = tokens[i].staticcall(
-                abi.encodeWithSelector(0x70a08231, address(target))
-            ); /*get Baal token balances - 'balanceOf(address)'*/
-            uint256 balance = abi.decode(balanceData, (uint256)); /*decode Baal token balances for calculation*/
-
-            uint256 amountToRagequit = ((lootToBurn + sharesToBurn) * balance) /
-                (totalShares + _totalLoot); /*calculate 'fair shair' claims*/
-
-            if (amountToRagequit != 0) {
-                /*gas optimization to allow higher maximum token limit*/
-                _safeTransfer(tokens[i], to, amountToRagequit); /*execute 'safe' token transfer*/
-            }
-        }
-
-        emit Ragequit(msg.sender, to, lootToBurn, sharesToBurn, tokens); /*event reflects claims made against Baal*/
-    }
+   
 
     /// @notice Delegate votes from user to `delegatee`.
     /// @param delegatee The address to delegate votes to.
