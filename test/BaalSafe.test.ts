@@ -296,7 +296,7 @@ describe.only('Baal contract', function () {
     gnosisSafeSingleton = (await GnosisSafe.deploy()) as GnosisSafe
     const handler = (await CompatibilityFallbackHandler.deploy()) as CompatibilityFallbackHandler
 
-    baalSummoner = (await BaalSummoner.deploy(baalSingleton.address, gnosisSafeSingleton.address, handler.address, multisend.address)) as BaalSummoner
+    baalSummoner = (await BaalSummoner.deploy(baalSingleton.address, gnosisSafeSingleton.address, handler.address, multisend.address, summoner.address)) as BaalSummoner
 
     encodedInitParams = await getBaalParams(
       baalSingleton,
@@ -310,7 +310,7 @@ describe.only('Baal contract', function () {
       [[summoner.address], [loot]]
     )
 
-    const tx = await baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101)
+    const tx = await baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101, '{"foo":"bar"}')
     const addresses = await getNewBaalAddresses(tx)
 
     baal = BaalFactory.attach(addresses.baal) as Baal
@@ -2406,7 +2406,7 @@ describe.only('Baal contract - tribute required', function () {
     multisend = (await MultisendContract.deploy()) as MultiSend
     gnosisSafeSingleton = (await GnosisSafe.deploy()) as GnosisSafe
     const handler = (await CompatibilityFallbackHandler.deploy()) as CompatibilityFallbackHandler
-    baalSummoner = (await BaalSummoner.deploy(baalSingleton.address, gnosisSafeSingleton.address, handler.address, multisend.address)) as BaalSummoner
+    baalSummoner = (await BaalSummoner.deploy(baalSingleton.address, gnosisSafeSingleton.address, handler.address, multisend.address, summoner.address)) as BaalSummoner
 
     const encodedInitParams = await getBaalParams(
       baalSingleton,
@@ -2420,7 +2420,7 @@ describe.only('Baal contract - tribute required', function () {
       [[summoner.address], [loot]]
     )
 
-    const tx = await baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101)
+    const tx = await baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101, '{"foo":"bar"}')
     const addresses = await getNewBaalAddresses(tx)
 
     baal = BaalFactory.attach(addresses.baal) as Baal
@@ -2537,7 +2537,7 @@ describe.only('Baal contract - no shares minted - fails', function () {
     gnosisSafeSingleton = (await GnosisSafe.deploy()) as GnosisSafe
     const handler = (await CompatibilityFallbackHandler.deploy()) as CompatibilityFallbackHandler
 
-    baalSummoner = (await BaalSummoner.deploy(baalSingleton.address, gnosisSafeSingleton.address, handler.address, multisend.address)) as BaalSummoner
+    baalSummoner = (await BaalSummoner.deploy(baalSingleton.address, gnosisSafeSingleton.address, handler.address, multisend.address, summoner.address)) as BaalSummoner
 
     const encodedInitParams = await getBaalParams(
       baalSingleton,
@@ -2551,7 +2551,7 @@ describe.only('Baal contract - no shares minted - fails', function () {
       [[summoner.address], [loot]]
     )
 
-    expect(baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101)).to.be.revertedWith(
+    expect(baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101, '{"foo":"bar"}')).to.be.revertedWith(
       revertMessages.molochSetupSharesNoShares
     )
   })

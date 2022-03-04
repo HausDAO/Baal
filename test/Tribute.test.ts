@@ -237,7 +237,7 @@ describe('Tribute proposal type', function () {
       [[summoner.address], [shares]],
       [[summoner.address], [loot]]
     )
-    const tx = await baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101)
+    const tx = await baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101, summoner.address)
     const addresses = await getNewBaalAddresses(tx)
 
     baal = BaalFactory.attach(addresses.baal) as Baal
