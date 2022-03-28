@@ -2,20 +2,14 @@
 pragma solidity >=0.8.0;
 import "../Baal.sol";
 
-//  import "hardhat/console.sol";
-
-interface IERC20 {
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
-}
+import "hardhat/console.sol";
 
 contract TributeEscrow {
-    event TributeProposal(address indexed baal, address token, uint256 amount, address recipient, uint256 proposalId);
     struct Escrow {
         address token;
         address applicant;
         uint256 amount;
         bool released;
-        address safe;
     }
     mapping(address => mapping(uint256 => Escrow)) escrows;
 
@@ -98,6 +92,7 @@ contract TributeEscrow {
         uint256 amount,
         uint256 shares,
         uint256 loot,
+        address recipient,
         uint32 expiration,
         string memory details
     ) public {
@@ -106,38 +101,32 @@ contract TributeEscrow {
             address(baal),
             shares,
             loot,
-            msg.sender,
+            recipient,
             proposalId,
             address(this)
         );
         escrows[address(baal)][proposalId] = Escrow(
             token,
-            msg.sender,
+            recipient,
             amount,
-            false,
-            baal.target()
+            false
         );
         baal.submitProposal(encodedProposal, expiration, details);
-        emit TributeProposal(address(baal), token, amount, msg.sender, proposalId);
     }
 
     function releaseEscrow(uint32 proposalId) external {
-        // console.log("releasing");
-        Baal baal = Baal(msg.sender);
+        Baal baal = Baal(payable(msg.sender));
         Escrow storage escrow = escrows[address(baal)][proposalId];
         require(!escrow.released, "Already released");
-        // console.log("releasing1b");
 
         bool[4] memory status = baal.getProposalStatus(proposalId);
-        // console.log("releasing1c");
         require(status[2], "Not passed");
         escrow.released = true;
 
         IERC20 token = IERC20(escrow.token);
-        // console.log("releasing2");
 
         require(
-            token.transferFrom(escrow.applicant, escrow.safe, escrow.amount),
+            token.transferFrom(escrow.applicant, address(baal), escrow.amount),
             "Transfer failed"
         );
     }
