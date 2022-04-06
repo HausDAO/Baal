@@ -17,7 +17,13 @@ import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/zodiac/contracts/factory/ModuleProxyFactory.sol";
 
-interface ILoot {
+interface ISharesLoot {
+    struct Checkpoint {
+        /*Baal checkpoint for marking number of delegated votes*/
+        uint32 fromTimeStamp; /*unix time for referencing voting balance*/
+        uint256 votes; /*votes at given unix time*/
+    }
+
     function setUp(string memory _name, string memory _symbol) external;
 
     function mint(address recipient, uint256 amount) external;
@@ -27,6 +33,10 @@ interface ILoot {
     function balanceOf(address account) external view returns (uint256);
 
     function totalSupply() external view returns (uint256);
+
+    function numCheckpoints(address) external view returns (uint256);
+
+    function checkpoints(address, uint256) external view returns (Checkpoint memory);
 }
 
 contract CloneFactory {
@@ -55,11 +65,12 @@ contract Baal is CloneFactory, Module {
     using ECDSA for bytes32;
 
     // ERC20 SHARES + LOOT
-    uint8 public constant decimals = 18; /*unit scaling factor in erc20 `shares` accounting - '18' is default to match ETH & common erc20s*/
-    uint256 public totalSupply; /*counter for total `members` voting `shares` with erc20 accounting*/
+    // uint8 public constant decimals = 18; /*unit scaling factor in erc20 `shares` accounting - '18' is default to match ETH & common erc20s*/
+    // uint256 public totalSupply; /*counter for total `members` voting `shares` with erc20 accounting*/
     string public name; /*'name' for erc20 `shares` accounting*/
     string public symbol; /*'symbol' for erc20 `shares` accounting*/
-    ILoot public lootToken; /*Sub ERC20 for loot mgmt*/
+    ISharesLoot public lootToken; /*Sub ERC20 for loot mgmt*/
+    ISharesLoot public sharesToken; /*Sub ERC20 for loot mgmt*/
     mapping(address => mapping(address => uint256)) public allowance; /*maps approved pulls of `shares` with erc20 accounting*/
     mapping(address => uint256) public balanceOf; /*maps `members` accounts to `shares` with erc20 accounting*/
 
@@ -97,10 +108,6 @@ contract Baal is CloneFactory, Module {
     mapping(address => mapping(uint32 => bool)) public memberVoted; /*maps members to their proposal votes (true = voted) */
     mapping(uint256 => Proposal) public proposals; /*maps `proposal id` to struct details*/
 
-    // DELEGATE TRACKING
-    mapping(address => mapping(uint256 => Checkpoint)) public checkpoints; /*maps record of vote `checkpoints` for each account by index*/
-    mapping(address => uint256) public numCheckpoints; /*maps number of `checkpoints` for each account*/
-    mapping(address => address) public delegates; /*maps record of each account's `shares` delegate*/
 
     // MISCELLANEOUS PARAMS
     uint256 status; /*internal reentrancy check tracking value*/
@@ -113,12 +120,12 @@ contract Baal is CloneFactory, Module {
         keccak256(
             "EIP712Domain(string name,uint256 chainId,address verifyingContract)"
         );
-    bytes32 constant DELEGATION_TYPEHASH =
-        keccak256("Delegation(address delegatee,uint nonce,uint expiry)");
-    bytes32 constant PERMIT_TYPEHASH =
-        keccak256(
-            "Permit(address owner,address spender,uint value,uint nonce,uint deadline)"
-        );
+    // bytes32 constant DELEGATION_TYPEHASH =
+    //     keccak256("Delegation(address delegatee,uint nonce,uint expiry)");
+    // bytes32 constant PERMIT_TYPEHASH =
+    //     keccak256(
+    //         "Permit(address owner,address spender,uint value,uint nonce,uint deadline)"
+    //     );
     bytes32 constant VOTE_TYPEHASH =
         keccak256("Vote(uint proposalId,bool support)");
 
@@ -138,12 +145,6 @@ contract Baal is CloneFactory, Module {
         address sponsor; /* address of the sponsor - set at sponsor proposal - relevant for cancellation */
         bytes32 proposalDataHash; /*hash of raw data associated with state updates*/
         string details; /*human-readable context for proposal*/
-    }
-
-    struct Checkpoint {
-        /*Baal checkpoint for marking number of delegated votes*/
-        uint32 fromTimeStamp; /*unix time for referencing voting balance*/
-        uint256 votes; /*votes at given unix time*/
     }
 
     /* Unborn -> Submitted -> Voting -> Grace -> Ready -> Processed 
@@ -255,16 +256,12 @@ contract Baal is CloneFactory, Module {
         address indexed to,
         uint256 amount
     ); /*emits when Baal `loot` is minted, burned or transferred*/
-    event DelegateChanged(
-        address indexed delegator,
-        address indexed fromDelegate,
-        address indexed toDelegate
-    ); /*emits when an account changes its voting delegate*/
-    event DelegateVotesChanged(
-        address indexed delegate,
-        uint256 previousBalance,
-        uint256 newBalance
-    ); /*emits when a delegate account's voting balance changes*/
+    event TransferShares(
+        address indexed from,
+        address indexed to,
+        uint256 amount
+    ); /*emits when Baal `loot` is minted, burned or transferred*/
+
     event ShamanSet(address indexed shaman, uint256 permission); /*emits when a shaman permission changes*/
     event GovernanceConfigSet(
         uint32 voting,
@@ -288,12 +285,13 @@ contract Baal is CloneFactory, Module {
             string memory _name, /*_name Name for erc20 `shares` accounting*/
             string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting*/
             address _lootSingleton, /*template contract to clone for loot ERC20 token*/
+            address _sharesSingleton, /*template contract to clone for loot ERC20 token*/
             address _multisendLibrary, /*address of multisend library*/
             address _avatar, /*Safe contract address*/
             bytes memory _initializationMultisendData /*here you call BaalOnly functions to set up initial shares, loot, shamans, periods, etc.*/
         ) = abi.decode(
                 _initializationParams,
-                (string, string, address, address, address, bytes)
+                (string, string, address, address, address, address, bytes)
             );
 
         __Ownable_init();
@@ -306,11 +304,17 @@ contract Baal is CloneFactory, Module {
         avatar = _avatar;
         target = _avatar; /*Set target to same address as avatar on setup - can be changed later via setTarget, though probably not a good idea*/
 
-        lootToken = ILoot(createClone(_lootSingleton)); /*Clone loot singleton using EIP1167 minimal proxy pattern*/
+        lootToken = ISharesLoot(createClone(_lootSingleton)); /*Clone loot singleton using EIP1167 minimal proxy pattern*/
         lootToken.setUp(
             string(abi.encodePacked(_name, " LOOT")),
             string(abi.encodePacked(_symbol, "-LOOT"))
         ); /*TODO this naming feels too opinionated*/
+
+        sharesToken = ISharesLoot(createClone(_sharesSingleton)); /*Clone loot singleton using EIP1167 minimal proxy pattern*/
+        sharesToken.setUp(
+            _name,
+            _symbol
+        ); 
 
         multisendLibrary = _multisendLibrary; /*Set address of Gnosis multisend library to use for all execution*/
 
@@ -342,7 +346,7 @@ contract Baal is CloneFactory, Module {
             minRetentionPercent,
             name,
             symbol,
-            totalSupply,
+            totalShares(),
             totalLoot()
         );
 
@@ -459,6 +463,7 @@ contract Baal is CloneFactory, Module {
     /// @param id Number of proposal in `proposals` mapping to cast vote on.
     /// @param approved If 'true', member will cast `yesVotes` onto proposal - if 'false', `noVotes` will be counted.
     /// @param signature Concatenated signature
+    // TODO sharestoken
     function submitVoteWithSig(
         uint32 id,
         bool approved,
@@ -487,6 +492,8 @@ contract Baal is CloneFactory, Module {
     /// @param voter Address of voter
     /// @param id Number of proposal in `proposals` mapping to cast vote on.
     /// @param approved If 'true', member will cast `yesVotes` onto proposal - if 'false', `noVotes` will be counted.
+    // TODO sharestoken
+
     function _submitVote(
         address voter,
         uint32 id,
@@ -505,11 +512,11 @@ contract Baal is CloneFactory, Module {
                 /*if `approved`, cast delegated balance `yesVotes` to proposal*/
                 prop.yesVotes += balance;
                 if (
-                    totalSupply + totalLoot() >
+                    totalShares() + totalLoot() >
                     prop.maxTotalSharesAndLootAtYesVote
                 ) {
                     prop.maxTotalSharesAndLootAtYesVote =
-                        totalSupply +
+                        totalShares() +
                         totalLoot();
                 }
             } else {
@@ -558,13 +565,13 @@ contract Baal is CloneFactory, Module {
             okToExecute = false;
 
         // Make proposal fail if it didn't pass quorum
-        if (okToExecute && prop.yesVotes * 100 < quorumPercent * totalSupply)
+        if (okToExecute && prop.yesVotes * 100 < quorumPercent * totalShares())
             okToExecute = false;
 
         // Make proposal fail if the minRetentionPercent is exceeded
         if (
             okToExecute &&
-            (totalSupply + totalLoot()) <
+            (totalShares() + totalLoot()) <
             (prop.maxTotalSharesAndLootAtYesVote * minRetentionPercent) / 100 /*Check for dilution since high water mark during voting*/
         ) {
             okToExecute = false;
@@ -662,13 +669,15 @@ contract Baal is CloneFactory, Module {
     /// @param lootToBurn Baal pure economic weight to burn.
     /// @param sharesToBurn Baal voting weight to burn.
     /// @param tokens Array of tokens to include in rage quit calculation
+    // TODO sharestoken
+
     function _ragequit(
         address to,
         uint256 sharesToBurn,
         uint256 lootToBurn,
         address[] memory tokens
     ) internal {
-        uint256 totalShares = totalSupply;
+        uint256 _totalShares = totalShares();
         uint256 _totalLoot = totalLoot();
 
         if (lootToBurn != 0) {
@@ -688,7 +697,7 @@ contract Baal is CloneFactory, Module {
             uint256 balance = abi.decode(balanceData, (uint256)); /*decode Baal token balances for calculation*/
 
             uint256 amountToRagequit = ((lootToBurn + sharesToBurn) * balance) /
-                (totalShares + _totalLoot); /*calculate 'fair shair' claims*/
+                (_totalShares + _totalLoot); /*calculate 'fair shair' claims*/
 
             if (amountToRagequit != 0) {
                 /*gas optimization to allow higher maximum token limit*/
@@ -697,130 +706,6 @@ contract Baal is CloneFactory, Module {
         }
 
         emit Ragequit(msg.sender, to, lootToBurn, sharesToBurn, tokens); /*event reflects claims made against Baal*/
-    }
-
-    /// @notice Delegate votes from user to `delegatee`.
-    /// @param delegatee The address to delegate votes to.
-    function delegate(address delegatee) external {
-        _delegate(msg.sender, delegatee);
-    }
-
-    /// @notice Delegates votes from `signatory` to `delegatee` with EIP-712 signature.
-    /// @param delegatee The address to delegate 'votes' to.
-    /// @param nonce The contract state required to match the signature.
-    /// @param deadline The time at which to expire the signature.
-    /// @param signature The concatenated signature
-    function delegateBySig(
-        address delegatee,
-        uint256 nonce,
-        uint256 deadline,
-        bytes calldata signature
-    ) external {
-        bytes32 domainSeparator = keccak256(
-            abi.encode(
-                DOMAIN_TYPEHASH,
-                keccak256(bytes(name)),
-                block.chainid,
-                address(this)
-            )
-        ); /*calculate EIP-712 domain hash*/
-        bytes32 structHash = keccak256(
-            abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, deadline)
-        ); /*calculate EIP-712 struct hash*/
-        bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", domainSeparator, structHash)
-        ); /*calculate EIP-712 digest for signature*/
-        address signatory = digest.recover(signature); /*recover signer from hash data*/
-
-        require(signatory != address(0), "!signatory"); /*check signer is not null*/
-        unchecked {
-            require(nonce == nonces[signatory]++, "!nonce"); /*check given `nonce` is next in `nonces`*/
-        }
-
-        require(deadline == 0 || deadline < block.timestamp, "expired");
-
-        _delegate(signatory, delegatee); /*execute delegation*/
-    }
-
-    /// @notice Delegates Baal voting weight.
-    /// @param delegator The address to delegate 'votes' from.
-    /// @param delegatee The address to delegate 'votes' to.
-    function _delegate(address delegator, address delegatee) private {
-        require(balanceOf[delegator] > 0, "!shares");
-        address currentDelegate = delegates[delegator];
-        delegates[delegator] = delegatee;
-
-        _moveDelegates(
-            currentDelegate,
-            delegatee,
-            uint256(balanceOf[delegator])
-        );
-
-        emit DelegateChanged(delegator, currentDelegate, delegatee);
-    }
-
-    /// @notice Elaborates delegate update - cf., 'Compound Governance'.
-    /// @param srcRep The address to delegate 'votes' from.
-    /// @param dstRep The address to delegate 'votes' to.
-    /// @param amount The amount of votes to delegate
-    function _moveDelegates(
-        address srcRep,
-        address dstRep,
-        uint256 amount
-    ) private {
-        unchecked {
-            if (srcRep != dstRep && amount != 0) {
-                if (srcRep != address(0)) {
-                    uint256 srcRepNum = numCheckpoints[srcRep];
-                    uint256 srcRepOld = srcRepNum != 0
-                        ? checkpoints[srcRep][srcRepNum - 1].votes
-                        : 0;
-                    uint256 srcRepNew = srcRepOld - amount;
-                    _writeCheckpoint(srcRep, srcRepNum, srcRepOld, srcRepNew);
-                }
-
-                if (dstRep != address(0)) {
-                    uint256 dstRepNum = numCheckpoints[dstRep];
-                    uint256 dstRepOld = dstRepNum != 0
-                        ? checkpoints[dstRep][dstRepNum - 1].votes
-                        : 0;
-                    uint256 dstRepNew = dstRepOld + amount;
-                    _writeCheckpoint(dstRep, dstRepNum, dstRepOld, dstRepNew);
-                }
-            }
-        }
-    }
-
-    /// @notice Elaborates delegate update - cf., 'Compound Governance'.
-    /// @param delegatee The address to snapshot
-    /// @param nCheckpoints The number of checkpoints delegatee has
-    /// @param oldVotes The number of votes the delegatee had
-    /// @param newVotes The number of votes the delegate has now
-    function _writeCheckpoint(
-        address delegatee,
-        uint256 nCheckpoints,
-        uint256 oldVotes,
-        uint256 newVotes
-    ) private {
-        uint32 timeStamp = uint32(block.timestamp);
-
-        unchecked {
-            if (
-                nCheckpoints != 0 &&
-                checkpoints[delegatee][nCheckpoints - 1].fromTimeStamp ==
-                timeStamp
-            ) {
-                checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
-            } else {
-                checkpoints[delegatee][nCheckpoints] = Checkpoint(
-                    timeStamp,
-                    newVotes
-                );
-                numCheckpoints[delegatee] = nCheckpoints + 1;
-            }
-        }
-
-        emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
     }
 
     /*******************
@@ -912,24 +797,11 @@ contract Baal is CloneFactory, Module {
     /// @notice Minting function for Baal `shares`.
     /// @param to Address to receive shares
     /// @param shares Amount to mint
+    // TODO sharestoken
+
     function _mintShares(address to, uint256 shares) private {
-        unchecked {
-            if (totalSupply + shares <= type(uint256).max / 2) {
-                /*If recipient is receiving their first shares, auto-self delegate*/
-                if (
-                    balanceOf[to] == 0 && numCheckpoints[to] == 0 && shares > 0
-                ) {
-                    delegates[to] = to;
-                }
-
-                balanceOf[to] += shares; /*add `shares` for `to` account*/
-                totalSupply += shares; /*add to total Baal `shares`*/
-
-                _moveDelegates(address(0), delegates[to], shares); /*update delegation*/
-
-                emit Transfer(address(0), to, shares); /*emit event reflecting mint of `shares` with erc20 accounting*/
-            }
-        }
+        sharesToken.mint(to, shares);
+        emit TransferShares(address(0), to, shares);
     }
 
     /// @notice Baal-or-manager-only function to burn shares.
@@ -948,15 +820,11 @@ contract Baal is CloneFactory, Module {
     /// @notice Burn function for Baal `shares`.
     /// @param from Address to lose shares
     /// @param shares Amount to burn
+    // TODO sharestoken
+
     function _burnShares(address from, uint256 shares) private {
-        balanceOf[from] -= shares; /*subtract `shares` for `from` account*/
-        unchecked {
-            totalSupply -= shares; /*subtract from total Baal `shares`*/
-        }
-
-        _moveDelegates(delegates[from], address(0), shares); /*update delegation*/
-
-        emit Transfer(from, address(0), shares); /*emit event reflecting burn of `shares` with erc20 accounting*/
+        sharesToken.burn(from, shares);
+        emit TransferShares(from, address(0), shares);
     }
 
     /// @notice Baal-or-manager-only function to mint loot.
@@ -1037,124 +905,8 @@ contract Baal is CloneFactory, Module {
     // **********************
     // ERC20 SHARES FUNCTIONS
     // **********************
+    // TODO sharestoken
 
-    /// @notice Approve `to` to transfer up to `amount`.
-    /// @param to Address to allow
-    /// @param amount Amount to allow `to` to spend
-    /// @return success Whether or not the approval succeeded.
-    function approve(address to, uint256 amount)
-        external
-        returns (bool success)
-    {
-        allowance[msg.sender][to] = amount; /*adjust `allowance`*/
-        emit Approval(msg.sender, to, amount); /*emit event reflecting approval*/
-        success = true; /*confirm approval with ERC-20 accounting*/
-    }
-
-    /// @notice Triggers an approval from `owner` to `spender` with EIP-712 signature.
-    /// @param owner The address to approve from.
-    /// @param spender The address to be approved.
-    /// @param amount The number of `shares` tokens that are approved (2^256-1 means infinite).
-    /// @param deadline The time at which to expire the signature.
-    /// @param signature Concatenated signature
-    function permit(
-        address owner,
-        address spender,
-        uint256 amount,
-        uint256 deadline,
-        bytes calldata signature
-    ) external {
-        bytes32 domainSeparator = keccak256(
-            abi.encode(
-                DOMAIN_TYPEHASH,
-                keccak256(bytes(name)),
-                block.chainid,
-                address(this)
-            )
-        ); /*calculate EIP-712 domain hash*/
-
-        unchecked {
-            bytes32 structHash = keccak256(
-                abi.encode(
-                    PERMIT_TYPEHASH,
-                    owner,
-                    spender,
-                    amount,
-                    nonces[owner]++,
-                    deadline
-                )
-            ); /*calculate EIP-712 struct hash*/
-            bytes32 digest = keccak256(
-                abi.encodePacked("\x19\x01", domainSeparator, structHash)
-            ); /*calculate EIP-712 digest for signature*/
-            address signatory = digest.recover(signature); /*recover signer from hash data*/
-            require(signatory != address(0), "!signatory"); /*check signer is not null*/
-            require(signatory == owner, "!authorized"); /*check signer is `owner`*/
-        }
-
-        require(block.timestamp <= deadline, "expired"); /*check signature is not expired*/
-        allowance[owner][spender] = amount; /*adjust `allowance`*/
-
-        emit Approval(owner, spender, amount); /*emit event reflecting approval*/
-    }
-
-    /// @notice Transfer `amount` tokens from user to `to`.
-    /// @param to The address of destination account.
-    /// @param amount The number of `shares` tokens to transfer.
-    /// @return success Whether or not the transfer succeeded.
-    function transfer(address to, uint256 amount)
-        external
-        returns (bool success)
-    {
-        require(!sharesPaused, "!transferable");
-        success = _transfer(msg.sender, to, amount);
-    }
-
-    /// @notice Transfer `amount` tokens from `from` to `to`.
-    /// @param from The address of the source account.
-    /// @param to The address of the destination account.
-    /// @param amount The number of `shares` tokens to transfer.
-    /// @return success Whether or not the transfer succeeded.
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) external returns (bool success) {
-        require(!sharesPaused, "!transferable");
-        if (allowance[from][msg.sender] != type(uint256).max) {
-            allowance[from][msg.sender] -= amount;
-        }
-
-        success = _transfer(from, to, amount);
-    }
-
-    /// @notice Transfer `amount` tokens from `from` to `to`.
-    /// @param from The address of the source account.
-    /// @param to The address of the destination account.
-    /// @param amount The number of `shares` tokens to transfer.
-    /// @return success Whether or not the transfer succeeded.
-    function _transfer(
-        address from,
-        address to,
-        uint256 amount
-    ) private returns (bool success) {
-        balanceOf[from] -= amount;
-
-        /*If recipient is receiving their first shares, auto-self delegate*/
-        if (balanceOf[to] == 0 && numCheckpoints[to] == 0 && amount > 0) {
-            delegates[to] = to;
-        }
-
-        unchecked {
-            balanceOf[to] += amount;
-        }
-
-        _moveDelegates(delegates[from], delegates[to], amount);
-
-        emit Transfer(from, to, amount);
-
-        success = true;
-    }
 
     /***************
     GETTER FUNCTIONS
@@ -1209,15 +961,16 @@ contract Baal is CloneFactory, Module {
     /// @notice Returns the current delegated `vote` balance for `account`.
     /// @param account The user to check delegated `votes` for.
     /// @return votes Current `votes` delegated to `account`.
+    // TODO: shares token
     function getCurrentVotes(address account)
         public
         view
         returns (uint256 votes)
     {
-        uint256 nCheckpoints = numCheckpoints[account]; /*Get most recent checkpoint, or 0 if no checkpoints*/
+        uint256 nCheckpoints = sharesToken.numCheckpoints(account); /*Get most recent checkpoint, or 0 if no checkpoints*/
         unchecked {
             votes = nCheckpoints != 0
-                ? checkpoints[account][nCheckpoints - 1].votes
+                ? sharesToken.checkpoints(account, nCheckpoints - 1).votes
                 : 0;
         }
     }
@@ -1226,6 +979,8 @@ contract Baal is CloneFactory, Module {
     /// @param account The user to check `votes` for.
     /// @param timeStamp The unix time to check `votes` for.
     /// @return votes Prior `votes` delegated to `account`.
+    // TODO sharestoken
+
     function getPriorVotes(address account, uint256 timeStamp)
         public
         view
@@ -1233,26 +988,26 @@ contract Baal is CloneFactory, Module {
     {
         require(timeStamp < block.timestamp, "!determined"); /* Prior votes must be in the past*/
 
-        uint256 nCheckpoints = numCheckpoints[account];
+        uint256 nCheckpoints = sharesToken.numCheckpoints(account);
         if (nCheckpoints == 0) return 0;
 
         unchecked {
             if (
-                checkpoints[account][nCheckpoints - 1].fromTimeStamp <=
+                sharesToken.checkpoints(account, nCheckpoints - 1).fromTimeStamp <=
                 timeStamp
-            ) return checkpoints[account][nCheckpoints - 1].votes; /* If most recent checkpoint is at or after desired timestamp, return*/
-            if (checkpoints[account][0].fromTimeStamp > timeStamp) return 0;
+            ) return sharesToken.checkpoints(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
+            if (sharesToken.checkpoints(account, 0).fromTimeStamp > timeStamp) return 0;
             uint256 lower = 0;
             uint256 upper = nCheckpoints - 1;
             while (upper > lower) {
                 /* Binary search to look for highest timestamp before desired timestamp*/
                 uint256 center = upper - (upper - lower) / 2;
-                Checkpoint memory cp = checkpoints[account][center];
+                ISharesLoot.Checkpoint memory cp = sharesToken.checkpoints(account, center);
                 if (cp.fromTimeStamp == timeStamp) return cp.votes;
                 else if (cp.fromTimeStamp < timeStamp) lower = center;
                 else upper = center - 1;
             }
-            votes = checkpoints[account][lower].votes;
+            votes = sharesToken.checkpoints(account, lower).votes;
         }
     }
 
@@ -1289,6 +1044,11 @@ contract Baal is CloneFactory, Module {
     /// @notice Helper to check total supply of child loot contract
     function totalLoot() public view returns (uint256) {
         return lootToken.totalSupply();
+    }
+
+    /// @notice Helper to check total supply of child shares contract
+    function totalShares() public view returns (uint256) {
+        return sharesToken.totalSupply();
     }
 
     /***************
@@ -1354,7 +1114,8 @@ contract BaalSummoner is ModuleProxyFactory {
     event SummonBaal(
         address indexed baal,
         address indexed loot,
-        address indexed safe
+        address indexed shares,
+        address safe
     );
 
     constructor(
@@ -1400,6 +1161,7 @@ contract BaalSummoner is ModuleProxyFactory {
         emit SummonBaal(
             address(_baal),
             address(_baal.lootToken()),
+            address(_baal.sharesToken()),
             address(_safe)
         );
 
@@ -1415,10 +1177,11 @@ contract BaalSummoner is ModuleProxyFactory {
             string memory _name, /*_name Name for erc20 `shares` accounting*/
             string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting*/
             address _lootSingleton, /*template contract to clone for loot ERC20 token*/
+            address _sharesSingleton, /*template contract to clone for loot ERC20 token*/
             address _multisendLibrary /*address of multisend library*/
         ) = abi.decode(
                 initializationParams,
-                (string, string, address, address)
+                (string, string, address, address, address)
             );
 
         // Deploy new safe but do not set it up yet
@@ -1476,6 +1239,7 @@ contract BaalSummoner is ModuleProxyFactory {
             _name,
             _symbol,
             _lootSingleton,
+            _sharesSingleton,
             _multisendLibrary,
             address(_safe),
             _initializationMultisendData
@@ -1486,6 +1250,7 @@ contract BaalSummoner is ModuleProxyFactory {
         emit SummonBaal(
             address(_baal),
             address(_baal.lootToken()),
+            address(_baal.sharesToken()),
             address(_safe)
         );
 
