@@ -297,6 +297,7 @@ contract Baal is CloneFactory, Module {
         __Ownable_init();
         transferOwnership(_avatar);
 
+        // TODO: can remove to token
         name = _name; /*initialize Baal `name` with erc20 accounting*/
         symbol = _symbol; /*initialize Baal `symbol` with erc20 accounting*/
 
