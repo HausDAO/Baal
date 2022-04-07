@@ -11,6 +11,7 @@ import { CompatibilityFallbackHandler } from '../src/types/CompatibilityFallback
 import { GnosisSafeProxy } from '../src/types/GnosisSafeProxy'
 import { TestErc20 } from '../src/types/TestErc20'
 import { Loot } from '../src/types/Loot'
+import { Shares } from '../src/types/Shares'
 import { decodeMultiAction, encodeMultiAction, hashOperation } from '../src/util'
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import { buildContractCall } from '@gnosis.pm/safe-contracts'
@@ -32,6 +33,7 @@ use(solidity)
 const revertMessages = {
   molochAlreadyInitialized: 'Initializable: contract is already initialized',
   lootAlreadyInitialized: 'Initializable: contract is already initialized',
+  sharesAlreadyInitialized: 'Initializable: contract is already initialized',
   molochSetupSharesNoShares: 'shares != 0',
   submitProposalExpired: 'expired',
   submitProposalOffering: 'Baal requires an offering',
@@ -122,6 +124,7 @@ const getBaalParams = async function (
   baal: Baal,
   multisend: MultiSend,
   lootSingleton: Loot,
+  sharesSingleton: Shares,
   poster: Poster,
   config: {
     PROPOSAL_OFFERING: any
@@ -173,21 +176,21 @@ const getBaalParams = async function (
   // )
   return {
     initParams: abiCoder.encode(
-      ['string', 'string', 'address', 'address'],
-      [config.TOKEN_NAME, config.TOKEN_SYMBOL, lootSingleton.address, multisend.address]
+      ['string', 'string', 'address', 'address', 'address'],
+      [config.TOKEN_NAME, config.TOKEN_SYMBOL, lootSingleton.address, sharesSingleton.address, multisend.address]
     ),
     initalizationActions,
   }
 }
 
-const getNewBaalAddresses = async (tx: ContractTransaction): Promise<{ baal: string; loot: string; safe: string }> => {
+const getNewBaalAddresses = async (tx: ContractTransaction): Promise<{ baal: string; loot: string; shares: string; safe: string }> => {
   const receipt = await ethers.provider.getTransactionReceipt(tx.hash)
   // console.log({logs: receipt.logs})
-  let baalSummonAbi = ['event SummonBaal(address indexed baal, address indexed loot, address indexed safe)']
+  let baalSummonAbi = ['event SummonBaal(address indexed baal, address indexed loot, address indexed shares, address safe)']
   let iface = new ethers.utils.Interface(baalSummonAbi)
   let log = iface.parseLog(receipt.logs[receipt.logs.length - 1])
-  const { baal, loot, safe } = log.args
-  return { baal, loot, safe }
+  const { baal, loot, shares, safe } = log.args
+  return { baal, loot, shares, safe }
 }
 
 const verifyProposal = function (prop1: any, prop2: any, overrides?: any) {
@@ -222,11 +225,15 @@ describe('Baal contract', function () {
   let baalAsShaman: Baal
   let baalSummoner: BaalSummoner
   let poster: Poster
+  let sharesSingleton: Shares
+  let SharesFactory: ContractFactory
   let lootSingleton: Loot
   let LootFactory: ContractFactory
   let BaalFactory: ContractFactory
   let Poster: ContractFactory
   let ERC20: ContractFactory
+  let sharesToken: Shares
+  let shamanSharesToken: Shares
   let lootToken: Loot
   let shamanLootToken: Loot
   let shamanBaal: Baal
@@ -286,6 +293,8 @@ describe('Baal contract', function () {
   this.beforeAll(async function () {
     LootFactory = await ethers.getContractFactory('Loot')
     lootSingleton = (await LootFactory.deploy()) as Loot
+    SharesFactory = await ethers.getContractFactory('Shares')
+    sharesSingleton = (await SharesFactory.deploy()) as Shares
     BaalFactory = await ethers.getContractFactory('Baal')
     baalSingleton = (await BaalFactory.deploy()) as Baal
     Poster = await ethers.getContractFactory('Poster')
@@ -321,6 +330,7 @@ describe('Baal contract', function () {
       baalSingleton,
       multisend,
       lootSingleton,
+      sharesSingleton,
       poster,
       deploymentConfig,
       [metadataConfig.CONTENT, metadataConfig.TAG],
@@ -350,6 +360,9 @@ describe('Baal contract', function () {
     lootToken = LootFactory.attach(addresses.loot) as Loot
     shamanLootToken = lootToken.connect(shaman)
 
+    sharesToken = SharesFactory.attach(addresses.shares) as Shares
+    shamanSharesToken = sharesToken.connect(shaman)
+
     const selfTransferAction = encodeMultiAction(multisend, ['0x'], [gnosisSafe.address], [BigNumber.from(0)], [0])
 
     proposal = {
@@ -363,7 +376,7 @@ describe('Baal contract', function () {
     baalAsShaman = baal.connect(signingShaman)
   })
 
-  describe('constructor', function () {
+  describe.only('constructor', function () {
     it('verify deployment parameters', async function () {
       const now = await blockTime()
 
@@ -397,6 +410,9 @@ describe('Baal contract', function () {
       const summonerLoot = await lootToken.balanceOf(summoner.address)
       expect(summonerLoot).to.equal(loot)
 
+      const summonerShares = await sharesToken.balanceOf(summoner.address)
+      expect(summonerShares).to.equal(Shares)
+
       const summonerVotes = await baal.getCurrentVotes(summoner.address)
       expect(summonerVotes).to.equal(100)
 
@@ -407,6 +423,9 @@ describe('Baal contract', function () {
 
       const totalLoot = await baal.totalLoot()
       expect(totalLoot).to.equal(500)
+      // Shares
+      const totalShares = await baal.totalShares()
+      expect(totalShares).to.equal(500)
 
       const avatar = await baal.avatar()
       const target = await baal.target()
@@ -2353,6 +2372,10 @@ describe('Baal contract - tribute required', function () {
   let LootFactory: ContractFactory
   let lootToken: Loot
 
+  let sharesSingleton: Shares
+  let SharesFactory: ContractFactory
+  let sharesToken: Shares
+
   let gnosisSafeSingleton: GnosisSafe
 
   let applicant: SignerWithAddress
@@ -2371,6 +2394,8 @@ describe('Baal contract - tribute required', function () {
   this.beforeAll(async function () {
     LootFactory = await ethers.getContractFactory('Loot')
     lootSingleton = (await LootFactory.deploy()) as Loot
+    SharesFactory = await ethers.getContractFactory('Shares')
+    sharesSingleton = (await SharesFactory.deploy()) as Shares
     BaalFactory = await ethers.getContractFactory('Baal')
     baalSingleton = (await BaalFactory.deploy()) as Baal
     Poster = await ethers.getContractFactory('Poster')
@@ -2398,6 +2423,7 @@ describe('Baal contract - tribute required', function () {
       baalSingleton,
       multisend,
       lootSingleton,
+      sharesSingleton,
       poster,
       customConfig,
       [metadataConfig.CONTENT, metadataConfig.TAG],
@@ -2415,6 +2441,10 @@ describe('Baal contract - tribute required', function () {
     const lootTokenAddress = await baal.lootToken()
 
     lootToken = LootFactory.attach(lootTokenAddress) as Loot
+
+    const sharesTokenAddress = await baal.sharesToken()
+
+    sharesToken = SharesFactory.attach(sharesTokenAddress) as Shares
 
     const selfTransferAction = encodeMultiAction(multisend, ['0x'], [baal.address], [BigNumber.from(0)], [0])
 
@@ -2491,6 +2521,11 @@ describe('Baal contract - no shares minted - fails', function () {
   let lootSingleton: Loot
   let LootFactory: ContractFactory
   let lootToken: Loot
+
+  let sharesSingleton: Shares
+  let SharesFactory: ContractFactory
+  let sharesToken: Shares
+
   let gnosisSafeSingleton: GnosisSafe
 
   let applicant: SignerWithAddress
@@ -2507,6 +2542,8 @@ describe('Baal contract - no shares minted - fails', function () {
   this.beforeAll(async function () {
     LootFactory = await ethers.getContractFactory('Loot')
     lootSingleton = (await LootFactory.deploy()) as Loot
+    SharesFactory = await ethers.getContractFactory('Shares')
+    sharesSingleton = (await SharesFactory.deploy()) as Shares
     const BaalFactory = await ethers.getContractFactory('Baal')
     baalSingleton = (await BaalFactory.deploy()) as Baal
     Poster = await ethers.getContractFactory('Poster')
@@ -2535,6 +2572,7 @@ describe('Baal contract - no shares minted - fails', function () {
       baalSingleton,
       multisend,
       lootSingleton,
+      sharesSingleton,
       poster,
       customConfig,
       [metadataConfig.CONTENT, metadataConfig.TAG],
