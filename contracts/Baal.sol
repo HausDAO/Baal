@@ -464,7 +464,6 @@ contract Baal is CloneFactory, Module {
     /// @param id Number of proposal in `proposals` mapping to cast vote on.
     /// @param approved If 'true', member will cast `yesVotes` onto proposal - if 'false', `noVotes` will be counted.
     /// @param signature Concatenated signature
-    // TODO sharestoken
     function submitVoteWithSig(
         uint32 id,
         bool approved,
@@ -493,8 +492,6 @@ contract Baal is CloneFactory, Module {
     /// @param voter Address of voter
     /// @param id Number of proposal in `proposals` mapping to cast vote on.
     /// @param approved If 'true', member will cast `yesVotes` onto proposal - if 'false', `noVotes` will be counted.
-    // TODO sharestoken
-
     function _submitVote(
         address voter,
         uint32 id,
@@ -670,8 +667,6 @@ contract Baal is CloneFactory, Module {
     /// @param lootToBurn Baal pure economic weight to burn.
     /// @param sharesToBurn Baal voting weight to burn.
     /// @param tokens Array of tokens to include in rage quit calculation
-    // TODO sharestoken
-
     function _ragequit(
         address to,
         uint256 sharesToBurn,
@@ -798,8 +793,6 @@ contract Baal is CloneFactory, Module {
     /// @notice Minting function for Baal `shares`.
     /// @param to Address to receive shares
     /// @param shares Amount to mint
-    // TODO sharestoken
-
     function _mintShares(address to, uint256 shares) private {
         sharesToken.mint(to, shares);
         emit TransferShares(address(0), to, shares);
@@ -821,8 +814,6 @@ contract Baal is CloneFactory, Module {
     /// @notice Burn function for Baal `shares`.
     /// @param from Address to lose shares
     /// @param shares Amount to burn
-    // TODO sharestoken
-
     function _burnShares(address from, uint256 shares) private {
         sharesToken.burn(from, shares);
         emit TransferShares(from, address(0), shares);
@@ -903,12 +894,6 @@ contract Baal is CloneFactory, Module {
         );
     }
 
-    // **********************
-    // ERC20 SHARES FUNCTIONS
-    // **********************
-    // TODO sharestoken
-
-
     /***************
     GETTER FUNCTIONS
     ***************/
@@ -980,8 +965,6 @@ contract Baal is CloneFactory, Module {
     /// @param account The user to check `votes` for.
     /// @param timeStamp The unix time to check `votes` for.
     /// @return votes Prior `votes` delegated to `account`.
-    // TODO sharestoken
-
     function getPriorVotes(address account, uint256 timeStamp)
         public
         view
