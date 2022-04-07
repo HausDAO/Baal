@@ -295,7 +295,7 @@ contract Shares is ERC20, Initializable {
                 if (srcRep != address(0)) {
                     uint256 srcRepNum = numCheckpoints[srcRep];
                     uint256 srcRepOld = srcRepNum != 0
-                        ? checkpoints[srcRep][srcRepNum - 1].votes
+                        ? getCheckpoint(srcRep,srcRepNum - 1).votes
                         : 0;
                     uint256 srcRepNew = srcRepOld - amount;
                     _writeCheckpoint(srcRep, srcRepNum, srcRepOld, srcRepNew);
@@ -304,7 +304,7 @@ contract Shares is ERC20, Initializable {
                 if (dstRep != address(0)) {
                     uint256 dstRepNum = numCheckpoints[dstRep];
                     uint256 dstRepOld = dstRepNum != 0
-                        ? checkpoints[dstRep][dstRepNum - 1].votes
+                        ? getCheckpoint(dstRep,dstRepNum - 1).votes
                         : 0;
                     uint256 dstRepNew = dstRepOld + amount;
                     _writeCheckpoint(dstRep, dstRepNum, dstRepOld, dstRepNew);
@@ -329,10 +329,10 @@ contract Shares is ERC20, Initializable {
         unchecked {
             if (
                 nCheckpoints != 0 &&
-                checkpoints[delegatee][nCheckpoints - 1].fromTimeStamp ==
+                getCheckpoint(delegatee, nCheckpoints - 1).fromTimeStamp ==
                 timeStamp
             ) {
-                checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+                getCheckpoint(delegatee, nCheckpoints - 1).votes = newVotes;
             } else {
                 checkpoints[delegatee][nCheckpoints] = Checkpoint(
                     timeStamp,
@@ -343,6 +343,11 @@ contract Shares is ERC20, Initializable {
         }
 
         emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
+    }
+
+
+    function getCheckpoint(address delegatee, uint256 nCheckpoints) public view returns(Checkpoint memory) {
+        return checkpoints[delegatee][nCheckpoints]; 
     }
 }
 

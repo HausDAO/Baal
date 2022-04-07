@@ -36,7 +36,7 @@ interface ISharesLoot {
 
     function numCheckpoints(address) external view returns (uint256);
 
-    function checkpoints(address, uint256) external view returns (Checkpoint memory);
+    function getCheckpoint(address, uint256) external view returns (Checkpoint memory);
 }
 
 contract CloneFactory {
@@ -970,7 +970,7 @@ contract Baal is CloneFactory, Module {
         uint256 nCheckpoints = sharesToken.numCheckpoints(account); /*Get most recent checkpoint, or 0 if no checkpoints*/
         unchecked {
             votes = nCheckpoints != 0
-                ? sharesToken.checkpoints(account, nCheckpoints - 1).votes
+                ? sharesToken.getCheckpoint(account, nCheckpoints - 1).votes
                 : 0;
         }
     }
@@ -993,21 +993,21 @@ contract Baal is CloneFactory, Module {
 
         unchecked {
             if (
-                sharesToken.checkpoints(account, nCheckpoints - 1).fromTimeStamp <=
+                sharesToken.getCheckpoint(account, nCheckpoints - 1).fromTimeStamp <=
                 timeStamp
-            ) return sharesToken.checkpoints(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
-            if (sharesToken.checkpoints(account, 0).fromTimeStamp > timeStamp) return 0;
+            ) return sharesToken.getCheckpoint(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
+            if (sharesToken.getCheckpoint(account, 0).fromTimeStamp > timeStamp) return 0;
             uint256 lower = 0;
             uint256 upper = nCheckpoints - 1;
             while (upper > lower) {
                 /* Binary search to look for highest timestamp before desired timestamp*/
                 uint256 center = upper - (upper - lower) / 2;
-                ISharesLoot.Checkpoint memory cp = sharesToken.checkpoints(account, center);
+                ISharesLoot.Checkpoint memory cp = sharesToken.getCheckpoint(account, center);
                 if (cp.fromTimeStamp == timeStamp) return cp.votes;
                 else if (cp.fromTimeStamp < timeStamp) lower = center;
                 else upper = center - 1;
             }
-            votes = sharesToken.checkpoints(account, lower).votes;
+            votes = sharesToken.getCheckpoint(account, lower).votes;
         }
     }
 
