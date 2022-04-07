@@ -10,7 +10,10 @@ import { GnosisSafe } from '../src/types/GnosisSafe'
 import { CompatibilityFallbackHandler } from '../src/types/CompatibilityFallbackHandler'
 import { GnosisSafeProxy } from '../src/types/GnosisSafeProxy'
 import { TestErc20 } from '../src/types/TestErc20'
+// import { TestErc20 as Loot } from '../src/types/TestErc20'
+// import { TestErc20 as Shares } from '../src/types/TestErc20'
 import { Loot } from '../src/types/Loot'
+// import { Loot as Shares } from '../src/types/Loot'
 import { Shares } from '../src/types/Shares'
 import { decodeMultiAction, encodeMultiAction, hashOperation } from '../src/util'
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
@@ -23,6 +26,7 @@ import signVote from '../src/signVote'
 import signDelegation from '../src/signDelegation'
 import signPermit from '../src/signPermit'
 import { string } from 'hardhat/internal/core/params/argumentTypes'
+
 
 use(solidity)
 
