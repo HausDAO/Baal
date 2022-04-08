@@ -1286,7 +1286,7 @@ describe('Baal contract', function () {
     })
   })
 
-  describe.only('erc20 shares - transfer', function () {
+  describe('erc20 shares - transfer', function () {
     it('transfer to first time recipient - auto self delegates', async function () {
       const beforeTransferTimestamp = await blockTime()
       
@@ -1412,14 +1412,14 @@ describe('Baal contract', function () {
   describe('erc20 shares - transferFrom', function () {
     it('transfer to first time recipient', async function () {
       const beforeTransferTimestamp = await blockTime()
-      await baal.approve(shaman.address, deploymentConfig.SPONSOR_THRESHOLD)
+      await sharesToken.approve(shaman.address, deploymentConfig.SPONSOR_THRESHOLD)
 
-      const allowanceBefore = await baal.allowance(summoner.address, shaman.address)
+      const allowanceBefore = await sharesToken.allowance(summoner.address, shaman.address)
       expect(allowanceBefore).to.equal(1)
 
-      await shamanBaal.transferFrom(summoner.address, shaman.address, deploymentConfig.SPONSOR_THRESHOLD)
+      await shamanSharesToken.transferFrom(summoner.address, shaman.address, deploymentConfig.SPONSOR_THRESHOLD)
 
-      const allowanceAfter = await baal.allowance(summoner.address, shaman.address)
+      const allowanceAfter = await sharesToken.allowance(summoner.address, shaman.address)
       expect(allowanceAfter).to.equal(0)
 
       const afterTransferTimestamp = await blockTime()
@@ -1448,15 +1448,15 @@ describe('Baal contract', function () {
 
     it('require fails - shares paused', async function () {
       await shamanBaal.setAdminConfig(true, false) // pause shares
-      await baal.approve(shaman.address, deploymentConfig.SPONSOR_THRESHOLD)
-      expect(baal.transferFrom(summoner.address, shaman.address, deploymentConfig.SPONSOR_THRESHOLD)).to.be.revertedWith(
+      await sharesToken.approve(shaman.address, deploymentConfig.SPONSOR_THRESHOLD)
+      expect(sharesToken.transferFrom(summoner.address, shaman.address, deploymentConfig.SPONSOR_THRESHOLD)).to.be.revertedWith(
         revertMessages.sharesTransferPaused
       )
     })
 
     it('require fails - insufficeint approval', async function () {
-      await baal.approve(shaman.address, 1)
-      expect(baal.transferFrom(summoner.address, shaman.address, 2)).to.be.revertedWith(revertMessages.sharesInsufficientApproval)
+      await sharesToken.approve(shaman.address, 1)
+      expect(sharesToken.transferFrom(summoner.address, shaman.address, 2)).to.be.revertedWith(revertMessages.sharesInsufficientApproval)
     })
   })
 
@@ -1761,7 +1761,7 @@ describe('Baal contract', function () {
   describe('delegateBySig', function () {
     it('happy case ', async function () {
       await baal.submitProposal(proposal.data, proposal.expiration, ethers.utils.id(proposal.details))
-      const signature = await signDelegation(chainId, baal.address, summoner, deploymentConfig.TOKEN_NAME, shaman.address, 0, 0)
+      const signature = await signDelegation(chainId, sharesToken.address, summoner, deploymentConfig.TOKEN_NAME, shaman.address, 0, 0)
       console.log(summoner.address)
       await shamanSharesToken.delegateBySig(shaman.address, 0, 0, signature)
       const summonerDelegate = await sharesToken.delegates(summoner.address)
@@ -1770,7 +1770,7 @@ describe('Baal contract', function () {
 
     it('require fail - nonce is re-used', async function () {
       await baal.submitProposal(proposal.data, proposal.expiration, ethers.utils.id(proposal.details))
-      const signature = await signDelegation(chainId, baal.address, summoner, deploymentConfig.TOKEN_NAME, shaman.address, 0, 0)
+      const signature = await signDelegation(chainId, sharesToken.address, summoner, deploymentConfig.TOKEN_NAME, shaman.address, 0, 0)
       console.log(summoner.address)
       await shamanSharesToken.delegateBySig(shaman.address, 0, 0, signature)
       expect(shamanSharesToken.delegateBySig(shaman.address, 0, 0, signature)).to.be.revertedWith('!nonce')
