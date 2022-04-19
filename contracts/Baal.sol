@@ -33,6 +33,8 @@ interface ISharesLoot {
     function balanceOf(address account) external view returns (uint256);
 
     function totalSupply() external view returns (uint256);
+    
+    function nameAndSymbol() external view returns (string name, string symbol);
 
     function numCheckpoints(address) external view returns (uint256);
 
@@ -67,8 +69,6 @@ contract Baal is CloneFactory, Module {
     // ERC20 SHARES + LOOT
     // uint8 public constant decimals = 18; /*unit scaling factor in erc20 `shares` accounting - '18' is default to match ETH & common erc20s*/
     // uint256 public totalSupply; /*counter for total `members` voting `shares` with erc20 accounting*/
-    string public name; /*'name' for erc20 `shares` accounting*/
-    string public symbol; /*'symbol' for erc20 `shares` accounting*/
     ISharesLoot public lootToken; /*Sub ERC20 for loot mgmt*/
     ISharesLoot public sharesToken; /*Sub ERC20 for loot mgmt*/
     mapping(address => mapping(address => uint256)) public allowance; /*maps approved pulls of `shares` with erc20 accounting*/
@@ -250,18 +250,6 @@ contract Baal is CloneFactory, Module {
         address indexed spender,
         uint256 amount
     ); /*emits when Baal `shares` are approved for pulls with erc20 accounting*/
-    event Transfer(address indexed from, address indexed to, uint256 amount); /*emits when Baal `shares` are minted, burned or transferred with erc20 accounting*/
-    event TransferLoot(
-        address indexed from,
-        address indexed to,
-        uint256 amount
-    ); /*emits when Baal `loot` is minted, burned or transferred*/
-    event TransferShares(
-        address indexed from,
-        address indexed to,
-        uint256 amount
-    ); /*emits when Baal `loot` is minted, burned or transferred*/
-
     event ShamanSet(address indexed shaman, uint256 permission); /*emits when a shaman permission changes*/
     event GovernanceConfigSet(
         uint32 voting,
@@ -795,7 +783,6 @@ contract Baal is CloneFactory, Module {
     /// @param shares Amount to mint
     function _mintShares(address to, uint256 shares) private {
         sharesToken.mint(to, shares);
-        emit TransferShares(address(0), to, shares);
     }
 
     /// @notice Baal-or-manager-only function to burn shares.
@@ -816,7 +803,6 @@ contract Baal is CloneFactory, Module {
     /// @param shares Amount to burn
     function _burnShares(address from, uint256 shares) private {
         sharesToken.burn(from, shares);
-        emit TransferShares(from, address(0), shares);
     }
 
     /// @notice Baal-or-manager-only function to mint loot.
@@ -837,7 +823,6 @@ contract Baal is CloneFactory, Module {
     /// @param loot Amount to mint
     function _mintLoot(address to, uint256 loot) private {
         lootToken.mint(to, loot);
-        emit TransferLoot(address(0), to, loot); /*emit event reflecting mint of `loot`*/
     }
 
     /// @notice Baal-or-manager-only function to burn loot.
@@ -858,7 +843,6 @@ contract Baal is CloneFactory, Module {
     /// @param loot Amount to burn
     function _burnLoot(address from, uint256 loot) private {
         lootToken.burn(from, loot);
-        emit TransferLoot(from, address(0), loot); /*emit event reflecting burn of `loot`*/
     }
 
     /// @notice Baal-or-governance-only function to change periods.
@@ -1035,6 +1019,10 @@ contract Baal is CloneFactory, Module {
         return sharesToken.totalSupply();
     }
 
+    function getNameSymbol() external view returns (string, string){
+        return sharesToken.nameAndSymbol();
+    }
+    
     /***************
     HELPER FUNCTIONS
     ***************/
