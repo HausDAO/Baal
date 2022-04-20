@@ -34,7 +34,7 @@ interface ISharesLoot {
 
     function totalSupply() external view returns (uint256);
     
-    function nameAndSymbol() external view returns (string name, string symbol);
+    function nameAndSymbol() external view returns (string memory name, string memory symbol);
 
     function numCheckpoints(address) external view returns (uint256);
 
@@ -205,8 +205,6 @@ contract Baal is CloneFactory, Module {
         uint256 quorumPercent,
         uint256 sponsorThreshold,
         uint256 minRetentionPercent,
-        string name,
-        string symbol,
         uint256 totalShares,
         uint256 totalLoot
     ); /*emits after Baal summoning*/
@@ -370,6 +368,10 @@ contract Baal is CloneFactory, Module {
             proposalCount++; /*increment proposal counter*/
             proposals[proposalCount] = Proposal( /*push params into proposal struct - start voting period timer if member submission*/
                 proposalCount,
+                0,
+                0,
+                0,
+                0,
                 expiration,
                 0, /* yes votes */
                 0, /* no votes */
@@ -445,7 +447,7 @@ contract Baal is CloneFactory, Module {
         bool approved,
         bytes calldata signature
     ) external nonReentrant {
-        (string name,) = getNameSymbol();
+        (string memory name,) = getNameSymbol();
         bytes32 domainSeparator = keccak256(
             abi.encode(
                 DOMAIN_TYPEHASH,
@@ -1008,7 +1010,7 @@ contract Baal is CloneFactory, Module {
         return sharesToken.totalSupply();
     }
 
-    function getNameSymbol() public view returns (string, string){
+    function getNameSymbol() public view returns (string memory, string memory){
         return sharesToken.nameAndSymbol();
     }
 
