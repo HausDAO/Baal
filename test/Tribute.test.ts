@@ -303,7 +303,7 @@ describe('Tribute proposal type', function () {
       )
       // const encodedProposal = encodeMultiAction(multisend, [mintShares], [baal.address], [BigNumber.from(0)], [0])
 
-      await baal.submitProposal(encodedProposal, proposal.expiration, ethers.utils.id(proposal.details))
+      await baal.submitProposal(encodedProposal, proposal.expiration, 0, ethers.utils.id(proposal.details))
       await baal.submitVote(1, yes)
       await moveForwardPeriods(2)
       await baal.processProposal(1, encodedProposal)
@@ -330,8 +330,8 @@ describe('Tribute proposal type', function () {
       const maliciousProposal = encodeMultiAction(multisend, [sendTribute], [weth.address], [BigNumber.from(0)], [0])
       // const encodedProposal = encodeMultiAction(multisend, [mintShares], [baal.address], [BigNumber.from(0)], [0])
 
-      await baal.submitProposal(encodedProposal, proposal.expiration, ethers.utils.id(proposal.details))
-      await baal.submitProposal(maliciousProposal, proposal.expiration, ethers.utils.id(proposal.details))
+      await baal.submitProposal(encodedProposal, proposal.expiration, 0, ethers.utils.id(proposal.details))
+      await baal.submitProposal(maliciousProposal, proposal.expiration, 0, ethers.utils.id(proposal.details))
       await baal.submitVote(1, no)
       await baal.submitVote(2, yes)
       await moveForwardPeriods(2)

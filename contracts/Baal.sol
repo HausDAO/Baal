@@ -141,6 +141,7 @@ contract Baal is CloneFactory, Module {
         uint32 votingStarts; /*starting time for proposal in seconds since unix epoch*/
         uint32 votingEnds; /*termination date for proposal in seconds since unix epoch - derived from `votingPeriod` set on proposal*/
         uint32 graceEnds; /*termination date for proposal in seconds since unix epoch - derived from `gracePeriod` set on proposal*/
+        uint32 baalGas; /* gas needed to process proposal */
         uint32 expiration; /*timestamp after which proposal should be considered invalid and skipped. */
         uint256 yesVotes; /*counter for `members` `approved` 'votes' to calculate approval on processing*/
         uint256 noVotes; /*counter for `members` 'dis-approved' 'votes' to calculate approval on processing*/
@@ -368,6 +369,7 @@ contract Baal is CloneFactory, Module {
     function submitProposal(
         bytes calldata proposalData,
         uint32 expiration,
+        uint32 baalGas,
         string calldata details
     ) external payable nonReentrant returns (uint256) {
         require(
@@ -399,6 +401,7 @@ contract Baal is CloneFactory, Module {
                     ? uint32(block.timestamp) + votingPeriod + gracePeriod
                     : 0, /* graceEnds */
                 expiration,
+                baalGas,
                 0, /* yes votes */
                 0, /* no votes */
                 0, /* highestMaxSharesAndLootAtYesVote */
@@ -558,6 +561,9 @@ contract Baal is CloneFactory, Module {
             hashOperation(proposalData) == prop.proposalDataHash,
             "incorrect calldata"
         );
+
+        require(prop.baalGas == 0 || gasleft() >= prop.baalGas, "not enough gas");
+
 
         prop.status[1] = true; /*Set processed flag to true*/
         bool okToExecute = true; /*Initialize and invalidate if conditions are not met below*/
