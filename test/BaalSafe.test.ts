@@ -17,7 +17,7 @@ import { decodeMultiAction, encodeMultiAction, hashOperation } from '../src/util
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
 import { buildContractCall } from '@gnosis.pm/safe-contracts'
 import { MultiSend } from '../src/types/MultiSend'
-import { ContractFactory, ContractTransaction, utils } from 'ethers'
+import { ContractFactory, ContractTransaction, providers, utils } from 'ethers'
 import { ConfigExtender } from 'hardhat/types'
 import { Test } from 'mocha'
 import signVote from '../src/signVote'
@@ -340,11 +340,9 @@ describe('Baal contract', function () {
     const tx = await baalSummoner.summonBaalAndSafe(encodedInitParams.initParams, encodedInitParams.initalizationActions, 101)
     const addresses = await getNewBaalAddresses(tx)
 
-    // console.log('addresses', addresses);
-    
 
     baal = BaalFactory.attach(addresses.baal) as Baal
-    gnosisSafe = BaalFactory.attach(addresses.safe) as GnosisSafe
+    gnosisSafe = GnosisSafe.attach(addresses.safe) as GnosisSafe
 
     shamanBaal = baal.connect(shaman) // needed to send txns to baal as the shaman
     applicantBaal = baal.connect(applicant) // needed to send txns to baal as the shaman
@@ -1582,7 +1580,7 @@ describe('Baal contract', function () {
     // })
   })
 
-  describe.only('sponsorProposal', function () {
+  describe('sponsorProposal', function () {
     it('happy case', async function () {
       await shamanBaal.submitProposal(proposal.data, proposal.expiration, proposal.baalGas, ethers.utils.id(proposal.details))
 
@@ -1781,7 +1779,17 @@ describe('Baal contract', function () {
   })
 
   describe('processProposal', function () {
-    it('happy case yes wins', async function () {
+    it.only('happy case yes wins', async function () {
+      console.log(gnosisSafe.address)
+      console.log(await gnosisSafe.getOwners())
+      const tx = await gnosisSafe.populateTransaction.requiredTxGas(multisend.address, 0, proposal.data, 1, {gasLimit: 2000000})
+      const res = await ethers.provider.call(tx)
+      console.log({res})
+      // await expect(gnosisSafe.callStatic.requiredTxGas(multisend.address, 0, proposal.data, 1)).to.be.revertedWith('not this')
+      // const baalGas = await gnosisSafe.requiredTxGas(multisend.address, 0, proposal.data, 1)
+      // const baalGas = await gnosisSafe.callStatic.requiredTxGas(multisend.address, 0, proposal.data, 1)
+      // const baalGas = await gnosisSafe.callStatic(['requiredTxGas', [multisend.address, 0, proposal.data, 1])
+      // console.log({baalGas})
       await baal.submitProposal(proposal.data, proposal.expiration, proposal.baalGas, ethers.utils.id(proposal.details))
       await baal.submitVote(1, yes)
       const beforeProcessed = await baal.proposals(1)
