@@ -78,8 +78,8 @@ contract Shares is ERC20, Initializable {
     }
 
     /// @notice Returns the name of the token.
-    function name() public view override(ERC20) returns (string memory) {
-        return _name;
+    function nameAndSymbol() public view returns (string memory, string memory) {
+        return (_name, _symbol);
     }
 
     /// @notice Returns the symbol of this token
