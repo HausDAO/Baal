@@ -17,6 +17,9 @@ import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/zodiac/contracts/factory/ModuleProxyFactory.sol";
 
+// import "hardhat/console.sol";
+
+
 interface ISharesLoot {
     struct Checkpoint {
         /*Baal checkpoint for marking number of delegated votes*/
@@ -72,7 +75,6 @@ contract Baal is CloneFactory, Module {
     ISharesLoot public lootToken; /*Sub ERC20 for loot mgmt*/
     ISharesLoot public sharesToken; /*Sub ERC20 for loot mgmt*/
     mapping(address => mapping(address => uint256)) public allowance; /*maps approved pulls of `shares` with erc20 accounting*/
-    mapping(address => uint256) public balanceOf; /*maps `members` accounts to `shares` with erc20 accounting*/
 
     // ADMIN PARAMETERS
     bool public lootPaused; /*tracks transferability of `loot` economic weight - amendable through 'period'[2] proposal*/
@@ -138,6 +140,7 @@ contract Baal is CloneFactory, Module {
         uint32 votingEnds; /*termination date for proposal in seconds since unix epoch - derived from `votingPeriod` set on proposal*/
         uint32 graceEnds; /*termination date for proposal in seconds since unix epoch - derived from `gracePeriod` set on proposal*/
         uint32 expiration; /*timestamp after which proposal should be considered invalid and skipped. */
+        uint256 baalGas; /* gas needed to process proposal */
         uint256 yesVotes; /*counter for `members` `approved` 'votes' to calculate approval on processing*/
         uint256 noVotes; /*counter for `members` 'dis-approved' 'votes' to calculate approval on processing*/
         uint256 maxTotalSharesAndLootAtYesVote; /* highest share+loot count during any individual yes vote*/
@@ -214,6 +217,7 @@ contract Baal is CloneFactory, Module {
         uint256 votingPeriod,
         bytes proposalData,
         uint256 expiration,
+        uint256 baalGas,
         bool selfSponsor,
         uint256 timestamp,
         string details
@@ -344,6 +348,7 @@ contract Baal is CloneFactory, Module {
     function submitProposal(
         bytes calldata proposalData,
         uint32 expiration,
+        uint256 baalGas,
         string calldata details
     ) external payable nonReentrant returns (uint256) {
         require(
@@ -363,7 +368,7 @@ contract Baal is CloneFactory, Module {
         }
 
         bytes32 proposalDataHash = hashOperation(proposalData); /*Store only hash of proposal data*/
-
+        
         unchecked {
             proposalCount++; /*increment proposal counter*/
             proposals[proposalCount] = Proposal( /*push params into proposal struct - start voting period timer if member submission*/
@@ -373,6 +378,7 @@ contract Baal is CloneFactory, Module {
                 0,
                 0,
                 expiration,
+                baalGas,
                 0, /* yes votes */
                 0, /* no votes */
                 0, /* highestMaxSharesAndLootAtYesVote */
@@ -393,6 +399,7 @@ contract Baal is CloneFactory, Module {
             votingPeriod,
             proposalData,
             expiration,
+            baalGas,
             selfSponsor,
             block.timestamp,
             details
@@ -489,12 +496,11 @@ contract Baal is CloneFactory, Module {
                 /*if `approved`, cast delegated balance `yesVotes` to proposal*/
                 prop.yesVotes += balance;
                 if (
-                    totalShares() + totalLoot() >
+                    totalSupply() >
                     prop.maxTotalSharesAndLootAtYesVote
                 ) {
                     prop.maxTotalSharesAndLootAtYesVote =
-                        totalShares() +
-                        totalLoot();
+                        totalSupply();
                 }
             } else {
                 /*otherwise, cast delegated balance `noVotes` to proposal*/
@@ -534,6 +540,8 @@ contract Baal is CloneFactory, Module {
             "incorrect calldata"
         );
 
+        require(prop.baalGas == 0 || gasleft() >= prop.baalGas, "not enough gas");
+
         prop.status[1] = true; /*Set processed flag to true*/
         bool okToExecute = true; /*Initialize and invalidate if conditions are not met below*/
 
@@ -548,7 +556,7 @@ contract Baal is CloneFactory, Module {
         // Make proposal fail if the minRetentionPercent is exceeded
         if (
             okToExecute &&
-            (totalShares() + totalLoot()) <
+            (totalSupply()) <
             (prop.maxTotalSharesAndLootAtYesVote * minRetentionPercent) / 100 /*Check for dilution since high water mark during voting*/
         ) {
             okToExecute = false;
@@ -1010,8 +1018,11 @@ contract Baal is CloneFactory, Module {
         return sharesToken.totalSupply();
     }
 
-    function getNameSymbol() public view returns (string memory, string memory){
-        return sharesToken.nameAndSymbol();
+
+    /// @notice Helper to check total supply of loot and shares
+    function totalSupply() public view returns (uint256) {
+        return totalLoot() + totalShares();
+
     }
 
     /***************

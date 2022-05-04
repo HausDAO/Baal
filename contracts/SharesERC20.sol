@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
+import "hardhat/console.sol";
+
+
 interface IBaal {
     function sharesPaused() external returns (bool);
 }
@@ -213,6 +216,12 @@ contract Shares is ERC20, Initializable {
                 !baal.sharesPaused(),
             "!transferable"
         );
+        /*If recipient is receiving their first shares, auto-self delegate*/
+        if (balanceOf(to) == 0 && numCheckpoints[to] == 0 && amount > 0) {
+            delegates[to] = to;
+        }
+
+        _moveDelegates(delegates[from], delegates[to], amount);
 
     }
 
