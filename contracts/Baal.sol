@@ -17,7 +17,7 @@ import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/zodiac/contracts/factory/ModuleProxyFactory.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 
 interface ISharesLoot {
@@ -75,8 +75,6 @@ contract Baal is CloneFactory, Module {
     ISharesLoot public lootToken; /*Sub ERC20 for loot mgmt*/
     ISharesLoot public sharesToken; /*Sub ERC20 for loot mgmt*/
     mapping(address => mapping(address => uint256)) public allowance; /*maps approved pulls of `shares` with erc20 accounting*/
-    // TODO: should we make a wrapper for this?
-    // mapping(address => uint256) public balanceOf; /*maps `members` accounts to `shares` with erc20 accounting*/
 
     // ADMIN PARAMETERS
     bool public lootPaused; /*tracks transferability of `loot` economic weight - amendable through 'period'[2] proposal*/
@@ -519,12 +517,11 @@ contract Baal is CloneFactory, Module {
                 /*if `approved`, cast delegated balance `yesVotes` to proposal*/
                 prop.yesVotes += balance;
                 if (
-                    totalShares() + totalLoot() >
+                    totalSupply() >
                     prop.maxTotalSharesAndLootAtYesVote
                 ) {
                     prop.maxTotalSharesAndLootAtYesVote =
-                        totalShares() +
-                        totalLoot();
+                        totalSupply();
                 }
             } else {
                 /*otherwise, cast delegated balance `noVotes` to proposal*/
@@ -563,10 +560,8 @@ contract Baal is CloneFactory, Module {
             hashOperation(proposalData) == prop.proposalDataHash,
             "incorrect calldata"
         );
-        console.log('baalGas', prop.baalGas);
-        console.log('asleft()', gasleft());
-        require(prop.baalGas == 0 || gasleft() >= prop.baalGas, "not enough gas");
 
+        require(prop.baalGas == 0 || gasleft() >= prop.baalGas, "not enough gas");
 
         prop.status[1] = true; /*Set processed flag to true*/
         bool okToExecute = true; /*Initialize and invalidate if conditions are not met below*/
@@ -582,7 +577,7 @@ contract Baal is CloneFactory, Module {
         // Make proposal fail if the minRetentionPercent is exceeded
         if (
             okToExecute &&
-            (totalShares() + totalLoot()) <
+            (totalSupply()) <
             (prop.maxTotalSharesAndLootAtYesVote * minRetentionPercent) / 100 /*Check for dilution since high water mark during voting*/
         ) {
             okToExecute = false;
@@ -624,8 +619,6 @@ contract Baal is CloneFactory, Module {
     function cancelProposal(uint32 id) external nonReentrant {
         Proposal storage prop = proposals[id];
         require(state(id) == ProposalState.Voting, "!voting");
-        console.log('priorVotes', getPriorVotes(prop.sponsor, block.timestamp - 1));
-        console.log('sponsorThreshold', sponsorThreshold);
         require(
             msg.sender == prop.sponsor ||
                 getPriorVotes(prop.sponsor, block.timestamp - 1) <
@@ -1046,15 +1039,14 @@ contract Baal is CloneFactory, Module {
     }
 
     /// @notice Helper to check total supply of child shares contract
-    // TODO: should this wrap totalsupply?
     function totalShares() public view returns (uint256) {
         return sharesToken.totalSupply();
     }
 
-    // TODO: remove to avoid confusion
-    // function balanceOf(address addr) public view returns (uint256) {
-    //     return sharesToken.balanceOf(addr);
-    // }
+    /// @notice Helper to check total supply of loot and shares
+    function totalSupply() public view returns (uint256) {
+        return totalLoot() + totalShares();
+    }
 
     /***************
     HELPER FUNCTIONS

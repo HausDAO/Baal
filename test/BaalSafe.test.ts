@@ -241,6 +241,7 @@ describe('Baal contract', function () {
   let shamanSharesToken: Shares
   let applicantBaal: Baal
   let weth: TestErc20
+  let weth2: TestErc20
   let applicantWeth: TestErc20
   let multisend: MultiSend
 
@@ -316,6 +317,7 @@ describe('Baal contract', function () {
 
     ERC20 = await ethers.getContractFactory('TestERC20')
     weth = (await ERC20.deploy('WETH', 'WETH', 10000000)) as TestErc20
+    weth2 = (await ERC20.deploy('WETH2', 'WETH2', 10000000)) as TestErc20
     applicantWeth = weth.connect(applicant)
 
     multisend = (await MultisendContract.deploy()) as MultiSend
@@ -1810,15 +1812,15 @@ describe('Baal contract', function () {
 
     it('require fail - not enough gas', async function () {
       const proposalCount = await baal.proposalCount();
-      console.log(proposalCount);
       
-      const baalGas = 9759158;
+      const baalGas = 100000000;
       await baal.submitProposal(proposal.data, proposal.expiration, baalGas, ethers.utils.id(proposal.details))
 
       await baal.submitVote(1, yes)
       await moveForwardPeriods(3)
       
-      const procprop =  baal.processProposal(1, proposal.data, {gasPrice: ethers.utils.parseUnits('100', 'gwei'), gasLimit: 10000000})
+      const procprop =  baal.processProposal(1, proposal.data)
+      // const procprop =  baal.processProposal(1, proposal.data, {gasPrice: ethers.utils.parseUnits('1', 'gwei'), gasLimit: 10000000})
       
       expect(procprop).to.be.revertedWith(revertMessages.notEnoughGas)
       
@@ -2289,25 +2291,28 @@ describe('Baal contract', function () {
     })
 
     it('happy case - full ragequit - two tokens', async function () {
-      // transfer 300 loot to DAO (summoner has 100 shares + 500 loot, so that's 50% of total)
-      // transfer 100 weth to DAO
-      // ragequit 100% of remaining shares & loot
-      // expect: receive 50% of weth / loot from DAO
+      // expect: receive 50% of weth from DAO
 
       const summonerWethBefore = await weth.balanceOf(summoner.address)
+      const summonerWeth2Before = await weth.balanceOf(summoner.address)
+
       await weth.transfer(gnosisSafe.address, 100)
-      await lootToken.transfer(gnosisSafe.address, 300)
-      await baal.ragequit(summoner.address, shares, loot - 300, [weth.address])
+      await weth2.transfer(gnosisSafe.address, 200)
+
+      await baal.ragequit(summoner.address, shares, loot - 300, [weth2.address, weth.address])
       const sharesAfter = await sharesToken.balanceOf(summoner.address)
       const lootAfter = await lootToken.balanceOf(summoner.address)
-      const safeLootAfter = await lootToken.balanceOf(gnosisSafe.address)
       const summonerWethAfter = await weth.balanceOf(summoner.address)
+      const summonerWeth2After = await weth2.balanceOf(summoner.address)
       const safeWethAfter = await weth.balanceOf(gnosisSafe.address)
-      expect(lootAfter).to.equal(150) // burn 200, receive 150
+      const safeWeth2After = await weth2.balanceOf(gnosisSafe.address)
+      expect(lootAfter).to.equal(300) // rq 200
       expect(sharesAfter).to.equal(0)
       expect(summonerWethAfter).to.equal(summonerWethBefore.sub(50)) // minus 100, plus 50
+      expect(summonerWeth2After).to.equal(summonerWeth2Before.sub(100)) // minus 200, plus 100
       expect(safeWethAfter).to.equal(50)
-      expect(safeLootAfter).to.equal(150)
+      expect(safeWethAfter).to.equal(50)
+      expect(safeWeth2After).to.equal(100)
     })
   })
 
