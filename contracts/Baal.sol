@@ -17,6 +17,9 @@ import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/zodiac/contracts/factory/ModuleProxyFactory.sol";
 
+import "hardhat/console.sol";
+
+
 interface ISharesLoot {
     struct Checkpoint {
         /*Baal checkpoint for marking number of delegated votes*/
@@ -72,7 +75,8 @@ contract Baal is CloneFactory, Module {
     ISharesLoot public lootToken; /*Sub ERC20 for loot mgmt*/
     ISharesLoot public sharesToken; /*Sub ERC20 for loot mgmt*/
     mapping(address => mapping(address => uint256)) public allowance; /*maps approved pulls of `shares` with erc20 accounting*/
-    mapping(address => uint256) public balanceOf; /*maps `members` accounts to `shares` with erc20 accounting*/
+    // TODO: should we make a wrapper for this?
+    // mapping(address => uint256) public balanceOf; /*maps `members` accounts to `shares` with erc20 accounting*/
 
     // ADMIN PARAMETERS
     bool public lootPaused; /*tracks transferability of `loot` economic weight - amendable through 'period'[2] proposal*/
@@ -590,6 +594,8 @@ contract Baal is CloneFactory, Module {
     function cancelProposal(uint32 id) external nonReentrant {
         Proposal storage prop = proposals[id];
         require(state(id) == ProposalState.Voting, "!voting");
+        console.log('priorVotes', getPriorVotes(prop.sponsor, block.timestamp - 1));
+        console.log('sponsorThreshold', sponsorThreshold);
         require(
             msg.sender == prop.sponsor ||
                 getPriorVotes(prop.sponsor, block.timestamp - 1) <
@@ -1006,13 +1012,15 @@ contract Baal is CloneFactory, Module {
     }
 
     /// @notice Helper to check total supply of child shares contract
+    // TODO: should this wrap totalsupply?
     function totalShares() public view returns (uint256) {
         return sharesToken.totalSupply();
     }
 
-    function getNameSymbol() public view returns (string memory, string memory){
-        return sharesToken.nameAndSymbol();
-    }
+    // TODO: remove to avoid confusion
+    // function balanceOf(address addr) public view returns (uint256) {
+    //     return sharesToken.balanceOf(addr);
+    // }
 
     /***************
     HELPER FUNCTIONS
