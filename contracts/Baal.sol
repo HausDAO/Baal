@@ -451,7 +451,7 @@ contract Baal is CloneFactory, Module {
         bool approved,
         bytes calldata signature
     ) external nonReentrant {
-        (string memory name,) = getNameSymbol();
+        (string memory name,) = sharesToken.nameAndSymbol();
         bytes32 domainSeparator = keccak256(
             abi.encode(
                 DOMAIN_TYPEHASH,
