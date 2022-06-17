@@ -31,6 +31,8 @@ import { string } from "hardhat/internal/core/params/argumentTypes";
 
 import { GnosisSafeProxyFactory } from '../src/types/GnosisSafeProxyFactory'
 import { ModuleProxyFactory } from '../src/types/ModuleProxyFactory'
+// import { calculateProxyAddress } from "@gnosis.pm/zodiac/dist/src/factory/factory";
+import { calculateProxyAddress } from "@gnosis.pm/zodiac/dist/src/factory/factory";
 
 use(solidity);
 
@@ -155,7 +157,8 @@ const getBaalParams = async function (
   adminConfig: [boolean, boolean],
   shamans: [string[], number[]],
   shares: [string[], number[]],
-  loots: [string[], number[]]
+  loots: [string[], number[]],
+  moduleAddr: any
 ) {
   const governanceConfig = abiCoder.encode(
     ["uint32", "uint32", "uint256", "uint256", "uint256", "uint256"],
@@ -215,7 +218,7 @@ const getBaalParams = async function (
   // )
   return {
     initParams: abiCoder.encode(
-      ["string", "string", "address", "address", "address"],
+      ["string", "string", "address", "address", "address", "address"],
       [
         config.TOKEN_NAME,
         config.TOKEN_SYMBOL,
@@ -425,6 +428,25 @@ describe("Baal contract", function () {
       moduleProxyFactory.address
     )) as BaalSummoner;
 
+    // const addr = await calculateProxyAddress(contract, baalTemplateAddr,encodedInitParams.initParams,""+randomSeed);
+    // initData = moduleMasterCopy.interface.encodeFunctionData("initialize", []);
+
+
+    const modAddr = "0xADD";
+    // TODO
+    // await calculateProxyAddress(
+    //   baalSummoner, 
+    //   baalSingleton.address, 
+    //   baal.interface.encodeFunctionData(
+    //     "setUp",
+    //     [
+    //       deploymentConfig.TOKEN_NAME,
+    //       deploymentConfig.TOKEN_SYMBOL, 
+    //       lootSingleton.address, 
+    //       sharesSingleton.address, 
+    //       multisend.address]),
+    //   "101");
+
     encodedInitParams = await getBaalParams(
       baalSingleton,
       multisend,
@@ -436,13 +458,14 @@ describe("Baal contract", function () {
       [sharesPaused, lootPaused],
       [[shaman.address], [7]],
       [[summoner.address], [shares]],
-      [[summoner.address], [loot]]
+      [[summoner.address], [loot]],
+      modAddr
     );
 
     const tx = await baalSummoner.summonBaalAndSafe(
       encodedInitParams.initParams,
       encodedInitParams.initalizationActions,
-      101
+      "101"
     );
     const addresses = await getNewBaalAddresses(tx);
 
@@ -489,7 +512,7 @@ describe("Baal contract", function () {
   });
 
   describe("constructor", function () {
-    it("verify deployment parameters", async function () {
+    it.only("verify deployment parameters", async function () {
       const now = await blockTime();
 
       // const decimals = await baal.decimals()
@@ -3325,13 +3348,14 @@ describe("Baal contract - offering required", function () {
       [sharesPaused, lootPaused],
       [[shaman.address], [7]],
       [[summoner.address], [shares]],
-      [[summoner.address], [loot]]
+      [[summoner.address], [loot]],
+      "0x123"
     );
 
     const tx = await baalSummoner.summonBaalAndSafe(
       encodedInitParams.initParams,
       encodedInitParams.initalizationActions,
-      101
+      "101"
     );
     const addresses = await getNewBaalAddresses(tx);
 

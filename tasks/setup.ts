@@ -15,6 +15,7 @@ import { encodeMultiSend, MetaTransaction } from "@gnosis.pm/safe-contracts";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { TestErc20 } from "../src/types/TestErc20";
 import { TributeMinion } from "../src/types/TributeMinion";
+import { calculateProxyAddress } from "@gnosis.pm/zodiac/dist/src/factory/factory";
 
 const _addresses = {
     gnosisSingleton: "0xd9db270c1b5e3bd161e8c8503c55ceabee709552",
@@ -62,13 +63,14 @@ task(
 );
 
 /* DAO tasks */
-/* TODO: DAO amin tasks */
+/* TODO: DAO admin tasks */
 
 
 task("delegate", "Delegate shares")
   .addParam("dao", "Dao address")
   .addParam("to", "delegate to")
   .setAction(async (taskArgs, hre) => {
+
     const Baal = await hre.ethers.getContractFactory("Baal");
     const baal = (await Baal.attach(taskArgs.dao)) as Baal;
     const delegateVotes = await baal.delegate(taskArgs.to);
@@ -317,6 +319,7 @@ task("summon", "Summons a new DAO")
   .addParam("name", "share token symbol")
   .addOptionalParam("meta", "updated meta data")
   .setAction(async (taskArgs, hre) => {
+    
     const network = await hre.ethers.provider.getNetwork()
     const chainId = network.chainId
     const metadataConfig = {
@@ -370,7 +373,8 @@ task("summon", "Summons a new DAO")
       adminConfig: [boolean, boolean],
       shamans: [string[], number[]],
       shares: [string[], number[]],
-      loots: [string[], number[]]
+      loots: [string[], number[]],
+      modAddr: string
     ) {
       const governanceConfig = abiCoder.encode(
         ["uint32", "uint32", "uint256", "uint256", "uint256", "uint256"],
@@ -500,22 +504,27 @@ task("summon", "Summons a new DAO")
       [taskArgs.sharesPaused, taskArgs.lootPaused],
       [[taskArgs.shaman], [7]],
       [summonerArr, sharesArr],
-      [summonerArr, lootArr]
+      [summonerArr, lootArr],
+      "0xadd"
     );
 
     const randomSeed = Math.floor(Math.random() * 10000000);
 
-    const tx = await contract.summonBaalAndSafe(
-      encodedInitParams.initParams,
-      encodedInitParams.initalizationActions,
-      randomSeed
-    );
+    //const addr = await calculateProxyAddress(contract, baalTemplateAddr,"TODO",""+randomSeed);
 
-    console.log(taskArgs);
-    console.log("tx:", tx.hash);
-    const deployers = await hre.ethers.getSigners();
-    const address = await deployers[0].getAddress();
-    const balance = await deployers[0].getBalance();
-    console.log("Account address:", address);
-    console.log("Account balance:", hre.ethers.utils.formatEther(balance));
+    // console.log('test addr', addr);
+    // TODO: use precalculated module address in initparams
+    // const tx = await contract.summonBaalAndSafe(
+    //   encodedInitParams.initParams,
+    //   encodedInitParams.initalizationActions,
+    //   randomSeed
+    // );
+
+    // console.log(taskArgs);
+    // console.log("tx:", tx.hash);
+    // const deployers = await hre.ethers.getSigners();
+    // const address = await deployers[0].getAddress();
+    // const balance = await deployers[0].getBalance();
+    // console.log("Account address:", address);
+    // console.log("Account balance:", hre.ethers.utils.formatEther(balance));
   });

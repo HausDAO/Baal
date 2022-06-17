@@ -1129,8 +1129,10 @@ contract BaalSummoner is ModuleProxyFactory {
         );
     }
 
-    function summonBaal(address _safe) external returns (address) {
-        Baal _baal = Baal(_safe);
+    function summonBaal(address _safe, uint256 _saltNonce) external returns (address) {
+         Baal _baal = Baal(
+            createProxy(template, keccak256(abi.encodePacked(_saltNonce)))
+        );
 
         emit SummonBaal(
             address(_baal),
@@ -1142,22 +1144,7 @@ contract BaalSummoner is ModuleProxyFactory {
         return (address(_baal));
     }
 
-    function summonBaalAndSafe(
-        bytes calldata initializationParams,
-        bytes[] calldata initializationActions,
-        uint256 _saltNonce
-    ) external returns (address) {
-        (
-            string memory _name, /*_name Name for erc20 `shares` accounting*/
-            string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting*/
-            address _lootSingleton, /*template contract to clone for loot ERC20 token*/
-            address _sharesSingleton, /*template contract to clone for loot ERC20 token*/
-            address _multisendLibrary /*address of multisend library*/
-        ) = abi.decode(
-                initializationParams,
-                (string, string, address, address, address)
-            );
-
+    function deployAndSetupSafe(address _moduleAddr, uint256 _saltNonce) internal returns(address) {
         // Deploy new safe but do not set it up yet
         GnosisSafe _safe = GnosisSafe(
             payable(
@@ -1167,22 +1154,10 @@ contract BaalSummoner is ModuleProxyFactory {
                 )
             )
         );
-
-
-        // TODO: use deployModule from moduleProxyFactory
-        Baal _baal = Baal(
-            createProxy(template, keccak256(abi.encodePacked(_saltNonce)))
-        );
-        
-        bytes memory _initializationMultisendData = encodeMultisend(
-            initializationActions,
-            address(_baal)
-        );
-
-        // Generate delegate calls so the safe calls enableModule on itself during setup
+// Generate delegate calls so the safe calls enableModule on itself during setup
         bytes memory _enableBaal = abi.encodeWithSignature(
             "enableModule(address)",
-            address(_baal)
+            address(_moduleAddr)
         );
         bytes memory _enableBaalMultisend = abi.encodePacked(
             uint8(0),
@@ -1191,6 +1166,7 @@ contract BaalSummoner is ModuleProxyFactory {
             uint256(_enableBaal.length),
             bytes(_enableBaal)
         );
+        
         bytes memory _multisendAction = abi.encodeWithSignature(
             "multiSend(bytes)",
             _enableBaalMultisend
@@ -1198,7 +1174,7 @@ contract BaalSummoner is ModuleProxyFactory {
 
         // Workaround for solidity dynamic memory array
         address[] memory _owners = new address[](1);
-        _owners[0] = address(_baal);
+        _owners[0] = address(_moduleAddr);
 
         // Call setup on safe to enable our new module and set the module as the only signer
         _safe.setup(
@@ -1212,23 +1188,60 @@ contract BaalSummoner is ModuleProxyFactory {
             payable(address(0))
         );
 
+        return address(_safe);
+    }
+
+    function summonBaalAndSafe(
+        bytes calldata initializationParams,
+        bytes[] calldata initializationActions,
+        uint256 _saltNonce
+    ) external returns (address) {
+        (
+            string memory _name, /*_name Name for erc20 `shares` accounting*/
+            string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting*/
+            address _lootSingleton, /*template contract to clone for loot ERC20 token*/
+            address _sharesSingleton, /*template contract to clone for loot ERC20 token*/
+            address _multisendLibrary, /*address of multisend library*/
+            address _moduleAddr /* pre calculated module address */
+        ) = abi.decode(
+                initializationParams,
+                (string, string, address, address, address, address)
+            );
+
+        address safeAddr = deployAndSetupSafe(_moduleAddr, _saltNonce);
+
+        bytes memory _initializationMultisendData = encodeMultisend(
+            initializationActions,
+            address(_moduleAddr)
+        );
+
         bytes memory _initializer = abi.encode(
             _name,
             _symbol,
             _lootSingleton,
             _sharesSingleton,
             _multisendLibrary,
-            address(_safe),
+            safeAddr,
             _initializationMultisendData
         );
 
-        _baal.setUp(_initializer);
+        // TODO: use deployModule from moduleProxyFactory
+
+        Baal _baal = Baal(
+            moduleProxyFactory.deployModule(
+                template,
+                abi.encodeWithSignature("setUp(bytes)", _initializer),
+                _saltNonce
+            )
+        );
+
+        // _baal.setUp(_initializer);
 
         emit SummonBaal(
             address(_baal),
             address(_baal.lootToken()),
             address(_baal.sharesToken()),
-            address(_safe)
+            safeAddr
         );
 
         return (address(_baal));
