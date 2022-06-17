@@ -1130,6 +1130,7 @@ contract BaalSummoner is ModuleProxyFactory {
     }
 
     function summonBaal(address _safe, uint256 _saltNonce) external returns (address) {
+        // TODO: use module proxy
          Baal _baal = Baal(
             createProxy(template, keccak256(abi.encodePacked(_saltNonce)))
         );
