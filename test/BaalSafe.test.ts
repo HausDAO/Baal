@@ -29,8 +29,8 @@ import signDelegation from "../src/signDelegation";
 import signPermit from "../src/signPermit";
 import { string } from "hardhat/internal/core/params/argumentTypes";
 
-import { GnosisSafeProxyFactory } from '../src/types/GnosisSafeProxyFactory'
-import { ModuleProxyFactory } from '../src/types/ModuleProxyFactory'
+import { GnosisSafeProxyFactory } from "../src/types/GnosisSafeProxyFactory";
+import { ModuleProxyFactory } from "../src/types/ModuleProxyFactory";
 // import { calculateProxyAddress } from "@gnosis.pm/zodiac/dist/src/factory/factory";
 import { calculateProxyAddress } from "@gnosis.pm/zodiac/dist/src/factory/factory";
 
@@ -131,7 +131,7 @@ const deploymentConfig = {
 
 const metadataConfig = {
   CONTENT: '{"name":"test"}',
-  TAG: "daohaus.summon.metadata",
+  TAG: "daohaus.summoner.daoProfile",
 };
 
 const abiCoder = ethers.utils.defaultAbiCoder;
@@ -313,11 +313,11 @@ describe("Baal contract", function () {
   let gnosisSafeSingleton: GnosisSafe;
   let gnosisSafe: GnosisSafe;
 
-  let GnosisSafeProxyFactory: ContractFactory
-  let gnosisSafeProxyFactory: GnosisSafeProxyFactory
+  let GnosisSafeProxyFactory: ContractFactory;
+  let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
 
-  let ModuleProxyFactory: ContractFactory
-  let moduleProxyFactory: ModuleProxyFactory
+  let ModuleProxyFactory: ContractFactory;
+  let moduleProxyFactory: ModuleProxyFactory;
 
   let signingShaman: SignerWithAddress;
   let chainId: number;
@@ -396,8 +396,12 @@ describe("Baal contract", function () {
     const GnosisSafe = await ethers.getContractFactory("GnosisSafe");
     const BaalSummoner = await ethers.getContractFactory("BaalSummoner");
 
-    const GnosisSafeProxyFactory = await ethers.getContractFactory('GnosisSafeProxyFactory')
-    const ModuleProxyFactory = await ethers.getContractFactory('ModuleProxyFactory')
+    const GnosisSafeProxyFactory = await ethers.getContractFactory(
+      "GnosisSafeProxyFactory"
+    );
+    const ModuleProxyFactory = await ethers.getContractFactory(
+      "ModuleProxyFactory"
+    );
 
     const CompatibilityFallbackHandler = await ethers.getContractFactory(
       "CompatibilityFallbackHandler"
@@ -416,8 +420,9 @@ describe("Baal contract", function () {
     const handler =
       (await CompatibilityFallbackHandler.deploy()) as CompatibilityFallbackHandler;
 
-    const proxy = await GnosisSafeProxyFactory.deploy()
-    moduleProxyFactory = (await ModuleProxyFactory.deploy()) as ModuleProxyFactory
+    const proxy = await GnosisSafeProxyFactory.deploy();
+    moduleProxyFactory =
+      (await ModuleProxyFactory.deploy()) as ModuleProxyFactory;
 
     baalSummoner = (await BaalSummoner.deploy(
       baalSingleton.address,
@@ -3283,7 +3288,7 @@ describe("Baal contract - offering required", function () {
   let summoner: SignerWithAddress;
   let shaman: SignerWithAddress;
 
-  let moduleProxyFactory: ModuleProxyFactory
+  let moduleProxyFactory: ModuleProxyFactory;
 
   let proposal: { [key: string]: any };
 
@@ -3309,8 +3314,12 @@ describe("Baal contract - offering required", function () {
     const MultisendContract = await ethers.getContractFactory("MultiSend");
     const GnosisSafe = await ethers.getContractFactory("GnosisSafe");
     const BaalSummoner = await ethers.getContractFactory("BaalSummoner");
-    const GnosisSafeProxyFactory = await ethers.getContractFactory('GnosisSafeProxyFactory')
-    const ModuleProxyFactory = await ethers.getContractFactory('ModuleProxyFactory')
+    const GnosisSafeProxyFactory = await ethers.getContractFactory(
+      "GnosisSafeProxyFactory"
+    );
+    const ModuleProxyFactory = await ethers.getContractFactory(
+      "ModuleProxyFactory"
+    );
     const CompatibilityFallbackHandler = await ethers.getContractFactory(
       "CompatibilityFallbackHandler"
     );
@@ -3325,8 +3334,9 @@ describe("Baal contract - offering required", function () {
     const handler =
       (await CompatibilityFallbackHandler.deploy()) as CompatibilityFallbackHandler;
 
-    const proxy = await GnosisSafeProxyFactory.deploy()
-    moduleProxyFactory = (await ModuleProxyFactory.deploy()) as ModuleProxyFactory
+    const proxy = await GnosisSafeProxyFactory.deploy();
+    moduleProxyFactory =
+      (await ModuleProxyFactory.deploy()) as ModuleProxyFactory;
 
     baalSummoner = (await BaalSummoner.deploy(
       baalSingleton.address,
