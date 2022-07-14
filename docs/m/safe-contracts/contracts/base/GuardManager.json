@@ -1,0 +1,32 @@
+{
+    "methods": {
+        "setGuard(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setGuard(address guard) external nonpayable",
+            "inputs": {
+                "guard": {
+                    "type": "address",
+                    "description": "The address of the guard to be used or the 0 address to disable the guard"
+                }
+            },
+            "outputs": {},
+            "details": "Set a guard that checks transactions before execution"
+        }
+    },
+    "events": {
+        "ChangedGuard": {
+            "code": "event ChangedGuard(address guard)",
+            "inputs": {
+                "guard": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "m/safe-contracts/contracts/base",
+    "title": "Fallback Manager - A contract that manages fallback calls made to this contract",
+    "author": "Richard Meissner - <richard@gnosis.pm>",
+    "name": "GuardManager"
+}

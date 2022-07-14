@@ -1,0 +1,50 @@
+{
+    "methods": {
+        "getMessageHash(bytes)": {
+            "stateMutability": "view",
+            "code": "function getMessageHash(bytes message) external view returns (bytes32)",
+            "inputs": {
+                "message": {
+                    "type": "bytes",
+                    "description": "Message that should be hashed"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes32",
+                    "description": "Message hash."
+                }
+            },
+            "details": "Returns hash of a message that can be signed by owners."
+        },
+        "signMessage(bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function signMessage(bytes _data) external nonpayable",
+            "inputs": {
+                "_data": {
+                    "type": "bytes",
+                    "description": "Arbitrary length data that should be marked as signed on the behalf of address(this)"
+                }
+            },
+            "outputs": {},
+            "notice": "Marks a message (`_data`) as signed.",
+            "details": "Marks a message as signed, so that it can be used with EIP-1271"
+        }
+    },
+    "events": {
+        "SignMsg": {
+            "code": "event SignMsg(bytes32 indexed msgHash)",
+            "inputs": {
+                "msgHash": {
+                    "type": "bytes32",
+                    "indexed": true
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "m/safe-contracts/contracts/examples/libraries",
+    "title": "SignMessageLib - Allows to set an entry in the signedMessages",
+    "author": "Richard Meissner - <richard@gnosis.io>",
+    "name": "SignMessageLib"
+}

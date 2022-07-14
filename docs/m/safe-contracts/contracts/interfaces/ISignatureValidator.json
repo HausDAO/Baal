@@ -1,0 +1,28 @@
+{
+    "methods": {
+        "isValidSignature(bytes,bytes)": {
+            "stateMutability": "view",
+            "code": "function isValidSignature(bytes _data, bytes _signature) external view returns (bytes4)",
+            "inputs": {
+                "_data": {
+                    "type": "bytes",
+                    "description": "Arbitrary length data signed on the behalf of address(this)"
+                },
+                "_signature": {
+                    "type": "bytes",
+                    "description": "Signature byte array associated with _data MUST return the bytes4 magic value 0x20c13b0b when function passes. MUST NOT modify state (using STATICCALL for solc < 0.5, view modifier for solc > 0.5) MUST allow external calls"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            },
+            "details": "Should return whether the signature provided is valid for the provided data"
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/interfaces",
+    "name": "ISignatureValidator"
+}

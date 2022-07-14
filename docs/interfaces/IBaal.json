@@ -1,0 +1,28 @@
+{
+    "methods": {
+        "lootPaused()": {
+            "stateMutability": "nonpayable",
+            "code": "function lootPaused() external nonpayable returns (bool)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "sharesPaused()": {
+            "stateMutability": "nonpayable",
+            "code": "function sharesPaused() external nonpayable returns (bool)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/interfaces",
+    "name": "IBaal"
+}

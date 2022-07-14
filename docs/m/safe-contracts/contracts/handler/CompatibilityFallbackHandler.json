@@ -1,0 +1,259 @@
+{
+    "methods": {
+        "NAME()": {
+            "stateMutability": "view",
+            "code": "function NAME() external view returns (string)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "string"
+                }
+            }
+        },
+        "VERSION()": {
+            "stateMutability": "view",
+            "code": "function VERSION() external view returns (string)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "string"
+                }
+            }
+        },
+        "getMessageHash(bytes)": {
+            "stateMutability": "view",
+            "code": "function getMessageHash(bytes message) external view returns (bytes32)",
+            "inputs": {
+                "message": {
+                    "type": "bytes",
+                    "description": "Message that should be hashed"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes32",
+                    "description": "Message hash."
+                }
+            },
+            "details": "Returns hash of a message that can be signed by owners."
+        },
+        "getMessageHashForSafe(address,bytes)": {
+            "stateMutability": "view",
+            "code": "function getMessageHashForSafe(contract GnosisSafe safe, bytes message) external view returns (bytes32)",
+            "inputs": {
+                "safe": {
+                    "type": "contract GnosisSafe",
+                    "description": "Safe to which the message is targeted"
+                },
+                "message": {
+                    "type": "bytes",
+                    "description": "Message that should be hashed"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes32",
+                    "description": "Message hash."
+                }
+            },
+            "details": "Returns hash of a message that can be signed by owners."
+        },
+        "getModules()": {
+            "stateMutability": "view",
+            "code": "function getModules() external view returns (address[])",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address[]",
+                    "description": "Array of modules."
+                }
+            },
+            "details": "Returns array of first 10 modules."
+        },
+        "isValidSignature(bytes32,bytes)": {
+            "stateMutability": "view",
+            "code": "function isValidSignature(bytes32 _dataHash, bytes _signature) external view returns (bytes4)",
+            "inputs": {
+                "_dataHash": {
+                    "type": "bytes32",
+                    "description": "Hash of the data signed on the behalf of address(msg.sender)"
+                },
+                "_signature": {
+                    "type": "bytes",
+                    "description": "Signature byte array associated with _dataHash"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4",
+                    "description": "a bool upon valid or invalid signature with corresponding _dataHash"
+                }
+            },
+            "notice": "Implementation of updated EIP-1271See https://github.com/gnosis/util-contracts/blob/bb5fe5fb5df6d8400998094fb1b32a178a47c3a1/contracts/StorageAccessible.sol",
+            "details": "Should return whether the signature provided is valid for the provided data.       The save does not implement the interface since `checkSignatures` is not a view method.       The method will not perform any state changes (see parameters of `checkSignatures`)"
+        },
+        "isValidSignature(bytes,bytes)": {
+            "stateMutability": "view",
+            "code": "function isValidSignature(bytes _data, bytes _signature) external view returns (bytes4)",
+            "inputs": {
+                "_data": {
+                    "type": "bytes",
+                    "description": "Arbitrary length data signed on the behalf of address(msg.sender)"
+                },
+                "_signature": {
+                    "type": "bytes",
+                    "description": "Signature byte array associated with _data"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4",
+                    "description": "a bool upon valid or invalid signature with corresponding _data"
+                }
+            },
+            "notice": "Implementation of ISignatureValidator (see `interfaces/ISignatureValidator.sol`)",
+            "details": "Should return whether the signature provided is valid for the provided data."
+        },
+        "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": {
+            "stateMutability": "pure",
+            "code": "function onERC1155BatchReceived(address, address, uint256[], uint256[], bytes) external pure returns (bytes4)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                },
+                "_2": {
+                    "type": "uint256[]"
+                },
+                "_3": {
+                    "type": "uint256[]"
+                },
+                "_4": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "onERC1155Received(address,address,uint256,uint256,bytes)": {
+            "stateMutability": "pure",
+            "code": "function onERC1155Received(address, address, uint256, uint256, bytes) external pure returns (bytes4)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                },
+                "_2": {
+                    "type": "uint256"
+                },
+                "_3": {
+                    "type": "uint256"
+                },
+                "_4": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "onERC721Received(address,address,uint256,bytes)": {
+            "stateMutability": "pure",
+            "code": "function onERC721Received(address, address, uint256, bytes) external pure returns (bytes4)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                },
+                "_2": {
+                    "type": "uint256"
+                },
+                "_3": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "simulate(address,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function simulate(address targetContract, bytes calldataPayload) external nonpayable returns (bytes response)",
+            "inputs": {
+                "targetContract": {
+                    "type": "address",
+                    "description": "Address of the contract containing the code to execute."
+                },
+                "calldataPayload": {
+                    "type": "bytes",
+                    "description": "Calldata that should be sent to the target contract (encoded method name and arguments)."
+                }
+            },
+            "outputs": {
+                "response": {
+                    "type": "bytes"
+                }
+            },
+            "details": "Performs a delegetecall on a targetContract in the context of self. Internally reverts execution to avoid side effects (making it static). Catches revert and returns encoded result as bytes."
+        },
+        "supportsInterface(bytes4)": {
+            "stateMutability": "view",
+            "code": "function supportsInterface(bytes4 interfaceId) external view returns (bool)",
+            "inputs": {
+                "interfaceId": {
+                    "type": "bytes4"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas."
+        },
+        "tokensReceived(address,address,address,uint256,bytes,bytes)": {
+            "stateMutability": "pure",
+            "code": "function tokensReceived(address, address, address, uint256, bytes, bytes) external pure",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                },
+                "_2": {
+                    "type": "address"
+                },
+                "_3": {
+                    "type": "uint256"
+                },
+                "_4": {
+                    "type": "bytes"
+                },
+                "_5": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/handler",
+    "title": "Compatibility Fallback Handler - fallback handler to provider compatibility between pre 1.3.0 and 1.3.0+ Safe contracts",
+    "author": "Richard Meissner - <richard@gnosis.pm>",
+    "name": "CompatibilityFallbackHandler"
+}

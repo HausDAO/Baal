@@ -1,0 +1,145 @@
+{
+    "methods": {
+        "NAME()": {
+            "stateMutability": "view",
+            "code": "function NAME() external view returns (string)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "string"
+                }
+            }
+        },
+        "VERSION()": {
+            "stateMutability": "view",
+            "code": "function VERSION() external view returns (string)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "string"
+                }
+            }
+        },
+        "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": {
+            "stateMutability": "pure",
+            "code": "function onERC1155BatchReceived(address, address, uint256[], uint256[], bytes) external pure returns (bytes4)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                },
+                "_2": {
+                    "type": "uint256[]"
+                },
+                "_3": {
+                    "type": "uint256[]"
+                },
+                "_4": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "onERC1155Received(address,address,uint256,uint256,bytes)": {
+            "stateMutability": "pure",
+            "code": "function onERC1155Received(address, address, uint256, uint256, bytes) external pure returns (bytes4)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                },
+                "_2": {
+                    "type": "uint256"
+                },
+                "_3": {
+                    "type": "uint256"
+                },
+                "_4": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "onERC721Received(address,address,uint256,bytes)": {
+            "stateMutability": "pure",
+            "code": "function onERC721Received(address, address, uint256, bytes) external pure returns (bytes4)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                },
+                "_2": {
+                    "type": "uint256"
+                },
+                "_3": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4"
+                }
+            }
+        },
+        "supportsInterface(bytes4)": {
+            "stateMutability": "view",
+            "code": "function supportsInterface(bytes4 interfaceId) external view returns (bool)",
+            "inputs": {
+                "interfaceId": {
+                    "type": "bytes4"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas."
+        },
+        "tokensReceived(address,address,address,uint256,bytes,bytes)": {
+            "stateMutability": "pure",
+            "code": "function tokensReceived(address, address, address, uint256, bytes, bytes) external pure",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                },
+                "_2": {
+                    "type": "address"
+                },
+                "_3": {
+                    "type": "uint256"
+                },
+                "_4": {
+                    "type": "bytes"
+                },
+                "_5": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/handler",
+    "title": "Default Callback Handler - returns true for known token callbacks",
+    "author": "Richard Meissner - <richard@gnosis.pm>",
+    "name": "DefaultCallbackHandler"
+}

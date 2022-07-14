@@ -1,0 +1,142 @@
+{
+    "methods": {
+        "calculateCreateProxyWithNonceAddress(address,bytes,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function calculateCreateProxyWithNonceAddress(address _singleton, bytes initializer, uint256 saltNonce) external nonpayable returns (contract GnosisSafeProxy proxy)",
+            "inputs": {
+                "_singleton": {
+                    "type": "address",
+                    "description": "Address of singleton contract."
+                },
+                "initializer": {
+                    "type": "bytes",
+                    "description": "Payload for message call sent to new proxy contract."
+                },
+                "saltNonce": {
+                    "type": "uint256",
+                    "description": "Nonce that will be used to generate the salt to calculate the address of the new proxy contract."
+                }
+            },
+            "outputs": {
+                "proxy": {
+                    "type": "contract GnosisSafeProxy"
+                }
+            },
+            "details": "Allows to get the address for a new proxy contact created via `createProxyWithNonce`      This method is only meant for address calculation purpose when you use an initializer that would revert,      therefore the response is returned with a revert. When calling this method set `from` to the address of the proxy factory."
+        },
+        "createProxy(address,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function createProxy(address singleton, bytes data) external nonpayable returns (contract GnosisSafeProxy proxy)",
+            "inputs": {
+                "singleton": {
+                    "type": "address",
+                    "description": "Address of singleton contract."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Payload for message call sent to new proxy contract."
+                }
+            },
+            "outputs": {
+                "proxy": {
+                    "type": "contract GnosisSafeProxy"
+                }
+            },
+            "details": "Allows to create new proxy contact and execute a message call to the new proxy within one transaction."
+        },
+        "createProxyWithCallback(address,bytes,uint256,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function createProxyWithCallback(address _singleton, bytes initializer, uint256 saltNonce, contract IProxyCreationCallback callback) external nonpayable returns (contract GnosisSafeProxy proxy)",
+            "inputs": {
+                "_singleton": {
+                    "type": "address",
+                    "description": "Address of singleton contract."
+                },
+                "initializer": {
+                    "type": "bytes",
+                    "description": "Payload for message call sent to new proxy contract."
+                },
+                "saltNonce": {
+                    "type": "uint256",
+                    "description": "Nonce that will be used to generate the salt to calculate the address of the new proxy contract."
+                },
+                "callback": {
+                    "type": "contract IProxyCreationCallback",
+                    "description": "Callback that will be invoced after the new proxy contract has been successfully deployed and initialized."
+                }
+            },
+            "outputs": {
+                "proxy": {
+                    "type": "contract GnosisSafeProxy"
+                }
+            },
+            "details": "Allows to create new proxy contact, execute a message call to the new proxy and call a specified callback within one transaction"
+        },
+        "createProxyWithNonce(address,bytes,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function createProxyWithNonce(address _singleton, bytes initializer, uint256 saltNonce) external nonpayable returns (contract GnosisSafeProxy proxy)",
+            "inputs": {
+                "_singleton": {
+                    "type": "address",
+                    "description": "Address of singleton contract."
+                },
+                "initializer": {
+                    "type": "bytes",
+                    "description": "Payload for message call sent to new proxy contract."
+                },
+                "saltNonce": {
+                    "type": "uint256",
+                    "description": "Nonce that will be used to generate the salt to calculate the address of the new proxy contract."
+                }
+            },
+            "outputs": {
+                "proxy": {
+                    "type": "contract GnosisSafeProxy"
+                }
+            },
+            "details": "Allows to create new proxy contact and execute a message call to the new proxy within one transaction."
+        },
+        "proxyCreationCode()": {
+            "stateMutability": "pure",
+            "code": "function proxyCreationCode() external pure returns (bytes)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bytes"
+                }
+            },
+            "details": "Allows to retrieve the creation code used for the Proxy deployment. With this it is easily possible to calculate predicted address."
+        },
+        "proxyRuntimeCode()": {
+            "stateMutability": "pure",
+            "code": "function proxyRuntimeCode() external pure returns (bytes)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bytes"
+                }
+            },
+            "details": "Allows to retrieve the runtime code of a deployed Proxy. This can be used to check that the expected Proxy was deployed."
+        }
+    },
+    "events": {
+        "ProxyCreation": {
+            "code": "event ProxyCreation(contract GnosisSafeProxy proxy, address singleton)",
+            "inputs": {
+                "proxy": {
+                    "type": "contract GnosisSafeProxy",
+                    "indexed": false
+                },
+                "singleton": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "m/safe-contracts/contracts/proxies",
+    "title": "Proxy Factory - Allows to create new proxy contact and execute a message call to the new proxy within one transaction.",
+    "author": "Stefan George - <stefan@gnosis.pm>",
+    "name": "GnosisSafeProxyFactory"
+}

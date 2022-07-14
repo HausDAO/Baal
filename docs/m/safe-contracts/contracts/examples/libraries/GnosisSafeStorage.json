@@ -1,0 +1,9 @@
+{
+    "methods": {},
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/examples/libraries",
+    "title": "GnosisSafeStorage - Storage layout of the Safe contracts to be used in libraries",
+    "author": "Richard Meissner - <richard@gnosis.io>",
+    "name": "GnosisSafeStorage"
+}

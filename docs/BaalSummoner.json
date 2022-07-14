@@ -1,0 +1,204 @@
+{
+    "methods": {
+        "deployModule(address,bytes,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function deployModule(address masterCopy, bytes initializer, uint256 saltNonce) external nonpayable returns (address proxy)",
+            "inputs": {
+                "masterCopy": {
+                    "type": "address"
+                },
+                "initializer": {
+                    "type": "bytes"
+                },
+                "saltNonce": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "proxy": {
+                    "type": "address"
+                }
+            }
+        },
+        "encodeMultisend(bytes[],address)": {
+            "stateMutability": "pure",
+            "code": "function encodeMultisend(bytes[] _calls, address _target) external pure returns (bytes encodedMultisend)",
+            "inputs": {
+                "_calls": {
+                    "type": "bytes[]"
+                },
+                "_target": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "encodedMultisend": {
+                    "type": "bytes"
+                }
+            }
+        },
+        "gnosisFallbackLibrary()": {
+            "stateMutability": "view",
+            "code": "function gnosisFallbackLibrary() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "gnosisMultisendLibrary()": {
+            "stateMutability": "view",
+            "code": "function gnosisMultisendLibrary() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "gnosisSingleton()": {
+            "stateMutability": "view",
+            "code": "function gnosisSingleton() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "lootSingleton()": {
+            "stateMutability": "view",
+            "code": "function lootSingleton() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "sharesSingleton()": {
+            "stateMutability": "view",
+            "code": "function sharesSingleton() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "summonBaal(bytes,bytes[],uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function summonBaal(bytes initializationParams, bytes[] initializationActions, uint256 _saltNonce) external nonpayable returns (address)",
+            "inputs": {
+                "initializationParams": {
+                    "type": "bytes"
+                },
+                "initializationActions": {
+                    "type": "bytes[]"
+                },
+                "_saltNonce": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "summonBaalAndSafe(bytes,bytes[],uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function summonBaalAndSafe(bytes initializationParams, bytes[] initializationActions, uint256 _saltNonce) external nonpayable returns (address)",
+            "inputs": {
+                "initializationParams": {
+                    "type": "bytes"
+                },
+                "initializationActions": {
+                    "type": "bytes[]"
+                },
+                "_saltNonce": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "template()": {
+            "stateMutability": "view",
+            "code": "function template() external view returns (address payable)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address payable"
+                }
+            }
+        }
+    },
+    "events": {
+        "ModuleProxyCreation": {
+            "code": "event ModuleProxyCreation(address indexed proxy, address indexed masterCopy)",
+            "inputs": {
+                "proxy": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "masterCopy": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        },
+        "SummonBaal": {
+            "code": "event SummonBaal(address indexed baal, address indexed loot, address indexed shares, address safe)",
+            "inputs": {
+                "baal": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "loot": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "shares": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "safe": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        }
+    },
+    "errors": {
+        "FailedInitialization": {
+            "code": "error FailedInitialization()",
+            "inputs": {},
+            "notice": "Initialization failed."
+        },
+        "TakenAddress": {
+            "code": "error TakenAddress(address address_)",
+            "inputs": {
+                "address_": {
+                    "type": "address"
+                }
+            },
+            "notice": "`address_` is already taken."
+        },
+        "ZeroAddress": {
+            "code": "error ZeroAddress(address target)",
+            "inputs": {
+                "target": {
+                    "type": "address"
+                }
+            },
+            "notice": "`target` can not be zero."
+        }
+    },
+    "path": "",
+    "name": "BaalSummoner"
+}

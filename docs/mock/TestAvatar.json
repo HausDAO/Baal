@@ -1,0 +1,124 @@
+{
+    "methods": {
+        "disableModule(address,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function disableModule(address, address) external nonpayable",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                }
+            },
+            "outputs": {}
+        },
+        "enableModule(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function enableModule(address _module) external nonpayable",
+            "inputs": {
+                "_module": {
+                    "type": "address"
+                }
+            },
+            "outputs": {}
+        },
+        "execTransactionFromModule(address,uint256,bytes,uint8)": {
+            "stateMutability": "nonpayable",
+            "code": "function execTransactionFromModule(address payable to, uint256 value, bytes data, uint8 operation) external nonpayable returns (bool success)",
+            "inputs": {
+                "to": {
+                    "type": "address payable"
+                },
+                "value": {
+                    "type": "uint256"
+                },
+                "data": {
+                    "type": "bytes"
+                },
+                "operation": {
+                    "type": "uint8"
+                }
+            },
+            "outputs": {
+                "success": {
+                    "type": "bool"
+                }
+            }
+        },
+        "execTransactionFromModuleReturnData(address,uint256,bytes,uint8)": {
+            "stateMutability": "nonpayable",
+            "code": "function execTransactionFromModuleReturnData(address payable to, uint256 value, bytes data, uint8 operation) external nonpayable returns (bool success, bytes returnData)",
+            "inputs": {
+                "to": {
+                    "type": "address payable"
+                },
+                "value": {
+                    "type": "uint256"
+                },
+                "data": {
+                    "type": "bytes"
+                },
+                "operation": {
+                    "type": "uint8"
+                }
+            },
+            "outputs": {
+                "success": {
+                    "type": "bool"
+                },
+                "returnData": {
+                    "type": "bytes"
+                }
+            }
+        },
+        "getModulesPaginated(address,uint256)": {
+            "stateMutability": "view",
+            "code": "function getModulesPaginated(address, uint256 pageSize) external view returns (address[] array, address next)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "pageSize": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "array": {
+                    "type": "address[]"
+                },
+                "next": {
+                    "type": "address"
+                }
+            }
+        },
+        "isModuleEnabled(address)": {
+            "stateMutability": "view",
+            "code": "function isModuleEnabled(address _module) external view returns (bool)",
+            "inputs": {
+                "_module": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "module()": {
+            "stateMutability": "view",
+            "code": "function module() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/mock",
+    "name": "TestAvatar"
+}

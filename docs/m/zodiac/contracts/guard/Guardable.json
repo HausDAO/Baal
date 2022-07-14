@@ -1,0 +1,112 @@
+{
+    "methods": {
+        "getGuard()": {
+            "stateMutability": "view",
+            "code": "function getGuard() external view returns (address _guard)",
+            "inputs": {},
+            "outputs": {
+                "_guard": {
+                    "type": "address"
+                }
+            }
+        },
+        "guard()": {
+            "stateMutability": "view",
+            "code": "function guard() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "owner()": {
+            "stateMutability": "view",
+            "code": "function owner() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "details": "Returns the address of the current owner."
+        },
+        "renounceOwnership()": {
+            "stateMutability": "nonpayable",
+            "code": "function renounceOwnership() external nonpayable",
+            "inputs": {},
+            "outputs": {},
+            "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+        },
+        "setGuard(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setGuard(address _guard) external nonpayable",
+            "inputs": {
+                "_guard": {
+                    "type": "address",
+                    "description": "The address of the guard to be used or the 0 address to disable the guard."
+                }
+            },
+            "outputs": {},
+            "details": "Set a guard that checks transactions before execution."
+        },
+        "transferOwnership(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function transferOwnership(address newOwner) external nonpayable",
+            "inputs": {
+                "newOwner": {
+                    "type": "address"
+                }
+            },
+            "outputs": {},
+            "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+        }
+    },
+    "events": {
+        "ChangedGuard": {
+            "code": "event ChangedGuard(address guard)",
+            "inputs": {
+                "guard": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "Initialized": {
+            "code": "event Initialized(uint8 version)",
+            "inputs": {
+                "version": {
+                    "type": "uint8",
+                    "indexed": false
+                }
+            }
+        },
+        "OwnershipTransferred": {
+            "code": "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+            "inputs": {
+                "previousOwner": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "newOwner": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        }
+    },
+    "errors": {
+        "NotIERC165Compliant": {
+            "code": "error NotIERC165Compliant(address guard_)",
+            "inputs": {
+                "guard_": {
+                    "type": "address"
+                }
+            },
+            "notice": "`guard_` does not implement IERC165."
+        }
+    },
+    "path": "m/zodiac/contracts/guard",
+    "title": "Guardable - A contract that manages fallback calls made to this contract",
+    "name": "Guardable"
+}

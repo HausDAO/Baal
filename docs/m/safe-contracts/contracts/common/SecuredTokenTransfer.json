@@ -1,0 +1,9 @@
+{
+    "methods": {},
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/common",
+    "title": "SecuredTokenTransfer - Secure token transfer",
+    "author": "Richard Meissner - <richard@gnosis.pm>",
+    "name": "SecuredTokenTransfer"
+}

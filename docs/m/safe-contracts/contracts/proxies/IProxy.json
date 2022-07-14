@@ -1,0 +1,20 @@
+{
+    "methods": {
+        "masterCopy()": {
+            "stateMutability": "view",
+            "code": "function masterCopy() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/proxies",
+    "title": "IProxy - Helper interface to access masterCopy of the Proxy on-chain",
+    "author": "Richard Meissner - <richard@gnosis.io>",
+    "name": "IProxy"
+}

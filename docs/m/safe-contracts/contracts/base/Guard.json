@@ -1,0 +1,61 @@
+{
+    "methods": {
+        "checkAfterExecution(bytes32,bool)": {
+            "stateMutability": "nonpayable",
+            "code": "function checkAfterExecution(bytes32 txHash, bool success) external nonpayable",
+            "inputs": {
+                "txHash": {
+                    "type": "bytes32"
+                },
+                "success": {
+                    "type": "bool"
+                }
+            },
+            "outputs": {}
+        },
+        "checkTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function checkTransaction(address to, uint256 value, bytes data, enum Enum.Operation operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address payable refundReceiver, bytes signatures, address msgSender) external nonpayable",
+            "inputs": {
+                "to": {
+                    "type": "address"
+                },
+                "value": {
+                    "type": "uint256"
+                },
+                "data": {
+                    "type": "bytes"
+                },
+                "operation": {
+                    "type": "enum Enum.Operation"
+                },
+                "safeTxGas": {
+                    "type": "uint256"
+                },
+                "baseGas": {
+                    "type": "uint256"
+                },
+                "gasPrice": {
+                    "type": "uint256"
+                },
+                "gasToken": {
+                    "type": "address"
+                },
+                "refundReceiver": {
+                    "type": "address payable"
+                },
+                "signatures": {
+                    "type": "bytes"
+                },
+                "msgSender": {
+                    "type": "address"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/base",
+    "name": "Guard"
+}

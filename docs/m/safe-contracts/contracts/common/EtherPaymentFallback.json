@@ -1,0 +1,23 @@
+{
+    "methods": {},
+    "events": {
+        "SafeReceived": {
+            "code": "event SafeReceived(address indexed sender, uint256 value)",
+            "inputs": {
+                "sender": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "value": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "m/safe-contracts/contracts/common",
+    "title": "EtherPaymentFallback - A contract that has a fallback to accept ether payments",
+    "author": "Richard Meissner - <richard@gnosis.pm>",
+    "name": "EtherPaymentFallback"
+}

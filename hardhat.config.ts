@@ -6,6 +6,7 @@ import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
 import "hardhat-typechain";
 import "hardhat-contract-sizer";
+import '@primitivefi/hardhat-dodoc';
 
 import * as fs from "fs";
 import "hardhat-typechain";
@@ -16,7 +17,6 @@ import "./tasks/setup";
 // Go to https://hardhat.org/config/ to learn more
 
 const defaultNetwork = "localhost";
-
 
 function mnemonic() {
   try {
@@ -161,6 +161,11 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: "src/types",
     target: "ethers-v5",
+  },
+  dodoc: {
+    runOnCompile: true,
+    debugMode: true,
+    // More options...
   },
 };
 

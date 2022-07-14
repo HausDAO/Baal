@@ -1,0 +1,27 @@
+{
+    "methods": {
+        "proxyCreated(address,address,bytes,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function proxyCreated(contract GnosisSafeProxy proxy, address _singleton, bytes initializer, uint256 saltNonce) external nonpayable",
+            "inputs": {
+                "proxy": {
+                    "type": "contract GnosisSafeProxy"
+                },
+                "_singleton": {
+                    "type": "address"
+                },
+                "initializer": {
+                    "type": "bytes"
+                },
+                "saltNonce": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/proxies",
+    "name": "IProxyCreationCallback"
+}

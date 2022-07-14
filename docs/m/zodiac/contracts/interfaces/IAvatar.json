@@ -1,0 +1,177 @@
+{
+    "methods": {
+        "disableModule(address,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function disableModule(address prevModule, address module) external nonpayable",
+            "inputs": {
+                "prevModule": {
+                    "type": "address",
+                    "description": "Address that pointed to the module to be removed in the linked list"
+                },
+                "module": {
+                    "type": "address",
+                    "description": "Module to be removed."
+                }
+            },
+            "outputs": {},
+            "notice": "Can only be called by the avatar.Must emit DisabledModule(address module) if successful.",
+            "details": "Disables a module on the avatar."
+        },
+        "enableModule(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function enableModule(address module) external nonpayable",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "description": "Module to be enabled."
+                }
+            },
+            "outputs": {},
+            "notice": "Can only be called by the avatar.Modules should be stored as a linked list.Must emit EnabledModule(address module) if successful.",
+            "details": "Enables a module on the avatar."
+        },
+        "execTransactionFromModule(address,uint256,bytes,uint8)": {
+            "stateMutability": "nonpayable",
+            "code": "function execTransactionFromModule(address to, uint256 value, bytes data, enum Enum.Operation operation) external nonpayable returns (bool success)",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Destination address of module transaction."
+                },
+                "value": {
+                    "type": "uint256",
+                    "description": "Ether value of module transaction."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload of module transaction."
+                },
+                "operation": {
+                    "type": "enum Enum.Operation",
+                    "description": "Operation type of module transaction: 0 == call, 1 == delegate call."
+                }
+            },
+            "outputs": {
+                "success": {
+                    "type": "bool"
+                }
+            },
+            "notice": "Can only be called by an enabled module.Must emit ExecutionFromModuleSuccess(address module) if successful.Must emit ExecutionFromModuleFailure(address module) if unsuccessful.",
+            "details": "Allows a Module to execute a transaction."
+        },
+        "execTransactionFromModuleReturnData(address,uint256,bytes,uint8)": {
+            "stateMutability": "nonpayable",
+            "code": "function execTransactionFromModuleReturnData(address to, uint256 value, bytes data, enum Enum.Operation operation) external nonpayable returns (bool success, bytes returnData)",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Destination address of module transaction."
+                },
+                "value": {
+                    "type": "uint256",
+                    "description": "Ether value of module transaction."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload of module transaction."
+                },
+                "operation": {
+                    "type": "enum Enum.Operation",
+                    "description": "Operation type of module transaction: 0 == call, 1 == delegate call."
+                }
+            },
+            "outputs": {
+                "success": {
+                    "type": "bool"
+                },
+                "returnData": {
+                    "type": "bytes"
+                }
+            },
+            "notice": "Can only be called by an enabled module.Must emit ExecutionFromModuleSuccess(address module) if successful.Must emit ExecutionFromModuleFailure(address module) if unsuccessful.",
+            "details": "Allows a Module to execute a transaction and return data"
+        },
+        "getModulesPaginated(address,uint256)": {
+            "stateMutability": "view",
+            "code": "function getModulesPaginated(address start, uint256 pageSize) external view returns (address[] array, address next)",
+            "inputs": {
+                "start": {
+                    "type": "address",
+                    "description": "Start of the page."
+                },
+                "pageSize": {
+                    "type": "uint256",
+                    "description": "Maximum number of modules that should be returned."
+                }
+            },
+            "outputs": {
+                "array": {
+                    "type": "address[]",
+                    "description": "Array of modules."
+                },
+                "next": {
+                    "type": "address",
+                    "description": "Start of the next page."
+                }
+            },
+            "details": "Returns array of modules."
+        },
+        "isModuleEnabled(address)": {
+            "stateMutability": "view",
+            "code": "function isModuleEnabled(address module) external view returns (bool)",
+            "inputs": {
+                "module": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool",
+                    "description": "True if the module is enabled"
+                }
+            },
+            "details": "Returns if an module is enabled"
+        }
+    },
+    "events": {
+        "DisabledModule": {
+            "code": "event DisabledModule(address module)",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "EnabledModule": {
+            "code": "event EnabledModule(address module)",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "ExecutionFromModuleFailure": {
+            "code": "event ExecutionFromModuleFailure(address indexed module)",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        },
+        "ExecutionFromModuleSuccess": {
+            "code": "event ExecutionFromModuleSuccess(address indexed module)",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "m/zodiac/contracts/interfaces",
+    "name": "IAvatar"
+}

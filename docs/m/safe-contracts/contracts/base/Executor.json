@@ -1,0 +1,9 @@
+{
+    "methods": {},
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/base",
+    "title": "Executor - A contract that can execute transactions",
+    "author": "Richard Meissner - <richard@gnosis.pm>",
+    "name": "Executor"
+}

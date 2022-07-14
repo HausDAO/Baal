@@ -1,0 +1,47 @@
+{
+    "methods": {
+        "getStorageAt(uint256,uint256)": {
+            "stateMutability": "view",
+            "code": "function getStorageAt(uint256 offset, uint256 length) external view returns (bytes)",
+            "inputs": {
+                "offset": {
+                    "type": "uint256",
+                    "description": "- the offset in the current contract's storage in words to start reading from"
+                },
+                "length": {
+                    "type": "uint256",
+                    "description": "- the number of words (32 bytes) of data to read"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes",
+                    "description": "the bytes that were read."
+                }
+            },
+            "details": "Reads `length` bytes of storage in the currents contract"
+        },
+        "simulateAndRevert(address,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function simulateAndRevert(address targetContract, bytes calldataPayload) external nonpayable",
+            "inputs": {
+                "targetContract": {
+                    "type": "address",
+                    "description": "Address of the contract containing the code to execute."
+                },
+                "calldataPayload": {
+                    "type": "bytes",
+                    "description": "Calldata that should be sent to the target contract (encoded method name and arguments)."
+                }
+            },
+            "outputs": {},
+            "details": "Performs a delegetecall on a targetContract in the context of self. Internally reverts execution to avoid side effects (making it static). This method reverts with data equal to `abi.encode(bool(success), bytes(response))`. Specifically, the `returndata` after a call to this method will be: `success:bool || response.length:uint256 || response:bytes`."
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/common",
+    "title": "StorageAccessible - generic base contract that allows callers to access all internal storage.",
+    "notice": "See https://github.com/gnosis/util-contracts/blob/bb5fe5fb5df6d8400998094fb1b32a178a47c3a1/contracts/StorageAccessible.sol",
+    "name": "StorageAccessible"
+}

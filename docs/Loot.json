@@ -1,0 +1,329 @@
+{
+    "methods": {
+        "allowance(address,address)": {
+            "stateMutability": "view",
+            "code": "function allowance(address owner, address spender) external view returns (uint256)",
+            "inputs": {
+                "owner": {
+                    "type": "address"
+                },
+                "spender": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "details": "See {IERC20-allowance}."
+        },
+        "approve(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function approve(address spender, uint256 amount) external nonpayable returns (bool)",
+            "inputs": {
+                "spender": {
+                    "type": "address"
+                },
+                "amount": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "See {IERC20-approve}. NOTE: If `amount` is the maximum `uint256`, the allowance is not updated on `transferFrom`. This is semantically equivalent to an infinite approval. Requirements: - `spender` cannot be the zero address."
+        },
+        "baal()": {
+            "stateMutability": "view",
+            "code": "function baal() external view returns (contract IBaal)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "contract IBaal"
+                }
+            }
+        },
+        "balanceOf(address)": {
+            "stateMutability": "view",
+            "code": "function balanceOf(address account) external view returns (uint256)",
+            "inputs": {
+                "account": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "details": "See {IERC20-balanceOf}."
+        },
+        "burn(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function burn(address account, uint256 amount) external nonpayable",
+            "inputs": {
+                "account": {
+                    "type": "address",
+                    "description": "Address to lose loot"
+                },
+                "amount": {
+                    "type": "uint256",
+                    "description": "Amount to burn"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-only function to burn loot."
+        },
+        "decimals()": {
+            "stateMutability": "view",
+            "code": "function decimals() external view returns (uint8)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint8"
+                }
+            },
+            "details": "Returns the number of decimals used to get its user representation. For example, if `decimals` equals `2`, a balance of `505` tokens should be displayed to a user as `5.05` (`505 / 10 ** 2`). Tokens usually opt for a value of 18, imitating the relationship between Ether and Wei. This is the value {ERC20} uses, unless this function is overridden; NOTE: This information is only used for _display_ purposes: it in no way affects any of the arithmetic of the contract, including {IERC20-balanceOf} and {IERC20-transfer}."
+        },
+        "decreaseAllowance(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function decreaseAllowance(address spender, uint256 subtractedValue) external nonpayable returns (bool)",
+            "inputs": {
+                "spender": {
+                    "type": "address"
+                },
+                "subtractedValue": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "Atomically decreases the allowance granted to `spender` by the caller. This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}. Emits an {Approval} event indicating the updated allowance. Requirements: - `spender` cannot be the zero address. - `spender` must have allowance for the caller of at least `subtractedValue`."
+        },
+        "increaseAllowance(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function increaseAllowance(address spender, uint256 addedValue) external nonpayable returns (bool)",
+            "inputs": {
+                "spender": {
+                    "type": "address"
+                },
+                "addedValue": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "Atomically increases the allowance granted to `spender` by the caller. This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}. Emits an {Approval} event indicating the updated allowance. Requirements: - `spender` cannot be the zero address."
+        },
+        "mint(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function mint(address recipient, uint256 amount) external nonpayable",
+            "inputs": {
+                "recipient": {
+                    "type": "address",
+                    "description": "Address to receive loot"
+                },
+                "amount": {
+                    "type": "uint256",
+                    "description": "Amount to mint"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-only function to mint loot."
+        },
+        "name()": {
+            "stateMutability": "view",
+            "code": "function name() external view returns (string)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "string"
+                }
+            },
+            "notice": "Returns the name of the token."
+        },
+        "nonces(address)": {
+            "stateMutability": "view",
+            "code": "function nonces(address) external view returns (uint256)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "permit(address,address,uint256,uint256,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function permit(address owner, address spender, uint256 amount, uint256 deadline, bytes signature) external nonpayable",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "description": "The address to approve from."
+                },
+                "spender": {
+                    "type": "address",
+                    "description": "The address to be approved."
+                },
+                "amount": {
+                    "type": "uint256",
+                    "description": "The number of `loot` tokens that are approved (2^256-1 means infinite)."
+                },
+                "deadline": {
+                    "type": "uint256",
+                    "description": "The time at which to expire the signature."
+                },
+                "signature": {
+                    "type": "bytes",
+                    "description": "Concatenated signature"
+                }
+            },
+            "outputs": {},
+            "notice": "Triggers an approval from `owner` to `spender` with EIP-712 signature."
+        },
+        "setUp(string,string)": {
+            "stateMutability": "nonpayable",
+            "code": "function setUp(string name_, string symbol_) external nonpayable",
+            "inputs": {
+                "name_": {
+                    "type": "string",
+                    "description": "Name for ERC20 token trackers"
+                },
+                "symbol_": {
+                    "type": "string",
+                    "description": "Symbol for ERC20 token trackers"
+                }
+            },
+            "outputs": {},
+            "notice": "Configure loot - called by Baal on summon",
+            "details": "initializer should prevent this from being called again"
+        },
+        "symbol()": {
+            "stateMutability": "view",
+            "code": "function symbol() external view returns (string)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "string"
+                }
+            },
+            "notice": "Returns the symbol of this token"
+        },
+        "totalSupply()": {
+            "stateMutability": "view",
+            "code": "function totalSupply() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "details": "See {IERC20-totalSupply}."
+        },
+        "transfer(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function transfer(address to, uint256 amount) external nonpayable returns (bool)",
+            "inputs": {
+                "to": {
+                    "type": "address"
+                },
+                "amount": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "See {IERC20-transfer}. Requirements: - `to` cannot be the zero address. - the caller must have a balance of at least `amount`."
+        },
+        "transferFrom(address,address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function transferFrom(address from, address to, uint256 amount) external nonpayable returns (bool success)",
+            "inputs": {
+                "from": {
+                    "type": "address",
+                    "description": "The address of the source account."
+                },
+                "to": {
+                    "type": "address",
+                    "description": "The address of the destination account."
+                },
+                "amount": {
+                    "type": "uint256",
+                    "description": "The number of `loot` tokens to transfer."
+                }
+            },
+            "outputs": {
+                "success": {
+                    "type": "bool",
+                    "description": "Whether or not the transfer succeeded."
+                }
+            },
+            "notice": "Transfer `amount` tokens from `from` to `to`."
+        }
+    },
+    "events": {
+        "Approval": {
+            "code": "event Approval(address indexed owner, address indexed spender, uint256 value)",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "spender": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "value": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "Initialized": {
+            "code": "event Initialized(uint8 version)",
+            "inputs": {
+                "version": {
+                    "type": "uint8",
+                    "indexed": false
+                }
+            }
+        },
+        "Transfer": {
+            "code": "event Transfer(address indexed from, address indexed to, uint256 value)",
+            "inputs": {
+                "from": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "to": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "value": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "",
+    "title": "Loot",
+    "notice": "Accounting for Baal non voting shares",
+    "name": "Loot"
+}

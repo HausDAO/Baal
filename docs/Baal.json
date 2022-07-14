@@ -1,0 +1,1181 @@
+{
+    "methods": {
+        "adminLock()": {
+            "stateMutability": "view",
+            "code": "function adminLock() external view returns (bool)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "allowance(address,address)": {
+            "stateMutability": "view",
+            "code": "function allowance(address, address) external view returns (uint256)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "avatar()": {
+            "stateMutability": "view",
+            "code": "function avatar() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "burnLoot(address[],uint256[])": {
+            "stateMutability": "nonpayable",
+            "code": "function burnLoot(address[] from, uint256[] amount) external nonpayable",
+            "inputs": {
+                "from": {
+                    "type": "address[]",
+                    "description": "Array of addresses to lose loot"
+                },
+                "amount": {
+                    "type": "uint256[]",
+                    "description": "Array of amounts to burn"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-or-manager-only function to burn loot."
+        },
+        "burnShares(address[],uint256[])": {
+            "stateMutability": "nonpayable",
+            "code": "function burnShares(address[] from, uint256[] amount) external nonpayable",
+            "inputs": {
+                "from": {
+                    "type": "address[]",
+                    "description": "Array of addresses to lose shares"
+                },
+                "amount": {
+                    "type": "uint256[]",
+                    "description": "Array of amounts to burn"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-or-manager-only function to burn shares."
+        },
+        "cancelProposal(uint32)": {
+            "stateMutability": "nonpayable",
+            "code": "function cancelProposal(uint32 id) external nonpayable",
+            "inputs": {
+                "id": {
+                    "type": "uint32",
+                    "description": "Number of proposal in `proposals` mapping to process for execution."
+                }
+            },
+            "outputs": {},
+            "notice": "Cancel proposal prior to execution",
+            "details": "Cancellable if proposal is during voting, sender is sponsor, governor, or if sponsor has fallen below threshold"
+        },
+        "encodeMultisend(bytes[],address)": {
+            "stateMutability": "pure",
+            "code": "function encodeMultisend(bytes[] _calls, address _target) external pure returns (bytes encodedMultisend)",
+            "inputs": {
+                "_calls": {
+                    "type": "bytes[]"
+                },
+                "_target": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "encodedMultisend": {
+                    "type": "bytes"
+                }
+            }
+        },
+        "executeAsBaal(address,uint256,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function executeAsBaal(address _to, uint256 _value, bytes _data) external nonpayable",
+            "inputs": {
+                "_to": {
+                    "type": "address",
+                    "description": "address to call"
+                },
+                "_value": {
+                    "type": "uint256",
+                    "description": "value to include in wei"
+                },
+                "_data": {
+                    "type": "bytes",
+                    "description": "arbitrary transaction data"
+                }
+            },
+            "outputs": {},
+            "notice": "Can only be called by the avatar which means this can only be called if passed by another     proposal or by a delegated signer on the Safe",
+            "details": "Function to Execute arbitrary code as baal - useful if funds are accidentally sent here"
+        },
+        "getCurrentVotes(address)": {
+            "stateMutability": "view",
+            "code": "function getCurrentVotes(address account) external view returns (uint256 votes)",
+            "inputs": {
+                "account": {
+                    "type": "address",
+                    "description": "The user to check delegated `votes` for."
+                }
+            },
+            "outputs": {
+                "votes": {
+                    "type": "uint256",
+                    "description": "Current `votes` delegated to `account`."
+                }
+            },
+            "notice": "Returns the current delegated `vote` balance for `account`."
+        },
+        "getGuard()": {
+            "stateMutability": "view",
+            "code": "function getGuard() external view returns (address _guard)",
+            "inputs": {},
+            "outputs": {
+                "_guard": {
+                    "type": "address"
+                }
+            }
+        },
+        "getPriorVotes(address,uint256)": {
+            "stateMutability": "view",
+            "code": "function getPriorVotes(address account, uint256 timeStamp) external view returns (uint256 votes)",
+            "inputs": {
+                "account": {
+                    "type": "address",
+                    "description": "The user to check `votes` for."
+                },
+                "timeStamp": {
+                    "type": "uint256",
+                    "description": "The unix time to check `votes` for."
+                }
+            },
+            "outputs": {
+                "votes": {
+                    "type": "uint256",
+                    "description": "Prior `votes` delegated to `account`."
+                }
+            },
+            "notice": "Returns the prior number of `votes` for `account` as of `timeStamp`."
+        },
+        "getProposalStatus(uint32)": {
+            "stateMutability": "view",
+            "code": "function getProposalStatus(uint32 id) external view returns (bool[4])",
+            "inputs": {
+                "id": {
+                    "type": "uint32",
+                    "description": "Number of proposal in proposals"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool[4]",
+                    "description": "[cancelled, processed, passed, actionFailed]"
+                }
+            },
+            "notice": "Helper to get recorded proposal flags"
+        },
+        "governorLock()": {
+            "stateMutability": "view",
+            "code": "function governorLock() external view returns (bool)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "gracePeriod()": {
+            "stateMutability": "view",
+            "code": "function gracePeriod() external view returns (uint32)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint32"
+                }
+            }
+        },
+        "guard()": {
+            "stateMutability": "view",
+            "code": "function guard() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "hashOperation(bytes)": {
+            "stateMutability": "pure",
+            "code": "function hashOperation(bytes _transactions) external pure returns (bytes32 hash)",
+            "inputs": {
+                "_transactions": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {
+                "hash": {
+                    "type": "bytes32"
+                }
+            },
+            "notice": "Returns the keccak256 hash of calldata"
+        },
+        "isAdmin(address)": {
+            "stateMutability": "view",
+            "code": "function isAdmin(address shaman) external view returns (bool)",
+            "inputs": {
+                "shaman": {
+                    "type": "address",
+                    "description": "Address attempting to execute admin permissioned functions"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "notice": "Helper to check if shaman permission contains admin capabilities"
+        },
+        "isGovernor(address)": {
+            "stateMutability": "view",
+            "code": "function isGovernor(address shaman) external view returns (bool)",
+            "inputs": {
+                "shaman": {
+                    "type": "address",
+                    "description": "Address attempting to execute governor permissioned functions"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "notice": "Helper to check if shaman permission contains governor capabilities"
+        },
+        "isManager(address)": {
+            "stateMutability": "view",
+            "code": "function isManager(address shaman) external view returns (bool)",
+            "inputs": {
+                "shaman": {
+                    "type": "address",
+                    "description": "Address attempting to execute manager permissioned functions"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "notice": "Helper to check if shaman permission contains manager capabilities"
+        },
+        "latestSponsoredProposalId()": {
+            "stateMutability": "view",
+            "code": "function latestSponsoredProposalId() external view returns (uint32)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint32"
+                }
+            }
+        },
+        "lockAdmin()": {
+            "stateMutability": "nonpayable",
+            "code": "function lockAdmin() external nonpayable",
+            "inputs": {},
+            "outputs": {},
+            "notice": "Lock admin so setShamans cannot be called with admin changes"
+        },
+        "lockGovernor()": {
+            "stateMutability": "nonpayable",
+            "code": "function lockGovernor() external nonpayable",
+            "inputs": {},
+            "outputs": {},
+            "notice": "Lock governor so setShamans cannot be called with governor changes"
+        },
+        "lockManager()": {
+            "stateMutability": "nonpayable",
+            "code": "function lockManager() external nonpayable",
+            "inputs": {},
+            "outputs": {},
+            "notice": "Lock manager so setShamans cannot be called with manager changes"
+        },
+        "lootPaused()": {
+            "stateMutability": "view",
+            "code": "function lootPaused() external view returns (bool)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "lootToken()": {
+            "stateMutability": "view",
+            "code": "function lootToken() external view returns (contract IBaalToken)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "contract IBaalToken"
+                }
+            }
+        },
+        "managerLock()": {
+            "stateMutability": "view",
+            "code": "function managerLock() external view returns (bool)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "memberVoted(address,uint32)": {
+            "stateMutability": "view",
+            "code": "function memberVoted(address, uint32) external view returns (bool)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "uint32"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "minRetentionPercent()": {
+            "stateMutability": "view",
+            "code": "function minRetentionPercent() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "mintLoot(address[],uint256[])": {
+            "stateMutability": "nonpayable",
+            "code": "function mintLoot(address[] to, uint256[] amount) external nonpayable",
+            "inputs": {
+                "to": {
+                    "type": "address[]",
+                    "description": "Array of addresses to mint loot"
+                },
+                "amount": {
+                    "type": "uint256[]",
+                    "description": "Array of amounts to mint"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-or-manager-only function to mint loot."
+        },
+        "mintShares(address[],uint256[])": {
+            "stateMutability": "nonpayable",
+            "code": "function mintShares(address[] to, uint256[] amount) external nonpayable",
+            "inputs": {
+                "to": {
+                    "type": "address[]",
+                    "description": "Array of addresses to receive shares"
+                },
+                "amount": {
+                    "type": "uint256[]",
+                    "description": "Array of amounts to mint"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-or-manager-only function to mint shares."
+        },
+        "nonces(address)": {
+            "stateMutability": "view",
+            "code": "function nonces(address) external view returns (uint256)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "owner()": {
+            "stateMutability": "view",
+            "code": "function owner() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "details": "Returns the address of the current owner."
+        },
+        "processProposal(uint32,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function processProposal(uint32 id, bytes proposalData) external nonpayable",
+            "inputs": {
+                "id": {
+                    "type": "uint32",
+                    "description": "Number of proposal in `proposals` mapping to process for execution."
+                },
+                "proposalData": {
+                    "type": "bytes",
+                    "description": "Packed multisend data to execute via Gnosis multisend library"
+                }
+            },
+            "outputs": {},
+            "notice": "Process `proposal` & execute internal functions.",
+            "details": "Proposal must have succeeded, not been processed, not expired, retention threshold must be met"
+        },
+        "proposalCount()": {
+            "stateMutability": "view",
+            "code": "function proposalCount() external view returns (uint32)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint32"
+                }
+            }
+        },
+        "proposalOffering()": {
+            "stateMutability": "view",
+            "code": "function proposalOffering() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "proposals(uint256)": {
+            "stateMutability": "view",
+            "code": "function proposals(uint256) external view returns (uint32 id, uint32 prevProposalId, uint32 votingStarts, uint32 votingEnds, uint32 graceEnds, uint32 expiration, uint256 baalGas, uint256 yesVotes, uint256 noVotes, uint256 maxTotalSharesAndLootAtYesVote, address sponsor, bytes32 proposalDataHash, string details)",
+            "inputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "id": {
+                    "type": "uint32"
+                },
+                "prevProposalId": {
+                    "type": "uint32"
+                },
+                "votingStarts": {
+                    "type": "uint32"
+                },
+                "votingEnds": {
+                    "type": "uint32"
+                },
+                "graceEnds": {
+                    "type": "uint32"
+                },
+                "expiration": {
+                    "type": "uint32"
+                },
+                "baalGas": {
+                    "type": "uint256"
+                },
+                "yesVotes": {
+                    "type": "uint256"
+                },
+                "noVotes": {
+                    "type": "uint256"
+                },
+                "maxTotalSharesAndLootAtYesVote": {
+                    "type": "uint256"
+                },
+                "sponsor": {
+                    "type": "address"
+                },
+                "proposalDataHash": {
+                    "type": "bytes32"
+                },
+                "details": {
+                    "type": "string"
+                }
+            }
+        },
+        "quorumPercent()": {
+            "stateMutability": "view",
+            "code": "function quorumPercent() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "ragequit(address,uint256,uint256,address[])": {
+            "stateMutability": "nonpayable",
+            "code": "function ragequit(address to, uint256 sharesToBurn, uint256 lootToBurn, address[] tokens) external nonpayable",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Account that receives 'fair share'."
+                },
+                "sharesToBurn": {
+                    "type": "uint256",
+                    "description": "Baal voting weight to burn."
+                },
+                "lootToBurn": {
+                    "type": "uint256",
+                    "description": "Baal pure economic weight to burn."
+                },
+                "tokens": {
+                    "type": "address[]",
+                    "description": "Array of tokens to include in rage quit calculation"
+                }
+            },
+            "outputs": {},
+            "notice": "Process member burn of `shares` and/or `loot` to claim 'fair share' of specified `tokens`"
+        },
+        "renounceOwnership()": {
+            "stateMutability": "nonpayable",
+            "code": "function renounceOwnership() external nonpayable",
+            "inputs": {},
+            "outputs": {},
+            "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+        },
+        "setAdminConfig(bool,bool)": {
+            "stateMutability": "nonpayable",
+            "code": "function setAdminConfig(bool pauseShares, bool pauseLoot) external nonpayable",
+            "inputs": {
+                "pauseShares": {
+                    "type": "bool",
+                    "description": "Turn share transfers on or off"
+                },
+                "pauseLoot": {
+                    "type": "bool",
+                    "description": "Turn loot transfers on or off"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-or-admin-only function to set admin config (pause/unpause shares/loot)"
+        },
+        "setAvatar(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setAvatar(address _avatar) external nonpayable",
+            "inputs": {
+                "_avatar": {
+                    "type": "address"
+                }
+            },
+            "outputs": {},
+            "notice": "Can only be called by the current owner.",
+            "details": "Sets the avatar to a new avatar (`newAvatar`)."
+        },
+        "setGovernanceConfig(bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function setGovernanceConfig(bytes _governanceConfig) external nonpayable",
+            "inputs": {
+                "_governanceConfig": {
+                    "type": "bytes",
+                    "description": "Encoded configuration parameters voting, grace period, tribute, quorum, sponsor threshold, retention bound"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-or-governance-only function to change periods."
+        },
+        "setGuard(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setGuard(address _guard) external nonpayable",
+            "inputs": {
+                "_guard": {
+                    "type": "address",
+                    "description": "The address of the guard to be used or the 0 address to disable the guard."
+                }
+            },
+            "outputs": {},
+            "details": "Set a guard that checks transactions before execution."
+        },
+        "setShamans(address[],uint256[])": {
+            "stateMutability": "nonpayable",
+            "code": "function setShamans(address[] _shamans, uint256[] _permissions) external nonpayable",
+            "inputs": {
+                "_shamans": {
+                    "type": "address[]",
+                    "description": "Addresses of shaman contracts"
+                },
+                "_permissions": {
+                    "type": "uint256[]",
+                    "description": "Permission level of each shaman in _shamans"
+                }
+            },
+            "outputs": {},
+            "notice": "Baal-only function to set shaman status."
+        },
+        "setTarget(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setTarget(address _target) external nonpayable",
+            "inputs": {
+                "_target": {
+                    "type": "address"
+                }
+            },
+            "outputs": {},
+            "notice": "Can only be called by the current owner.",
+            "details": "Sets the target to a new target (`newTarget`)."
+        },
+        "setUp(bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function setUp(bytes _initializationParams) external nonpayable",
+            "inputs": {
+                "_initializationParams": {
+                    "type": "bytes",
+                    "description": "Encoded setup information."
+                }
+            },
+            "outputs": {},
+            "notice": "Summon Baal with voting configuration & initial array of `members` accounts with `shares` & `loot` weights."
+        },
+        "shamans(address)": {
+            "stateMutability": "view",
+            "code": "function shamans(address) external view returns (uint256)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "sharesPaused()": {
+            "stateMutability": "view",
+            "code": "function sharesPaused() external view returns (bool)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "sharesToken()": {
+            "stateMutability": "view",
+            "code": "function sharesToken() external view returns (contract IBaalToken)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "contract IBaalToken"
+                }
+            }
+        },
+        "sponsorProposal(uint32)": {
+            "stateMutability": "nonpayable",
+            "code": "function sponsorProposal(uint32 id) external nonpayable",
+            "inputs": {
+                "id": {
+                    "type": "uint32",
+                    "description": "Number of proposal in `proposals` mapping to sponsor."
+                }
+            },
+            "outputs": {},
+            "notice": "Sponsor proposal to Baal `members` for approval within voting period."
+        },
+        "sponsorThreshold()": {
+            "stateMutability": "view",
+            "code": "function sponsorThreshold() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "state(uint32)": {
+            "stateMutability": "view",
+            "code": "function state(uint32 id) external view returns (enum Baal.ProposalState)",
+            "inputs": {
+                "id": {
+                    "type": "uint32",
+                    "description": "Number of proposal in proposals"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "enum Baal.ProposalState",
+                    "description": "Unborn -> Submitted -> Voting -> Grace -> Ready -> Processed         \\-> Cancelled  \\-> Defeated"
+                }
+            },
+            "notice": "State helper to determine proposal state"
+        },
+        "submitProposal(bytes,uint32,uint256,string)": {
+            "stateMutability": "payable",
+            "code": "function submitProposal(bytes proposalData, uint32 expiration, uint256 baalGas, string details) external payable returns (uint256)",
+            "inputs": {
+                "proposalData": {
+                    "type": "bytes",
+                    "description": "Multisend encoded transactions or proposal data"
+                },
+                "expiration": {
+                    "type": "uint32"
+                },
+                "baalGas": {
+                    "type": "uint256"
+                },
+                "details": {
+                    "type": "string",
+                    "description": "Context for proposal."
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256",
+                    "description": "proposal Count for submitted proposal."
+                }
+            },
+            "notice": "Submit proposal to Baal `members` for approval within given voting period."
+        },
+        "submitVote(uint32,bool)": {
+            "stateMutability": "nonpayable",
+            "code": "function submitVote(uint32 id, bool approved) external nonpayable",
+            "inputs": {
+                "id": {
+                    "type": "uint32",
+                    "description": "Number of proposal in `proposals` mapping to cast vote on."
+                },
+                "approved": {
+                    "type": "bool",
+                    "description": "If 'true', member will cast `yesVotes` onto proposal - if 'false', `noVotes` will be counted."
+                }
+            },
+            "outputs": {},
+            "notice": "Submit vote - proposal must exist & voting period must not have ended."
+        },
+        "submitVoteWithSig(uint32,bool,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function submitVoteWithSig(uint32 id, bool approved, bytes signature) external nonpayable",
+            "inputs": {
+                "id": {
+                    "type": "uint32",
+                    "description": "Number of proposal in `proposals` mapping to cast vote on."
+                },
+                "approved": {
+                    "type": "bool",
+                    "description": "If 'true', member will cast `yesVotes` onto proposal - if 'false', `noVotes` will be counted."
+                },
+                "signature": {
+                    "type": "bytes",
+                    "description": "Concatenated signature"
+                }
+            },
+            "outputs": {},
+            "notice": "Submit vote with EIP-712 signature - proposal must exist & voting period must not have ended."
+        },
+        "target()": {
+            "stateMutability": "view",
+            "code": "function target() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "totalLoot()": {
+            "stateMutability": "view",
+            "code": "function totalLoot() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "notice": "Helper to check total supply of child loot contract"
+        },
+        "totalShares()": {
+            "stateMutability": "view",
+            "code": "function totalShares() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "notice": "Helper to check total supply of child shares contract"
+        },
+        "totalSupply()": {
+            "stateMutability": "view",
+            "code": "function totalSupply() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "notice": "Helper to check total supply of loot and shares"
+        },
+        "transferOwnership(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function transferOwnership(address newOwner) external nonpayable",
+            "inputs": {
+                "newOwner": {
+                    "type": "address"
+                }
+            },
+            "outputs": {},
+            "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+        },
+        "votingPeriod()": {
+            "stateMutability": "view",
+            "code": "function votingPeriod() external view returns (uint32)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint32"
+                }
+            }
+        }
+    },
+    "events": {
+        "Approval": {
+            "code": "event Approval(address indexed owner, address indexed spender, uint256 amount)",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "spender": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "amount": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "AvatarSet": {
+            "code": "event AvatarSet(address indexed previousAvatar, address indexed newAvatar)",
+            "inputs": {
+                "previousAvatar": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "newAvatar": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        },
+        "CancelProposal": {
+            "code": "event CancelProposal(uint256 indexed proposal)",
+            "inputs": {
+                "proposal": {
+                    "type": "uint256",
+                    "indexed": true
+                }
+            }
+        },
+        "ChangedGuard": {
+            "code": "event ChangedGuard(address guard)",
+            "inputs": {
+                "guard": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "GovernanceConfigSet": {
+            "code": "event GovernanceConfigSet(uint32 voting, uint32 grace, uint256 newOffering, uint256 quorum, uint256 sponsor, uint256 minRetention)",
+            "inputs": {
+                "voting": {
+                    "type": "uint32",
+                    "indexed": false
+                },
+                "grace": {
+                    "type": "uint32",
+                    "indexed": false
+                },
+                "newOffering": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "quorum": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "sponsor": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "minRetention": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "Initialized": {
+            "code": "event Initialized(uint8 version)",
+            "inputs": {
+                "version": {
+                    "type": "uint8",
+                    "indexed": false
+                }
+            }
+        },
+        "LootPaused": {
+            "code": "event LootPaused(bool paused)",
+            "inputs": {
+                "paused": {
+                    "type": "bool",
+                    "indexed": false
+                }
+            }
+        },
+        "OwnershipTransferred": {
+            "code": "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+            "inputs": {
+                "previousOwner": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "newOwner": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        },
+        "ProcessProposal": {
+            "code": "event ProcessProposal(uint256 indexed proposal, bool passed, bool actionFailed)",
+            "inputs": {
+                "proposal": {
+                    "type": "uint256",
+                    "indexed": true
+                },
+                "passed": {
+                    "type": "bool",
+                    "indexed": false
+                },
+                "actionFailed": {
+                    "type": "bool",
+                    "indexed": false
+                }
+            }
+        },
+        "Ragequit": {
+            "code": "event Ragequit(address indexed member, address to, uint256 indexed lootToBurn, uint256 indexed sharesToBurn, address[] tokens)",
+            "inputs": {
+                "member": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "to": {
+                    "type": "address",
+                    "indexed": false
+                },
+                "lootToBurn": {
+                    "type": "uint256",
+                    "indexed": true
+                },
+                "sharesToBurn": {
+                    "type": "uint256",
+                    "indexed": true
+                },
+                "tokens": {
+                    "type": "address[]",
+                    "indexed": false
+                }
+            }
+        },
+        "SetupComplete": {
+            "code": "event SetupComplete(bool lootPaused, bool sharesPaused, uint32 gracePeriod, uint32 votingPeriod, uint256 proposalOffering, uint256 quorumPercent, uint256 sponsorThreshold, uint256 minRetentionPercent, string name, string symbol, uint256 totalShares, uint256 totalLoot)",
+            "inputs": {
+                "lootPaused": {
+                    "type": "bool",
+                    "indexed": false
+                },
+                "sharesPaused": {
+                    "type": "bool",
+                    "indexed": false
+                },
+                "gracePeriod": {
+                    "type": "uint32",
+                    "indexed": false
+                },
+                "votingPeriod": {
+                    "type": "uint32",
+                    "indexed": false
+                },
+                "proposalOffering": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "quorumPercent": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "sponsorThreshold": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "minRetentionPercent": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "name": {
+                    "type": "string",
+                    "indexed": false
+                },
+                "symbol": {
+                    "type": "string",
+                    "indexed": false
+                },
+                "totalShares": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "totalLoot": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "ShamanSet": {
+            "code": "event ShamanSet(address indexed shaman, uint256 permission)",
+            "inputs": {
+                "shaman": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "permission": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "SharesPaused": {
+            "code": "event SharesPaused(bool paused)",
+            "inputs": {
+                "paused": {
+                    "type": "bool",
+                    "indexed": false
+                }
+            }
+        },
+        "SponsorProposal": {
+            "code": "event SponsorProposal(address indexed member, uint256 indexed proposal, uint256 indexed votingStarts)",
+            "inputs": {
+                "member": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "proposal": {
+                    "type": "uint256",
+                    "indexed": true
+                },
+                "votingStarts": {
+                    "type": "uint256",
+                    "indexed": true
+                }
+            }
+        },
+        "SubmitProposal": {
+            "code": "event SubmitProposal(uint256 indexed proposal, bytes32 indexed proposalDataHash, uint256 votingPeriod, bytes proposalData, uint256 expiration, uint256 baalGas, bool selfSponsor, uint256 timestamp, string details)",
+            "inputs": {
+                "proposal": {
+                    "type": "uint256",
+                    "indexed": true
+                },
+                "proposalDataHash": {
+                    "type": "bytes32",
+                    "indexed": true
+                },
+                "votingPeriod": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "proposalData": {
+                    "type": "bytes",
+                    "indexed": false
+                },
+                "expiration": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "baalGas": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "selfSponsor": {
+                    "type": "bool",
+                    "indexed": false
+                },
+                "timestamp": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "details": {
+                    "type": "string",
+                    "indexed": false
+                }
+            }
+        },
+        "SubmitVote": {
+            "code": "event SubmitVote(address indexed member, uint256 balance, uint256 indexed proposal, bool indexed approved)",
+            "inputs": {
+                "member": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "balance": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "proposal": {
+                    "type": "uint256",
+                    "indexed": true
+                },
+                "approved": {
+                    "type": "bool",
+                    "indexed": true
+                }
+            }
+        },
+        "TargetSet": {
+            "code": "event TargetSet(address indexed previousTarget, address indexed newTarget)",
+            "inputs": {
+                "previousTarget": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "newTarget": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        }
+    },
+    "errors": {
+        "NotIERC165Compliant": {
+            "code": "error NotIERC165Compliant(address guard_)",
+            "inputs": {
+                "guard_": {
+                    "type": "address"
+                }
+            },
+            "notice": "`guard_` does not implement IERC165."
+        }
+    },
+    "path": "",
+    "title": "Baal ';_;'.",
+    "notice": "Flexible guild contract inspired by Moloch DAO framework.",
+    "name": "Baal"
+}

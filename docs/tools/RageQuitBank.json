@@ -1,0 +1,51 @@
+{
+    "methods": {
+        "baal()": {
+            "stateMutability": "view",
+            "code": "function baal() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "init(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function init(address _baal) external nonpayable",
+            "inputs": {
+                "_baal": {
+                    "type": "address"
+                }
+            },
+            "outputs": {}
+        },
+        "memberAction(address,uint96,uint96)": {
+            "stateMutability": "payable",
+            "code": "function memberAction(address, uint96 loot, uint96 shares) external payable returns (uint96 lootOut, uint96 sharesOut)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "loot": {
+                    "type": "uint96"
+                },
+                "shares": {
+                    "type": "uint96"
+                }
+            },
+            "outputs": {
+                "lootOut": {
+                    "type": "uint96"
+                },
+                "sharesOut": {
+                    "type": "uint96"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/tools",
+    "name": "RageQuitBank"
+}

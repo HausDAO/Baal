@@ -1,0 +1,48 @@
+{
+    "methods": {
+        "baal()": {
+            "stateMutability": "view",
+            "code": "function baal() external view returns (contract Baal)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "contract Baal"
+                }
+            }
+        },
+        "doubler(address[])": {
+            "stateMutability": "payable",
+            "code": "function doubler(address[] members) external payable",
+            "inputs": {
+                "members": {
+                    "type": "address[]"
+                }
+            },
+            "outputs": {}
+        },
+        "init(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function init(address payable _baal) external nonpayable",
+            "inputs": {
+                "_baal": {
+                    "type": "address payable"
+                }
+            },
+            "outputs": {}
+        },
+        "sharesToken()": {
+            "stateMutability": "view",
+            "code": "function sharesToken() external view returns (contract IBaalToken)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "contract IBaalToken"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/tools",
+    "name": "ShamanMinter"
+}

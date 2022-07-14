@@ -1,0 +1,64 @@
+{
+    "methods": {
+        "burnLoot(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function burnLoot(address _from, uint256 _amount) external nonpayable",
+            "inputs": {
+                "_from": {
+                    "type": "address"
+                },
+                "_amount": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {}
+        },
+        "lootPaused()": {
+            "stateMutability": "view",
+            "code": "function lootPaused() external view returns (bool)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "lootToken()": {
+            "stateMutability": "view",
+            "code": "function lootToken() external view returns (contract IBaalToken)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "contract IBaalToken"
+                }
+            }
+        },
+        "mintLoot(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function mintLoot(address _to, uint256 _amount) external nonpayable",
+            "inputs": {
+                "_to": {
+                    "type": "address"
+                },
+                "_amount": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {}
+        },
+        "setLootPaused(bool)": {
+            "stateMutability": "nonpayable",
+            "code": "function setLootPaused(bool paused) external nonpayable",
+            "inputs": {
+                "paused": {
+                    "type": "bool"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/mock",
+    "name": "MockBaal"
+}

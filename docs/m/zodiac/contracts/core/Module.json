@@ -1,0 +1,195 @@
+{
+    "methods": {
+        "avatar()": {
+            "stateMutability": "view",
+            "code": "function avatar() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "details": "Address that will ultimately execute function calls."
+        },
+        "getGuard()": {
+            "stateMutability": "view",
+            "code": "function getGuard() external view returns (address _guard)",
+            "inputs": {},
+            "outputs": {
+                "_guard": {
+                    "type": "address"
+                }
+            }
+        },
+        "guard()": {
+            "stateMutability": "view",
+            "code": "function guard() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            }
+        },
+        "owner()": {
+            "stateMutability": "view",
+            "code": "function owner() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "details": "Returns the address of the current owner."
+        },
+        "renounceOwnership()": {
+            "stateMutability": "nonpayable",
+            "code": "function renounceOwnership() external nonpayable",
+            "inputs": {},
+            "outputs": {},
+            "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+        },
+        "setAvatar(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setAvatar(address _avatar) external nonpayable",
+            "inputs": {
+                "_avatar": {
+                    "type": "address"
+                }
+            },
+            "outputs": {},
+            "notice": "Can only be called by the current owner.",
+            "details": "Sets the avatar to a new avatar (`newAvatar`)."
+        },
+        "setGuard(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setGuard(address _guard) external nonpayable",
+            "inputs": {
+                "_guard": {
+                    "type": "address",
+                    "description": "The address of the guard to be used or the 0 address to disable the guard."
+                }
+            },
+            "outputs": {},
+            "details": "Set a guard that checks transactions before execution."
+        },
+        "setTarget(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setTarget(address _target) external nonpayable",
+            "inputs": {
+                "_target": {
+                    "type": "address"
+                }
+            },
+            "outputs": {},
+            "notice": "Can only be called by the current owner.",
+            "details": "Sets the target to a new target (`newTarget`)."
+        },
+        "setUp(bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function setUp(bytes initializeParams) external nonpayable",
+            "inputs": {
+                "initializeParams": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {}
+        },
+        "target()": {
+            "stateMutability": "view",
+            "code": "function target() external view returns (address)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "details": "Address that this module will pass transactions to."
+        },
+        "transferOwnership(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function transferOwnership(address newOwner) external nonpayable",
+            "inputs": {
+                "newOwner": {
+                    "type": "address"
+                }
+            },
+            "outputs": {},
+            "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+        }
+    },
+    "events": {
+        "AvatarSet": {
+            "code": "event AvatarSet(address indexed previousAvatar, address indexed newAvatar)",
+            "inputs": {
+                "previousAvatar": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "newAvatar": {
+                    "type": "address",
+                    "indexed": true
+                }
+            },
+            "details": "Emitted each time the avatar is set."
+        },
+        "ChangedGuard": {
+            "code": "event ChangedGuard(address guard)",
+            "inputs": {
+                "guard": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "Initialized": {
+            "code": "event Initialized(uint8 version)",
+            "inputs": {
+                "version": {
+                    "type": "uint8",
+                    "indexed": false
+                }
+            }
+        },
+        "OwnershipTransferred": {
+            "code": "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+            "inputs": {
+                "previousOwner": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "newOwner": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        },
+        "TargetSet": {
+            "code": "event TargetSet(address indexed previousTarget, address indexed newTarget)",
+            "inputs": {
+                "previousTarget": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "newTarget": {
+                    "type": "address",
+                    "indexed": true
+                }
+            },
+            "details": "Emitted each time the Target is set."
+        }
+    },
+    "errors": {
+        "NotIERC165Compliant": {
+            "code": "error NotIERC165Compliant(address guard_)",
+            "inputs": {
+                "guard_": {
+                    "type": "address"
+                }
+            },
+            "notice": "`guard_` does not implement IERC165."
+        }
+    },
+    "path": "m/zodiac/contracts/core",
+    "name": "Module"
+}

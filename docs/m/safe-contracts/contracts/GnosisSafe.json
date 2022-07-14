@@ -1,0 +1,833 @@
+{
+    "methods": {
+        "VERSION()": {
+            "stateMutability": "view",
+            "code": "function VERSION() external view returns (string)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "string"
+                }
+            }
+        },
+        "addOwnerWithThreshold(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function addOwnerWithThreshold(address owner, uint256 _threshold) external nonpayable",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "description": "New owner address."
+                },
+                "_threshold": {
+                    "type": "uint256",
+                    "description": "New threshold."
+                }
+            },
+            "outputs": {},
+            "notice": "Adds the owner `owner` to the Safe and updates the threshold to `_threshold`.",
+            "details": "Allows to add a new owner to the Safe and update the threshold at the same time.      This can only be done via a Safe transaction."
+        },
+        "approveHash(bytes32)": {
+            "stateMutability": "nonpayable",
+            "code": "function approveHash(bytes32 hashToApprove) external nonpayable",
+            "inputs": {
+                "hashToApprove": {
+                    "type": "bytes32",
+                    "description": "The hash that should be marked as approved for signatures that are verified by this contract."
+                }
+            },
+            "outputs": {},
+            "details": "Marks a hash as approved. This can be used to validate a hash that is used by a signature."
+        },
+        "approvedHashes(address,bytes32)": {
+            "stateMutability": "view",
+            "code": "function approvedHashes(address, bytes32) external view returns (uint256)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "bytes32"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "changeThreshold(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function changeThreshold(uint256 _threshold) external nonpayable",
+            "inputs": {
+                "_threshold": {
+                    "type": "uint256",
+                    "description": "New threshold."
+                }
+            },
+            "outputs": {},
+            "notice": "Changes the threshold of the Safe to `_threshold`.",
+            "details": "Allows to update the number of required confirmations by Safe owners.      This can only be done via a Safe transaction."
+        },
+        "checkNSignatures(bytes32,bytes,bytes,uint256)": {
+            "stateMutability": "view",
+            "code": "function checkNSignatures(bytes32 dataHash, bytes data, bytes signatures, uint256 requiredSignatures) external view",
+            "inputs": {
+                "dataHash": {
+                    "type": "bytes32",
+                    "description": "Hash of the data (could be either a message hash or transaction hash)"
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "That should be signed (this is passed to an external validator contract)"
+                },
+                "signatures": {
+                    "type": "bytes",
+                    "description": "Signature data that should be verified. Can be ECDSA signature, contract signature (EIP-1271) or approved hash."
+                },
+                "requiredSignatures": {
+                    "type": "uint256",
+                    "description": "Amount of required valid signatures."
+                }
+            },
+            "outputs": {},
+            "details": "Checks whether the signature provided is valid for the provided data, hash. Will revert otherwise."
+        },
+        "checkSignatures(bytes32,bytes,bytes)": {
+            "stateMutability": "view",
+            "code": "function checkSignatures(bytes32 dataHash, bytes data, bytes signatures) external view",
+            "inputs": {
+                "dataHash": {
+                    "type": "bytes32",
+                    "description": "Hash of the data (could be either a message hash or transaction hash)"
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "That should be signed (this is passed to an external validator contract)"
+                },
+                "signatures": {
+                    "type": "bytes",
+                    "description": "Signature data that should be verified. Can be ECDSA signature, contract signature (EIP-1271) or approved hash."
+                }
+            },
+            "outputs": {},
+            "details": "Checks whether the signature provided is valid for the provided data, hash. Will revert otherwise."
+        },
+        "disableModule(address,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function disableModule(address prevModule, address module) external nonpayable",
+            "inputs": {
+                "prevModule": {
+                    "type": "address",
+                    "description": "Module that pointed to the module to be removed in the linked list"
+                },
+                "module": {
+                    "type": "address",
+                    "description": "Module to be removed."
+                }
+            },
+            "outputs": {},
+            "notice": "Disables the module `module` for the Safe.",
+            "details": "Allows to remove a module from the whitelist.      This can only be done via a Safe transaction."
+        },
+        "domainSeparator()": {
+            "stateMutability": "view",
+            "code": "function domainSeparator() external view returns (bytes32)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "bytes32"
+                }
+            }
+        },
+        "enableModule(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function enableModule(address module) external nonpayable",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "description": "Module to be whitelisted."
+                }
+            },
+            "outputs": {},
+            "notice": "Enables the module `module` for the Safe.",
+            "details": "Allows to add a module to the whitelist.      This can only be done via a Safe transaction."
+        },
+        "encodeTransactionData(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)": {
+            "stateMutability": "view",
+            "code": "function encodeTransactionData(address to, uint256 value, bytes data, enum Enum.Operation operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address refundReceiver, uint256 _nonce) external view returns (bytes)",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Destination address."
+                },
+                "value": {
+                    "type": "uint256",
+                    "description": "Ether value."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload."
+                },
+                "operation": {
+                    "type": "enum Enum.Operation",
+                    "description": "Operation type."
+                },
+                "safeTxGas": {
+                    "type": "uint256",
+                    "description": "Gas that should be used for the safe transaction."
+                },
+                "baseGas": {
+                    "type": "uint256",
+                    "description": "Gas costs for that are independent of the transaction execution(e.g. base transaction fee, signature check, payment of the refund)"
+                },
+                "gasPrice": {
+                    "type": "uint256",
+                    "description": "Maximum gas price that should be used for this transaction."
+                },
+                "gasToken": {
+                    "type": "address",
+                    "description": "Token address (or 0 if ETH) that is used for the payment."
+                },
+                "refundReceiver": {
+                    "type": "address",
+                    "description": "Address of receiver of gas payment (or 0 if tx.origin)."
+                },
+                "_nonce": {
+                    "type": "uint256",
+                    "description": "Transaction nonce."
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes",
+                    "description": "Transaction hash bytes."
+                }
+            },
+            "details": "Returns the bytes that are hashed to be signed by owners."
+        },
+        "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)": {
+            "stateMutability": "payable",
+            "code": "function execTransaction(address to, uint256 value, bytes data, enum Enum.Operation operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address payable refundReceiver, bytes signatures) external payable returns (bool success)",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Destination address of Safe transaction."
+                },
+                "value": {
+                    "type": "uint256",
+                    "description": "Ether value of Safe transaction."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload of Safe transaction."
+                },
+                "operation": {
+                    "type": "enum Enum.Operation",
+                    "description": "Operation type of Safe transaction."
+                },
+                "safeTxGas": {
+                    "type": "uint256",
+                    "description": "Gas that should be used for the Safe transaction."
+                },
+                "baseGas": {
+                    "type": "uint256",
+                    "description": "Gas costs that are independent of the transaction execution(e.g. base transaction fee, signature check, payment of the refund)"
+                },
+                "gasPrice": {
+                    "type": "uint256",
+                    "description": "Gas price that should be used for the payment calculation."
+                },
+                "gasToken": {
+                    "type": "address",
+                    "description": "Token address (or 0 if ETH) that is used for the payment."
+                },
+                "refundReceiver": {
+                    "type": "address payable",
+                    "description": "Address of receiver of gas payment (or 0 if tx.origin)."
+                },
+                "signatures": {
+                    "type": "bytes",
+                    "description": "Packed signature data ({bytes32 r}{bytes32 s}{uint8 v})"
+                }
+            },
+            "outputs": {
+                "success": {
+                    "type": "bool"
+                }
+            },
+            "details": "Allows to execute a Safe transaction confirmed by required number of owners and then pays the account that submitted the transaction.      Note: The fees are always transferred, even if the user transaction fails."
+        },
+        "execTransactionFromModule(address,uint256,bytes,uint8)": {
+            "stateMutability": "nonpayable",
+            "code": "function execTransactionFromModule(address to, uint256 value, bytes data, enum Enum.Operation operation) external nonpayable returns (bool success)",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Destination address of module transaction."
+                },
+                "value": {
+                    "type": "uint256",
+                    "description": "Ether value of module transaction."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload of module transaction."
+                },
+                "operation": {
+                    "type": "enum Enum.Operation",
+                    "description": "Operation type of module transaction."
+                }
+            },
+            "outputs": {
+                "success": {
+                    "type": "bool"
+                }
+            },
+            "details": "Allows a Module to execute a Safe transaction without any further confirmations."
+        },
+        "execTransactionFromModuleReturnData(address,uint256,bytes,uint8)": {
+            "stateMutability": "nonpayable",
+            "code": "function execTransactionFromModuleReturnData(address to, uint256 value, bytes data, enum Enum.Operation operation) external nonpayable returns (bool success, bytes returnData)",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Destination address of module transaction."
+                },
+                "value": {
+                    "type": "uint256",
+                    "description": "Ether value of module transaction."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload of module transaction."
+                },
+                "operation": {
+                    "type": "enum Enum.Operation",
+                    "description": "Operation type of module transaction."
+                }
+            },
+            "outputs": {
+                "success": {
+                    "type": "bool"
+                },
+                "returnData": {
+                    "type": "bytes"
+                }
+            },
+            "details": "Allows a Module to execute a Safe transaction without any further confirmations and return data"
+        },
+        "getChainId()": {
+            "stateMutability": "view",
+            "code": "function getChainId() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            },
+            "details": "Returns the chain id used by this contract."
+        },
+        "getModulesPaginated(address,uint256)": {
+            "stateMutability": "view",
+            "code": "function getModulesPaginated(address start, uint256 pageSize) external view returns (address[] array, address next)",
+            "inputs": {
+                "start": {
+                    "type": "address",
+                    "description": "Start of the page."
+                },
+                "pageSize": {
+                    "type": "uint256",
+                    "description": "Maximum number of modules that should be returned."
+                }
+            },
+            "outputs": {
+                "array": {
+                    "type": "address[]",
+                    "description": "Array of modules."
+                },
+                "next": {
+                    "type": "address",
+                    "description": "Start of the next page."
+                }
+            },
+            "details": "Returns array of modules."
+        },
+        "getOwners()": {
+            "stateMutability": "view",
+            "code": "function getOwners() external view returns (address[])",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address[]",
+                    "description": "Array of Safe owners."
+                }
+            },
+            "details": "Returns array of owners."
+        },
+        "getStorageAt(uint256,uint256)": {
+            "stateMutability": "view",
+            "code": "function getStorageAt(uint256 offset, uint256 length) external view returns (bytes)",
+            "inputs": {
+                "offset": {
+                    "type": "uint256",
+                    "description": "- the offset in the current contract's storage in words to start reading from"
+                },
+                "length": {
+                    "type": "uint256",
+                    "description": "- the number of words (32 bytes) of data to read"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes",
+                    "description": "the bytes that were read."
+                }
+            },
+            "details": "Reads `length` bytes of storage in the currents contract"
+        },
+        "getThreshold()": {
+            "stateMutability": "view",
+            "code": "function getThreshold() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "getTransactionHash(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,uint256)": {
+            "stateMutability": "view",
+            "code": "function getTransactionHash(address to, uint256 value, bytes data, enum Enum.Operation operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address refundReceiver, uint256 _nonce) external view returns (bytes32)",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Destination address."
+                },
+                "value": {
+                    "type": "uint256",
+                    "description": "Ether value."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload."
+                },
+                "operation": {
+                    "type": "enum Enum.Operation",
+                    "description": "Operation type."
+                },
+                "safeTxGas": {
+                    "type": "uint256",
+                    "description": "Fas that should be used for the safe transaction."
+                },
+                "baseGas": {
+                    "type": "uint256",
+                    "description": "Gas costs for data used to trigger the safe transaction."
+                },
+                "gasPrice": {
+                    "type": "uint256",
+                    "description": "Maximum gas price that should be used for this transaction."
+                },
+                "gasToken": {
+                    "type": "address",
+                    "description": "Token address (or 0 if ETH) that is used for the payment."
+                },
+                "refundReceiver": {
+                    "type": "address",
+                    "description": "Address of receiver of gas payment (or 0 if tx.origin)."
+                },
+                "_nonce": {
+                    "type": "uint256",
+                    "description": "Transaction nonce."
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes32",
+                    "description": "Transaction hash."
+                }
+            },
+            "details": "Returns hash to be signed by owners."
+        },
+        "isModuleEnabled(address)": {
+            "stateMutability": "view",
+            "code": "function isModuleEnabled(address module) external view returns (bool)",
+            "inputs": {
+                "module": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool",
+                    "description": "True if the module is enabled"
+                }
+            },
+            "details": "Returns if an module is enabled"
+        },
+        "isOwner(address)": {
+            "stateMutability": "view",
+            "code": "function isOwner(address owner) external view returns (bool)",
+            "inputs": {
+                "owner": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "nonce()": {
+            "stateMutability": "view",
+            "code": "function nonce() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "removeOwner(address,address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function removeOwner(address prevOwner, address owner, uint256 _threshold) external nonpayable",
+            "inputs": {
+                "prevOwner": {
+                    "type": "address",
+                    "description": "Owner that pointed to the owner to be removed in the linked list"
+                },
+                "owner": {
+                    "type": "address",
+                    "description": "Owner address to be removed."
+                },
+                "_threshold": {
+                    "type": "uint256",
+                    "description": "New threshold."
+                }
+            },
+            "outputs": {},
+            "notice": "Removes the owner `owner` from the Safe and updates the threshold to `_threshold`.",
+            "details": "Allows to remove an owner from the Safe and update the threshold at the same time.      This can only be done via a Safe transaction."
+        },
+        "requiredTxGas(address,uint256,bytes,uint8)": {
+            "stateMutability": "nonpayable",
+            "code": "function requiredTxGas(address to, uint256 value, bytes data, enum Enum.Operation operation) external nonpayable returns (uint256)",
+            "inputs": {
+                "to": {
+                    "type": "address",
+                    "description": "Destination address of Safe transaction."
+                },
+                "value": {
+                    "type": "uint256",
+                    "description": "Ether value of Safe transaction."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload of Safe transaction."
+                },
+                "operation": {
+                    "type": "enum Enum.Operation",
+                    "description": "Operation type of Safe transaction."
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256",
+                    "description": "Estimate without refunds and overhead fees (base transaction and payload data gas costs)."
+                }
+            },
+            "notice": "Deprecated in favor of common/StorageAccessible.sol and will be removed in next version.",
+            "details": "Allows to estimate a Safe transaction.      This method is only meant for estimation purpose, therefore the call will always revert and encode the result in the revert data.      Since the `estimateGas` function includes refunds, call this method to get an estimated of the costs that are deducted from the safe with `execTransaction`"
+        },
+        "setFallbackHandler(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setFallbackHandler(address handler) external nonpayable",
+            "inputs": {
+                "handler": {
+                    "type": "address",
+                    "description": "contract to handle fallbacks calls."
+                }
+            },
+            "outputs": {},
+            "details": "Allows to add a contract to handle fallback calls.      Only fallback calls without value and with data will be forwarded.      This can only be done via a Safe transaction."
+        },
+        "setGuard(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setGuard(address guard) external nonpayable",
+            "inputs": {
+                "guard": {
+                    "type": "address",
+                    "description": "The address of the guard to be used or the 0 address to disable the guard"
+                }
+            },
+            "outputs": {},
+            "details": "Set a guard that checks transactions before execution"
+        },
+        "setup(address[],uint256,address,bytes,address,address,uint256,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setup(address[] _owners, uint256 _threshold, address to, bytes data, address fallbackHandler, address paymentToken, uint256 payment, address payable paymentReceiver) external nonpayable",
+            "inputs": {
+                "_owners": {
+                    "type": "address[]",
+                    "description": "List of Safe owners."
+                },
+                "_threshold": {
+                    "type": "uint256",
+                    "description": "Number of required confirmations for a Safe transaction."
+                },
+                "to": {
+                    "type": "address",
+                    "description": "Contract address for optional delegate call."
+                },
+                "data": {
+                    "type": "bytes",
+                    "description": "Data payload for optional delegate call."
+                },
+                "fallbackHandler": {
+                    "type": "address",
+                    "description": "Handler for fallback calls to this contract"
+                },
+                "paymentToken": {
+                    "type": "address",
+                    "description": "Token that should be used for the payment (0 is ETH)"
+                },
+                "payment": {
+                    "type": "uint256",
+                    "description": "Value that should be paid"
+                },
+                "paymentReceiver": {
+                    "type": "address payable",
+                    "description": "Adddress that should receive the payment (or 0 if tx.origin)"
+                }
+            },
+            "outputs": {},
+            "details": "Setup function sets initial storage of contract."
+        },
+        "signedMessages(bytes32)": {
+            "stateMutability": "view",
+            "code": "function signedMessages(bytes32) external view returns (uint256)",
+            "inputs": {
+                "_0": {
+                    "type": "bytes32"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "simulateAndRevert(address,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function simulateAndRevert(address targetContract, bytes calldataPayload) external nonpayable",
+            "inputs": {
+                "targetContract": {
+                    "type": "address",
+                    "description": "Address of the contract containing the code to execute."
+                },
+                "calldataPayload": {
+                    "type": "bytes",
+                    "description": "Calldata that should be sent to the target contract (encoded method name and arguments)."
+                }
+            },
+            "outputs": {},
+            "details": "Performs a delegetecall on a targetContract in the context of self. Internally reverts execution to avoid side effects (making it static). This method reverts with data equal to `abi.encode(bool(success), bytes(response))`. Specifically, the `returndata` after a call to this method will be: `success:bool || response.length:uint256 || response:bytes`."
+        },
+        "swapOwner(address,address,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function swapOwner(address prevOwner, address oldOwner, address newOwner) external nonpayable",
+            "inputs": {
+                "prevOwner": {
+                    "type": "address",
+                    "description": "Owner that pointed to the owner to be replaced in the linked list"
+                },
+                "oldOwner": {
+                    "type": "address",
+                    "description": "Owner address to be replaced."
+                },
+                "newOwner": {
+                    "type": "address",
+                    "description": "New owner address."
+                }
+            },
+            "outputs": {},
+            "notice": "Replaces the owner `oldOwner` in the Safe with `newOwner`.",
+            "details": "Allows to swap/replace an owner from the Safe with another address.      This can only be done via a Safe transaction."
+        }
+    },
+    "events": {
+        "AddedOwner": {
+            "code": "event AddedOwner(address owner)",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "ApproveHash": {
+            "code": "event ApproveHash(bytes32 indexed approvedHash, address indexed owner)",
+            "inputs": {
+                "approvedHash": {
+                    "type": "bytes32",
+                    "indexed": true
+                },
+                "owner": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        },
+        "ChangedFallbackHandler": {
+            "code": "event ChangedFallbackHandler(address handler)",
+            "inputs": {
+                "handler": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "ChangedGuard": {
+            "code": "event ChangedGuard(address guard)",
+            "inputs": {
+                "guard": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "ChangedThreshold": {
+            "code": "event ChangedThreshold(uint256 threshold)",
+            "inputs": {
+                "threshold": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "DisabledModule": {
+            "code": "event DisabledModule(address module)",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "EnabledModule": {
+            "code": "event EnabledModule(address module)",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "ExecutionFailure": {
+            "code": "event ExecutionFailure(bytes32 txHash, uint256 payment)",
+            "inputs": {
+                "txHash": {
+                    "type": "bytes32",
+                    "indexed": false
+                },
+                "payment": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "ExecutionFromModuleFailure": {
+            "code": "event ExecutionFromModuleFailure(address indexed module)",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        },
+        "ExecutionFromModuleSuccess": {
+            "code": "event ExecutionFromModuleSuccess(address indexed module)",
+            "inputs": {
+                "module": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        },
+        "ExecutionSuccess": {
+            "code": "event ExecutionSuccess(bytes32 txHash, uint256 payment)",
+            "inputs": {
+                "txHash": {
+                    "type": "bytes32",
+                    "indexed": false
+                },
+                "payment": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "RemovedOwner": {
+            "code": "event RemovedOwner(address owner)",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "SafeReceived": {
+            "code": "event SafeReceived(address indexed sender, uint256 value)",
+            "inputs": {
+                "sender": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "value": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "SafeSetup": {
+            "code": "event SafeSetup(address indexed initiator, address[] owners, uint256 threshold, address initializer, address fallbackHandler)",
+            "inputs": {
+                "initiator": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "owners": {
+                    "type": "address[]",
+                    "indexed": false
+                },
+                "threshold": {
+                    "type": "uint256",
+                    "indexed": false
+                },
+                "initializer": {
+                    "type": "address",
+                    "indexed": false
+                },
+                "fallbackHandler": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "SignMsg": {
+            "code": "event SignMsg(bytes32 indexed msgHash)",
+            "inputs": {
+                "msgHash": {
+                    "type": "bytes32",
+                    "indexed": true
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "m/safe-contracts/contracts",
+    "title": "Gnosis Safe - A multisignature wallet with support for confirmations using signed messages based on ERC191.",
+    "author": "Stefan George - <stefan@gnosis.io>Richard Meissner - <richard@gnosis.io>",
+    "name": "GnosisSafe"
+}

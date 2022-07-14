@@ -1,0 +1,33 @@
+{
+    "methods": {
+        "tokensReceived(address,address,address,uint256,bytes,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function tokensReceived(address operator, address from, address to, uint256 amount, bytes data, bytes operatorData) external nonpayable",
+            "inputs": {
+                "operator": {
+                    "type": "address"
+                },
+                "from": {
+                    "type": "address"
+                },
+                "to": {
+                    "type": "address"
+                },
+                "amount": {
+                    "type": "uint256"
+                },
+                "data": {
+                    "type": "bytes"
+                },
+                "operatorData": {
+                    "type": "bytes"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/interfaces",
+    "name": "ERC777TokensRecipient"
+}

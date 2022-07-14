@@ -1,0 +1,112 @@
+{
+    "methods": {
+        "balanceOf(address)": {
+            "stateMutability": "view",
+            "code": "function balanceOf(address account) external view returns (uint256)",
+            "inputs": {
+                "account": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "burn(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function burn(address account, uint256 amount) external nonpayable",
+            "inputs": {
+                "account": {
+                    "type": "address"
+                },
+                "amount": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {}
+        },
+        "getCheckpoint(address,uint256)": {
+            "stateMutability": "view",
+            "code": "function getCheckpoint(address, uint256) external view returns (struct IBaalToken.Checkpoint)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                },
+                "_1": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "IBaalToken.Checkpoint"
+                }
+            }
+        },
+        "mint(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function mint(address recipient, uint256 amount) external nonpayable",
+            "inputs": {
+                "recipient": {
+                    "type": "address"
+                },
+                "amount": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {}
+        },
+        "name()": {
+            "stateMutability": "view",
+            "code": "function name() external view returns (string)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "string"
+                }
+            }
+        },
+        "numCheckpoints(address)": {
+            "stateMutability": "view",
+            "code": "function numCheckpoints(address) external view returns (uint256)",
+            "inputs": {
+                "_0": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "setUp(string,string)": {
+            "stateMutability": "nonpayable",
+            "code": "function setUp(string _name, string _symbol) external nonpayable",
+            "inputs": {
+                "_name": {
+                    "type": "string"
+                },
+                "_symbol": {
+                    "type": "string"
+                }
+            },
+            "outputs": {}
+        },
+        "totalSupply()": {
+            "stateMutability": "view",
+            "code": "function totalSupply() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "",
+    "name": "IBaalToken"
+}

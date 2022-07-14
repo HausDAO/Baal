@@ -1,0 +1,32 @@
+{
+    "methods": {
+        "setFallbackHandler(address)": {
+            "stateMutability": "nonpayable",
+            "code": "function setFallbackHandler(address handler) external nonpayable",
+            "inputs": {
+                "handler": {
+                    "type": "address",
+                    "description": "contract to handle fallbacks calls."
+                }
+            },
+            "outputs": {},
+            "details": "Allows to add a contract to handle fallback calls.      Only fallback calls without value and with data will be forwarded.      This can only be done via a Safe transaction."
+        }
+    },
+    "events": {
+        "ChangedFallbackHandler": {
+            "code": "event ChangedFallbackHandler(address handler)",
+            "inputs": {
+                "handler": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "m/safe-contracts/contracts/base",
+    "title": "Fallback Manager - A contract that manages fallback calls made to this contract",
+    "author": "Richard Meissner - <richard@gnosis.pm>",
+    "name": "FallbackManager"
+}

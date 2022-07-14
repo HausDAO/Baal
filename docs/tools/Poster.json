@@ -1,0 +1,39 @@
+{
+    "methods": {
+        "post(string,string)": {
+            "stateMutability": "nonpayable",
+            "code": "function post(string content, string tag) external nonpayable",
+            "inputs": {
+                "content": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            },
+            "outputs": {}
+        }
+    },
+    "events": {
+        "NewPost": {
+            "code": "event NewPost(address indexed user, string content, string indexed tag)",
+            "inputs": {
+                "user": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "content": {
+                    "type": "string",
+                    "indexed": false
+                },
+                "tag": {
+                    "type": "string",
+                    "indexed": true
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "/tools",
+    "name": "Poster"
+}

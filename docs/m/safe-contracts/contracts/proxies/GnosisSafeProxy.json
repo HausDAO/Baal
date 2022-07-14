@@ -1,0 +1,9 @@
+{
+    "methods": {},
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/proxies",
+    "title": "GnosisSafeProxy - Generic proxy contract allows to execute all transactions applying the code of a master contract.",
+    "author": "Stefan George - <stefan@gnosis.io>Richard Meissner - <richard@gnosis.io>",
+    "name": "GnosisSafeProxy"
+}

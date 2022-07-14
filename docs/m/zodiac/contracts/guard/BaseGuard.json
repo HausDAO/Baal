@@ -1,0 +1,78 @@
+{
+    "methods": {
+        "checkAfterExecution(bytes32,bool)": {
+            "stateMutability": "nonpayable",
+            "code": "function checkAfterExecution(bytes32 txHash, bool success) external nonpayable",
+            "inputs": {
+                "txHash": {
+                    "type": "bytes32"
+                },
+                "success": {
+                    "type": "bool"
+                }
+            },
+            "outputs": {}
+        },
+        "checkTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function checkTransaction(address to, uint256 value, bytes data, enum Enum.Operation operation, uint256 safeTxGas, uint256 baseGas, uint256 gasPrice, address gasToken, address payable refundReceiver, bytes signatures, address msgSender) external nonpayable",
+            "inputs": {
+                "to": {
+                    "type": "address"
+                },
+                "value": {
+                    "type": "uint256"
+                },
+                "data": {
+                    "type": "bytes"
+                },
+                "operation": {
+                    "type": "enum Enum.Operation"
+                },
+                "safeTxGas": {
+                    "type": "uint256"
+                },
+                "baseGas": {
+                    "type": "uint256"
+                },
+                "gasPrice": {
+                    "type": "uint256"
+                },
+                "gasToken": {
+                    "type": "address"
+                },
+                "refundReceiver": {
+                    "type": "address payable"
+                },
+                "signatures": {
+                    "type": "bytes"
+                },
+                "msgSender": {
+                    "type": "address"
+                }
+            },
+            "outputs": {},
+            "notice": "This interface is used to maintain compatibilty with Gnosis Safe transaction guards.",
+            "details": "Module transactions only use the first four parameters: to, value, data, and operation. Module.sol hardcodes the remaining parameters as 0 since they are not used for module transactions."
+        },
+        "supportsInterface(bytes4)": {
+            "stateMutability": "pure",
+            "code": "function supportsInterface(bytes4 interfaceId) external pure returns (bool)",
+            "inputs": {
+                "interfaceId": {
+                    "type": "bytes4"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            },
+            "details": "Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas."
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/zodiac/contracts/guard",
+    "name": "BaseGuard"
+}

@@ -1,0 +1,28 @@
+{
+    "methods": {
+        "transferFrom(address,address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function transferFrom(address from, address to, uint256 value) external nonpayable returns (bool)",
+            "inputs": {
+                "from": {
+                    "type": "address"
+                },
+                "to": {
+                    "type": "address"
+                },
+                "value": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "/tools",
+    "name": "IERC20"
+}

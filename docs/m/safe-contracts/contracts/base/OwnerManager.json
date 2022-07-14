@@ -1,0 +1,146 @@
+{
+    "methods": {
+        "addOwnerWithThreshold(address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function addOwnerWithThreshold(address owner, uint256 _threshold) external nonpayable",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "description": "New owner address."
+                },
+                "_threshold": {
+                    "type": "uint256",
+                    "description": "New threshold."
+                }
+            },
+            "outputs": {},
+            "notice": "Adds the owner `owner` to the Safe and updates the threshold to `_threshold`.",
+            "details": "Allows to add a new owner to the Safe and update the threshold at the same time.      This can only be done via a Safe transaction."
+        },
+        "changeThreshold(uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function changeThreshold(uint256 _threshold) external nonpayable",
+            "inputs": {
+                "_threshold": {
+                    "type": "uint256",
+                    "description": "New threshold."
+                }
+            },
+            "outputs": {},
+            "notice": "Changes the threshold of the Safe to `_threshold`.",
+            "details": "Allows to update the number of required confirmations by Safe owners.      This can only be done via a Safe transaction."
+        },
+        "getOwners()": {
+            "stateMutability": "view",
+            "code": "function getOwners() external view returns (address[])",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "address[]",
+                    "description": "Array of Safe owners."
+                }
+            },
+            "details": "Returns array of owners."
+        },
+        "getThreshold()": {
+            "stateMutability": "view",
+            "code": "function getThreshold() external view returns (uint256)",
+            "inputs": {},
+            "outputs": {
+                "_0": {
+                    "type": "uint256"
+                }
+            }
+        },
+        "isOwner(address)": {
+            "stateMutability": "view",
+            "code": "function isOwner(address owner) external view returns (bool)",
+            "inputs": {
+                "owner": {
+                    "type": "address"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bool"
+                }
+            }
+        },
+        "removeOwner(address,address,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function removeOwner(address prevOwner, address owner, uint256 _threshold) external nonpayable",
+            "inputs": {
+                "prevOwner": {
+                    "type": "address",
+                    "description": "Owner that pointed to the owner to be removed in the linked list"
+                },
+                "owner": {
+                    "type": "address",
+                    "description": "Owner address to be removed."
+                },
+                "_threshold": {
+                    "type": "uint256",
+                    "description": "New threshold."
+                }
+            },
+            "outputs": {},
+            "notice": "Removes the owner `owner` from the Safe and updates the threshold to `_threshold`.",
+            "details": "Allows to remove an owner from the Safe and update the threshold at the same time.      This can only be done via a Safe transaction."
+        },
+        "swapOwner(address,address,address)": {
+            "stateMutability": "nonpayable",
+            "code": "function swapOwner(address prevOwner, address oldOwner, address newOwner) external nonpayable",
+            "inputs": {
+                "prevOwner": {
+                    "type": "address",
+                    "description": "Owner that pointed to the owner to be replaced in the linked list"
+                },
+                "oldOwner": {
+                    "type": "address",
+                    "description": "Owner address to be replaced."
+                },
+                "newOwner": {
+                    "type": "address",
+                    "description": "New owner address."
+                }
+            },
+            "outputs": {},
+            "notice": "Replaces the owner `oldOwner` in the Safe with `newOwner`.",
+            "details": "Allows to swap/replace an owner from the Safe with another address.      This can only be done via a Safe transaction."
+        }
+    },
+    "events": {
+        "AddedOwner": {
+            "code": "event AddedOwner(address owner)",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        },
+        "ChangedThreshold": {
+            "code": "event ChangedThreshold(uint256 threshold)",
+            "inputs": {
+                "threshold": {
+                    "type": "uint256",
+                    "indexed": false
+                }
+            }
+        },
+        "RemovedOwner": {
+            "code": "event RemovedOwner(address owner)",
+            "inputs": {
+                "owner": {
+                    "type": "address",
+                    "indexed": false
+                }
+            }
+        }
+    },
+    "errors": {},
+    "path": "m/safe-contracts/contracts/base",
+    "title": "OwnerManager - Manages a set of owners and a threshold to perform actions.",
+    "author": "Stefan George - <stefan@gnosis.pm>Richard Meissner - <richard@gnosis.pm>",
+    "name": "OwnerManager"
+}

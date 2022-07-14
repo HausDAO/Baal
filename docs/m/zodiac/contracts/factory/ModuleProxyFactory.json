@@ -1,0 +1,66 @@
+{
+    "methods": {
+        "deployModule(address,bytes,uint256)": {
+            "stateMutability": "nonpayable",
+            "code": "function deployModule(address masterCopy, bytes initializer, uint256 saltNonce) external nonpayable returns (address proxy)",
+            "inputs": {
+                "masterCopy": {
+                    "type": "address"
+                },
+                "initializer": {
+                    "type": "bytes"
+                },
+                "saltNonce": {
+                    "type": "uint256"
+                }
+            },
+            "outputs": {
+                "proxy": {
+                    "type": "address"
+                }
+            }
+        }
+    },
+    "events": {
+        "ModuleProxyCreation": {
+            "code": "event ModuleProxyCreation(address indexed proxy, address indexed masterCopy)",
+            "inputs": {
+                "proxy": {
+                    "type": "address",
+                    "indexed": true
+                },
+                "masterCopy": {
+                    "type": "address",
+                    "indexed": true
+                }
+            }
+        }
+    },
+    "errors": {
+        "FailedInitialization": {
+            "code": "error FailedInitialization()",
+            "inputs": {},
+            "notice": "Initialization failed."
+        },
+        "TakenAddress": {
+            "code": "error TakenAddress(address address_)",
+            "inputs": {
+                "address_": {
+                    "type": "address"
+                }
+            },
+            "notice": "`address_` is already taken."
+        },
+        "ZeroAddress": {
+            "code": "error ZeroAddress(address target)",
+            "inputs": {
+                "target": {
+                    "type": "address"
+                }
+            },
+            "notice": "`target` can not be zero."
+        }
+    },
+    "path": "m/zodiac/contracts/factory",
+    "name": "ModuleProxyFactory"
+}

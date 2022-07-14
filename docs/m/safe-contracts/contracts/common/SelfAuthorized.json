@@ -1,0 +1,9 @@
+{
+    "methods": {},
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/common",
+    "title": "SelfAuthorized - authorizes current contract to perform actions",
+    "author": "Richard Meissner - <richard@gnosis.pm>",
+    "name": "SelfAuthorized"
+}

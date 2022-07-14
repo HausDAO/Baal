@@ -1,0 +1,39 @@
+{
+    "methods": {
+        "onERC721Received(address,address,uint256,bytes)": {
+            "stateMutability": "nonpayable",
+            "code": "function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes _data) external nonpayable returns (bytes4)",
+            "inputs": {
+                "_operator": {
+                    "type": "address",
+                    "description": "The address which called `safeTransferFrom` function"
+                },
+                "_from": {
+                    "type": "address",
+                    "description": "The address which previously owned the token"
+                },
+                "_tokenId": {
+                    "type": "uint256",
+                    "description": "The NFT identifier which is being transferred"
+                },
+                "_data": {
+                    "type": "bytes",
+                    "description": "Additional data with no specified format"
+                }
+            },
+            "outputs": {
+                "_0": {
+                    "type": "bytes4",
+                    "description": "`bytes4(keccak256(\"onERC721Received(address,address,uint256,bytes)\"))`  unless throwing"
+                }
+            },
+            "notice": "Handle the receipt of an NFT",
+            "details": "The ERC721 smart contract calls this function on the recipient  after a `transfer`. This function MAY throw to revert and reject the  transfer. Return of other than the magic value MUST result in the  transaction being reverted.  Note: the contract address is always the message sender."
+        }
+    },
+    "events": {},
+    "errors": {},
+    "path": "m/safe-contracts/contracts/interfaces",
+    "details": "Note: the ERC-165 identifier for this interface is 0x150b7a02.",
+    "name": "ERC721TokenReceiver"
+}
