@@ -409,7 +409,8 @@ describe("Onboarder type", function () {
         100, // max units
         ethers.utils.parseEther("1.0"), // price per unit
         "test", // details
-        false) // erc20
+        false, // erc20
+        ) 
     // console.log(summoner);
 
     let result = await summonOnboarder.wait();

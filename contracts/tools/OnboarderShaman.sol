@@ -172,7 +172,9 @@ contract OnboarderShaman is ReentrancyGuard {
         uint256 _raiseStartTime,
         uint256 _maxUnits, // per individual
         uint256 _pricePerUnit,
-        bool _onlyERC20
+        bool _onlyERC20,
+        uint256 _platformFee, 
+        uint256 _lootPerUnit
     ) public {
         require(!initialized, "already initialized");
         initialized = true;
@@ -184,6 +186,8 @@ contract OnboarderShaman is ReentrancyGuard {
         maxUnitsPerAddr = _maxUnits;
         pricePerUnit = _pricePerUnit;
         onlyERC20 = _onlyERC20;
+        platformFee = _platformFee;
+        lootPerUnit = _lootPerUnit;
         factory = OnboarderShamanSummoner(msg.sender);
     }
 
@@ -218,8 +222,8 @@ contract OnboarderShaman is ReentrancyGuard {
 
         balance = balance + _value;
 
-        uint256 lootToGive = (numUnits * factory.lootPerUnit());
-        uint256 lootToPlatform = (numUnits * factory.platformFee());
+        uint256 lootToGive = (numUnits * lootPerUnit);
+        uint256 lootToPlatform = (numUnits * platformFee);
 
         address[] memory recs = new address[](1);
         recs[0] = msg.sender;
@@ -282,8 +286,8 @@ contract OnboarderShaman is ReentrancyGuard {
 
         balance = balance + newValue;
 
-        uint256 lootToGive = (numUnits * factory.lootPerUnit());
-        uint256 lootToPlatform = (numUnits * factory.platformFee());
+        uint256 lootToGive = (numUnits * lootPerUnit);
+        uint256 lootToPlatform = (numUnits * platformFee);
 
         address[] memory recs = new address[](1);
         recs[0] = msg.sender;
@@ -340,12 +344,6 @@ contract CloneFactory {
 
 contract OnboarderShamanSummoner is CloneFactory, Ownable {
     address payable public template;
-    uint256 public yeetIdx = 0;
-
-    uint256 public platformFee = 3; // fee of 3.09%
-    uint256 public lootPerUnit = 100;
-
-    event PlatformFeeUpdate(uint256 platformFee, uint256 lootPerUnit);
 
     event SummonOnbShamanoarderComplete(
         address indexed baal,
@@ -359,7 +357,6 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
         string details,
         bool _onlyERC20
     );
-            // bool _onlyERC20
 
     constructor(address payable _template) {
         template = _template;
@@ -376,7 +373,9 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
         uint256 _maxUnits,
         uint256 _pricePerUnit,
         string calldata _details,
-        bool _onlyERC20
+        bool _onlyERC20,
+        uint256 _platformFee, 
+        uint256 _lootPerUnit
     ) public returns (address) {
         OnboarderShaman onboarder = OnboarderShaman(payable(createClone(template)));
 
@@ -388,7 +387,9 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
             _raiseStartTime,
             _maxUnits,
             _pricePerUnit,
-            _onlyERC20
+            _onlyERC20,
+            _platformFee,
+            _lootPerUnit
         );
 
 
@@ -408,14 +409,4 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
         return address(onboarder);
     }
 
-    // owner only functions
-    function setConfig(uint256 _platformFee, uint256 _lootPerUnit)
-        public
-        onlyOwner
-    {
-        require(_lootPerUnit > 0, "Can not be 0");
-        platformFee = _platformFee;
-        lootPerUnit = _lootPerUnit;
-        emit PlatformFeeUpdate(platformFee, lootPerUnit);
-    }
 }
