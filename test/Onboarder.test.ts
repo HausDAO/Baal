@@ -410,6 +410,8 @@ describe("Onboarder type", function () {
         ethers.utils.parseEther("1.0"), // price per unit
         "test", // details
         false, // erc20
+        3,
+        100
         ) 
     // console.log(summoner);
 
