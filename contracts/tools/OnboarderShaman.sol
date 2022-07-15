@@ -16,7 +16,8 @@ interface IERC20 {
 
 interface IBAAL {
     function mintLoot(address[] calldata to, uint256[] calldata amount) external;
-    function shamans(address shaman) external returns(bool);
+    function shamans(address shaman) external returns(uint256);
+    function isManager(address shaman) external returns(bool);
     function target() external returns(address);
 }
 
@@ -196,7 +197,7 @@ contract OnboarderShaman is ReentrancyGuard {
         require(balance < maxTarget, "Max Target reached"); // balance plus newvalue
         require(block.timestamp < raiseEndTime, "Time is up");
         require(block.timestamp > raiseStartTime, "Not Started");
-        require(baal.shamans(address(this)), "Shaman not whitelisted");
+        require(baal.isManager(address(this)), "Shaman not whitelisted");
 
         require(_value % pricePerUnit == 0, "!valid amount"); // require value as multiple of units
 
@@ -228,9 +229,9 @@ contract OnboarderShaman is ReentrancyGuard {
         baal.mintLoot(recs, gives);
         if (lootToPlatform > 0) {
             address[] memory platRecs = new address[](1);
-            platRecs[0] = msg.sender;
+            platRecs[0] = address(factory);
             uint256[] memory platGives = new uint256[](1);
-            platGives[0] = lootToGive;
+            platGives[0] = lootToPlatform;
             baal.mintLoot(platRecs, platGives);
         }
 
@@ -251,7 +252,8 @@ contract OnboarderShaman is ReentrancyGuard {
         require(balance < maxTarget, "Max Target reached"); // balance plus newvalue
         require(block.timestamp < raiseEndTime, "Time is up");
         require(block.timestamp > raiseStartTime, "Not Started");
-        require(baal.shamans(address(this)), "Shaman not whitelisted");
+        require(baal.isManager(address(this)), "Shaman not whitelisted");
+
 
         uint256 numUnits = msg.value / pricePerUnit; // floor units
         uint256 newValue = numUnits * pricePerUnit;
@@ -291,9 +293,9 @@ contract OnboarderShaman is ReentrancyGuard {
         baal.mintLoot(recs, gives);
         if (lootToPlatform > 0) {
             address[] memory platRecs = new address[](1);
-            platRecs[0] = msg.sender;
+            platRecs[0] = address(factory);
             uint256[] memory platGives = new uint256[](1);
-            platGives[0] = lootToGive;
+            platGives[0] = lootToPlatform;
             baal.mintLoot(platRecs, platGives);
         }
 
@@ -365,7 +367,7 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
         _onboarder.initTemplate();
     }
 
-    function summonYeet(
+    function summonOnboarder(
         address _baal,
         address payable _token,
         uint256 _maxTarget,
