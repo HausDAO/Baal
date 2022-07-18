@@ -403,10 +403,6 @@ describe("Onboarder type", function () {
     summonOnboarder = await onboarderShamanSummoner.summonOnboarder(
         baal.address, // baal
         weth.address, // wrapper
-        ethers.utils.parseEther("100.0"), // max target
-        (await blockTime()) + 1000000000000, // end time
-        (await blockTime()), // start time
-        100, // max units
         ethers.utils.parseEther("1.0"), // price per unit
         "test", // details
         false, // erc20
