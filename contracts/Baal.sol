@@ -1243,7 +1243,7 @@ contract BaalSummoner is ModuleProxyFactory {
         bytes calldata initializationParams,
         bytes[] calldata initializationActions,
         uint256 _saltNonce
-    ) external returns (address) {
+    ) external payable returns (address) {
         (
             string memory _name, /*_name Name for erc20 `shares` accounting*/
             string memory _symbol /*_symbol Symbol for erc20 `shares` accounting*/
@@ -1251,6 +1251,10 @@ contract BaalSummoner is ModuleProxyFactory {
                 initializationParams,
                 (string, string)
             );
+
+        if(msg.value > 0){
+            msg.sender.call{value: msg.value}("");
+        }
 
         bytes memory _anyCall = abi.encodeWithSignature("avatar()"); /*This call can be anything, it just needs to return successfully*/
         Baal _baal = Baal(moduleProxyFactory.deployModule(template, _anyCall, _saltNonce));

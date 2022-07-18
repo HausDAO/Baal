@@ -147,10 +147,7 @@ contract OnboarderShaman is ReentrancyGuard {
         uint256 lootToPlatform
     );
     mapping(address => uint256) public deposits;
-    uint256 public maxTarget;
-    uint256 public raiseEndTime;
-    uint256 public raiseStartTime;
-    uint256 public maxUnitsPerAddr;
+
     uint256 public pricePerUnit;
     uint256 public lootPerUnit;
     bool public onlyERC20;
@@ -167,10 +164,6 @@ contract OnboarderShaman is ReentrancyGuard {
     function init(
         address _baal,
         address payable _token, // use wraper for native yeets
-        uint256 _maxTarget, // max raise target
-        uint256 _raiseEndTime,
-        uint256 _raiseStartTime,
-        uint256 _maxUnits, // per individual
         uint256 _pricePerUnit,
         bool _onlyERC20,
         uint256 _platformFee, 
@@ -180,10 +173,6 @@ contract OnboarderShaman is ReentrancyGuard {
         initialized = true;
         baal = IBAAL(_baal);
         token = IERC20(_token);
-        maxTarget = _maxTarget;
-        raiseEndTime = _raiseEndTime;
-        raiseStartTime = _raiseStartTime;
-        maxUnitsPerAddr = _maxUnits;
         pricePerUnit = _pricePerUnit;
         onlyERC20 = _onlyERC20;
         platformFee = _platformFee;
@@ -197,21 +186,11 @@ contract OnboarderShaman is ReentrancyGuard {
 
     function onboarder20(uint256 _value) public nonReentrant {
         require(address(baal) != address(0), "!init");
-        // require(msg.value >= pricePerUnit, "< minimum");
-        require(balance < maxTarget, "Max Target reached"); // balance plus newvalue
-        require(block.timestamp < raiseEndTime, "Time is up");
-        require(block.timestamp > raiseStartTime, "Not Started");
-        require(baal.isManager(address(this)), "Shaman not whitelisted");
+        require(baal.isManager(address(this)), "Shaman not manager");
 
         require(_value % pricePerUnit == 0, "!valid amount"); // require value as multiple of units
 
         uint256 numUnits = _value / pricePerUnit;
-
-        // if some one yeets over max should we give them the max and return leftover.
-        require(
-            deposits[msg.sender] + _value <= maxUnitsPerAddr * pricePerUnit,
-            "Can not deposit more than max"
-        );
 
         // send to dao
         require(token.transferFrom(msg.sender, baal.target(), _value), "Transfer failed");
@@ -253,20 +232,11 @@ contract OnboarderShaman is ReentrancyGuard {
         require(!onlyERC20, "!native");
         require(address(baal) != address(0), "!init");
         require(msg.value >= pricePerUnit, "< minimum");
-        require(balance < maxTarget, "Max Target reached"); // balance plus newvalue
-        require(block.timestamp < raiseEndTime, "Time is up");
-        require(block.timestamp > raiseStartTime, "Not Started");
         require(baal.isManager(address(this)), "Shaman not whitelisted");
 
 
         uint256 numUnits = msg.value / pricePerUnit; // floor units
         uint256 newValue = numUnits * pricePerUnit;
-
-        // if some one yeets over max should we give them the max and return leftover.
-        require(
-            deposits[msg.sender] + newValue <= maxUnitsPerAddr * pricePerUnit,
-            "Can not deposit more than max"
-        );
 
         // wrap
         (bool success, ) = address(token).call{value: newValue}("");
@@ -316,10 +286,6 @@ contract OnboarderShaman is ReentrancyGuard {
     receive() external payable {
         onboarder();
     }
-
-    function goalReached() public view returns (bool) {
-        return balance >= maxTarget;
-    }
 }
 
 contract CloneFactory {
@@ -349,10 +315,6 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
         address indexed baal,
         address onboarder,
         address wrapper,
-        uint256 maxTarget,
-        uint256 raiseEndTime,
-        uint256 raiseStartTime,
-        uint256 maxUnits,
         uint256 pricePerUnit,
         string details,
         bool _onlyERC20
@@ -367,10 +329,6 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
     function summonOnboarder(
         address _baal,
         address payable _token,
-        uint256 _maxTarget,
-        uint256 _raiseEndTime,
-        uint256 _raiseStartTime,
-        uint256 _maxUnits,
         uint256 _pricePerUnit,
         string calldata _details,
         bool _onlyERC20,
@@ -382,10 +340,6 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
         onboarder.init(
             _baal,
             _token,
-            _maxTarget,
-            _raiseEndTime,
-            _raiseStartTime,
-            _maxUnits,
             _pricePerUnit,
             _onlyERC20,
             _platformFee,
@@ -397,10 +351,6 @@ contract OnboarderShamanSummoner is CloneFactory, Ownable {
             _baal,
             address(onboarder),
             _token,
-            _maxTarget,
-            _raiseEndTime,
-            _raiseStartTime,
-            _maxUnits,
             _pricePerUnit,
             _details,
             _onlyERC20
