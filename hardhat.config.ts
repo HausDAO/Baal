@@ -4,11 +4,11 @@ import "@nomiclabs/hardhat-ethers";
 import "hardhat-gas-reporter";
 import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
-import "hardhat-typechain";
 import "hardhat-contract-sizer";
+import "hardhat-abi-exporter";
 
 import * as fs from "fs";
-import "hardhat-typechain";
+import "@typechain/hardhat";
 
 import "./tasks/setup";
 
@@ -157,6 +157,10 @@ const config: HardhatUserConfig = {
         },
       },
     ],
+  },
+  abiExporter: {
+    path: './abi',
+    clear: true,
   },
   typechain: {
     outDir: "src/types",
