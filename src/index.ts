@@ -5,10 +5,9 @@ export { default as SharesABI } from '../abi/contracts/SharesERC20.sol/Shares.js
 export { default as PosterABI } from '../abi/contracts/tools/Poster.sol/Poster.json';
 export { default as TributeMinionABI } from '../abi/contracts/tools/TributeMinion.sol/TributeMinion.json';
 
-export { Baal } from './types/Baal';
 export { BaalFactory } from './types/BaalFactory';
-export { BaalSummoner } from './types/BaalSummoner';
-export { Loot } from './types/Loot';
-export { Shares } from './types/Shares';
-export { Poster } from './types/Poster';
-export { TributeMinion } from './types/TributeMinion';
+export { BaalSummonerFactory } from './types/BaalSummonerFactory';
+export { LootFactory } from './types/LootFactory';
+export { SharesFactory } from './types/SharesFactory';
+export { PosterFactory } from './types/PosterFactory';
+export { TributeMinionFactory } from './types/TributeMinionFactory';

@@ -5,7 +5,6 @@ cache/
 *.swp
 src/types/*.js
 src/types/*.ts
-src/types/factories/*
 *.txt
 
 ### START npm requirements ###
@@ -15,12 +14,5 @@ dist/
 abi/@openzeppelin
 abi/@gnosis.pm
 abi/contracts/mock
-
-!src/types/BaalFactory.ts
-!src/types/BaalSummonerFactory.ts
-!src/types/LootFactory.ts
-!src/types/SharesFactory.ts
-!src/types/PosterFactory.ts
-!src/types/TributeMinionFactory.ts
 
 ### END npm requirements ###
