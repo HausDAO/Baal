@@ -31,7 +31,6 @@
   "include": [
     "src/index.ts",
     "src/types/contracts/**/*.ts",
-    "src/types/@gnosis.pm/**/*{GnosisSafe, CompatibilityFallbackHandler, GnosisSafeProxy, GnosisSafeProxyFactory, ModuleProxyFactory}.ts",
     "src/types/factories/contracts/**/*.ts",
     "src/types/common.ts",
     "abi/**/*.json"

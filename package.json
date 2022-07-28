@@ -4,7 +4,7 @@
   "description": "Lo, also it is the time of His rain.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
-  "lockfileVersion": 1,
+  "lockfileVersion": 2,
   "scripts": {
     "test": "hardhat test --network hardhat",
     "publish": "npm run compile && npm publish --access public --scope=daohaus",
