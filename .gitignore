@@ -9,15 +9,9 @@ cache/
 dist/
 
 # typechain
-src/types/*.ts
 src/types/@gnosis.pm
 src/types/@openzeppelin
 src/types/factories/@gnosis.pm
 src/types/factories/@openzeppelin
-
-# abi exporter
-abi/@openzeppelin
-abi/@gnosis.pm
-abi/contracts/mock
 
 ### END npm requirements ###

@@ -20,14 +20,18 @@
     "strict": true,
     "strictNullChecks": true,
     "rootDirs": [
-      "src/",
+      "src/index.ts",
+      "src/types/contracts/**/*.ts",
+      "src/types/factories/contracts/**/*.ts",
+      "src/types/common.ts",
       "abi/"
     ],
     "target": "es6",
   },
   "include": [
     "src/index.ts",
-    "src/types/**/*.ts",
+    "src/types/contracts/**/*.ts",
+    "src/types/factories/contracts/**/*.ts",
     "src/types/common.ts",
     "abi/**/*.json"
   ],

@@ -13,7 +13,6 @@ import { buildContractCall } from "@gnosis.pm/safe-contracts";
 import { MultiSend } from "../src/types/index";
 import { CompatibilityFallbackHandler } from "../src/types/index";
 import { ContractFactory, ContractTransaction } from "ethers";
-import { ConfigExtender } from "hardhat/types";
 import { Test } from "mocha";
 import { BaalSummoner } from "../src/types/index";
 import { GnosisSafe } from "../src/types/index";
