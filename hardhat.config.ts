@@ -9,6 +9,7 @@ import "hardhat-abi-exporter";
 
 import * as fs from "fs";
 import "@typechain/hardhat";
+import '@nomiclabs/hardhat-ethers'
 
 import "./tasks/setup";
 

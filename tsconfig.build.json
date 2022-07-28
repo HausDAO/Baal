@@ -21,18 +21,16 @@
     "strictNullChecks": true,
     "rootDirs": [
       "src/index.ts",
-      "src/types/contracts/**/*.ts",
-      "src/types/factories/**/*.ts",
-      "src/types/common.d.ts",
-      "abi/**/*.json"
+      "src/types/**/*.ts",
+      "src/types/common.ts",
+      "abi/contracts/**/*.json"
     ],
     "target": "es6",
   },
   "include": [
     "src/index.ts",
-    "src/types/contracts/**/*.ts",
-    "src/types/factories/**/*.ts",
-    "src/types/common.d.ts",
-    "abi/**/*.json"
+    "src/types/**/*.ts",
+    "src/types/common.ts",
+    "abi/contracts/**/*.json"
   ],
 }
