@@ -11,6 +11,7 @@ dist/
 # typechain
 src/types/@gnosis.pm
 src/types/@openzeppelin
-src/types/factories
+src/types/factories/@openzeppelin
+src/types/factories/@gnosis.pm
 
 ### END npm requirements ###
