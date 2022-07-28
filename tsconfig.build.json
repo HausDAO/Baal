@@ -21,24 +21,18 @@
     "strictNullChecks": true,
     "rootDirs": [
       "src/index.ts",
-      "src/types/BaalFactory.ts",
-      "src/types/BaalSummonerFactory.ts",
-      "src/types/LootFactory.ts",
-      "src/types/SharesFactory.ts",
-      "src/types/PosterFactory.ts",
-      "src/types/TributeMinionFactory.ts",
+      "src/types/contracts/**/*.ts",
+      "src/types/factories/**/*.ts",
+      "src/types/common.d.ts",
       "abi/**/*.json"
     ],
     "target": "es6",
   },
   "include": [
     "src/index.ts",
-    "src/types/BaalFactory.ts",
-    "src/types/BaalSummonerFactory.ts",
-    "src/types/LootFactory.ts",
-    "src/types/SharesFactory.ts",
-    "src/types/PosterFactory.ts",
-    "src/types/TributeMinionFactory.ts",
+    "src/types/contracts/**/*.ts",
+    "src/types/factories/**/*.ts",
+    "src/types/common.d.ts",
     "abi/**/*.json"
   ],
 }

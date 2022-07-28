@@ -3,12 +3,19 @@ artifacts/
 cache/
 .DS_Store
 *.swp
-src/types/*.js
-src/types/*.ts
 *.txt
 
 ### START npm requirements ###
 dist/
+
+# typechain
+# src/types/*.js
+# src/types/*.ts
+src/types/@gnosis.pm/
+src/types/@openzeppelin
+src/types/hardhat.d**
+# src/types/common.d.ts
+# src/types/@gnosis.pm/safe-contracts/contracts/libraries/MultiSend.ts
 
 # abi exporter
 abi/@openzeppelin
