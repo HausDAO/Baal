@@ -37,6 +37,12 @@ contract BaalSummoner is ModuleProxyFactory {
         bool existingSafe
     );
 
+    event DaoReferral(
+        bytes32 referrer,
+        bool daoHadExistingSafe,
+        address daoAddress
+    );
+
     constructor(
         address payable _template,
         address _gnosisSingleton,
@@ -84,11 +90,11 @@ contract BaalSummoner is ModuleProxyFactory {
         );
     }
 
-    function summonBaal(
+    function _summonBaal(
         bytes calldata initializationParams,
         bytes[] calldata initializationActions,
         uint256 _saltNonce
-    ) external returns (address) {
+    ) internal returns (address) {
         (
             string memory _name, /*_name Name for erc20 `shares` accounting*/
             string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting*/
@@ -177,11 +183,107 @@ contract BaalSummoner is ModuleProxyFactory {
         return address(_safe);
     }
 
+    function summonBaal(
+        bytes calldata initializationParams,
+        bytes[] calldata initializationActions,
+        uint256 _saltNonce
+    ) external returns (address) {
+        return
+            _summonBaal(
+                initializationParams,
+                initializationActions,
+                _saltNonce
+            );
+    }
+
     function summonBaalAndSafe(
         bytes calldata initializationParams,
         bytes[] calldata initializationActions,
         uint256 _saltNonce
     ) external returns (address) {
+        return
+            _summonBaalAndSafe(
+                initializationParams,
+                initializationActions,
+                _saltNonce
+            );
+    }
+
+    function summonBaalFromReferrer(
+        bytes calldata initializationParams,
+        bytes[] calldata initializationActions,
+        uint256 _saltNonce,
+        bool existingSafe,
+        bytes32 referrer
+    ) external payable returns (address) {
+        address daoAddress;
+
+        if (existingSafe) {
+            daoAddress = _summonBaal(
+                initializationParams,
+                initializationActions,
+                _saltNonce
+            );
+        } else {
+            daoAddress = _summonBaalAndSafe(
+                initializationParams,
+                initializationActions,
+                _saltNonce
+            );
+        }
+
+        emit DaoReferral(referrer, existingSafe, daoAddress);
+        return daoAddress;
+    }
+
+    function _summonBaal(
+        bytes calldata initializationParams,
+        bytes[] calldata initializationActions,
+        uint256 _saltNonce
+    ) internal returns (address) {
+        (
+            string memory _name, /*_name Name for erc20 `shares` accounting*/
+            string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting*/
+            address _safeAddr /*address of safe*/
+        ) = abi.decode(initializationParams, (string, string, address));
+
+        bytes memory _anyCall = abi.encodeWithSignature("avatar()"); /*This call can be anything, it just needs to return successfully*/
+        Baal _baal = Baal(
+            moduleProxyFactory.deployModule(template, _anyCall, _saltNonce)
+        );
+
+        bytes memory _initializationMultisendData = encodeMultisend(
+            initializationActions,
+            address(_baal)
+        );
+        bytes memory _initializer = abi.encode(
+            _name,
+            _symbol,
+            lootSingleton,
+            sharesSingleton,
+            gnosisMultisendLibrary,
+            _safeAddr,
+            _initializationMultisendData
+        );
+        // can run the actions now because we have a baal
+        _baal.setUp(_initializer);
+
+        emit SummonBaal(
+            address(_baal),
+            address(_baal.lootToken()),
+            address(_baal.sharesToken()),
+            _safeAddr,
+            true
+        );
+
+        return (address(_baal));
+    }
+
+    function _summonBaalAndSafe(
+        bytes calldata initializationParams,
+        bytes[] calldata initializationActions,
+        uint256 _saltNonce
+    ) internal returns (address) {
         (
             string memory _name, /*_name Name for erc20 `shares` accounting*/
             string memory _symbol /*_symbol Symbol for erc20 `shares` accounting*/
