@@ -1177,11 +1177,12 @@ contract BaalSummoner is ModuleProxyFactory {
         bytes[] calldata initializationActions,
         uint256 _saltNonce
     ) external returns (address) {
-        return _summonBaal(
-            bytes calldata initializationParams,
-            bytes[] calldata initializationActions,
-            uint256 _saltNonce
-        );
+        return
+            _summonBaal(
+                initializationParams,
+                initializationActions,
+                _saltNonce
+            );
     }
 
     function summonBaalAndSafe(
@@ -1189,11 +1190,12 @@ contract BaalSummoner is ModuleProxyFactory {
         bytes[] calldata initializationActions,
         uint256 _saltNonce
     ) external returns (address) {
-        return _summonBaalAndSafe(
-            bytes calldata initializationParams,
-            bytes[] calldata initializationActions,
-            uint256 _saltNonce
-        );
+        return
+            _summonBaalAndSafe(
+                initializationParams,
+                initializationActions,
+                _saltNonce
+            );
     }
 
     function summonBaalFromReferrer(
@@ -1202,17 +1204,17 @@ contract BaalSummoner is ModuleProxyFactory {
         uint256 _saltNonce,
         bool existingSafe,
         bytes32 referrer
-    ) external returns (address) {
+    ) external payable returns (address) {
         address daoAddress;
 
         if (existingSafe) {
-            daoAddress = summonBaal(
+            daoAddress = _summonBaal(
                 initializationParams,
                 initializationActions,
                 _saltNonce
             );
         } else {
-            daoAddress = summonBaalAndSafe(
+            daoAddress = _summonBaalAndSafe(
                 initializationParams,
                 initializationActions,
                 _saltNonce
@@ -1220,8 +1222,6 @@ contract BaalSummoner is ModuleProxyFactory {
         }
 
         uint256 totalPayment = msg.value;
-        // add  referrer
-        dao.referrer = referrer;
         // emit event dao refferal
         emit DaoReferral(referrer, existingSafe, daoAddress, totalPayment);
         // TODO payment splitter split and forward msg.value
@@ -1321,11 +1321,11 @@ contract BaalSummoner is ModuleProxyFactory {
         return address(_safe);
     }
 
-    function summonBaalAndSafe(
+    function _summonBaalAndSafe(
         bytes calldata initializationParams,
         bytes[] calldata initializationActions,
         uint256 _saltNonce
-    ) external returns (address) {
+    ) internal returns (address) {
         (
             string memory _name, /*_name Name for erc20 `shares` accounting*/
             string memory _symbol /*_symbol Symbol for erc20 `shares` accounting*/
