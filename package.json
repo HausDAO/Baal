@@ -10,7 +10,7 @@
     "build": "npm run build:sol && npm run build:abi && npm run build:ts && npm run build:declarations",
     "build:ts": "npx tsc --build tsconfig.build.json",
     "build:abi": "npx hardhat export-abi",
-    "build:sol": "npx hardhat compile",
+    "build:sol": "npx hardhat compile --force",
     "build:declarations": "shx cp src/types/*.d.ts dist/src/types"
   },
   "repository": {

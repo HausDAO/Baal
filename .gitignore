@@ -9,13 +9,11 @@ cache/
 dist/
 
 # typechain
-# src/types/*.js
-# src/types/*.ts
-src/types/@gnosis.pm/
+src/types/*.ts
+src/types/@gnosis.pm
 src/types/@openzeppelin
-src/types/hardhat.d**
-# src/types/common.d.ts
-# src/types/@gnosis.pm/safe-contracts/contracts/libraries/MultiSend.ts
+src/types/factories/@gnosis.pm
+src/types/factories/@openzeppelin
 
 # abi exporter
 abi/@openzeppelin

@@ -163,7 +163,7 @@ const config: HardhatUserConfig = {
     path: './abi',
     clear: true,
     flat: true,
-    pretty: true,
+    except: ['@gnosis.pm', '@openzeppelin'],
   },
   typechain: {
     outDir: "src/types",

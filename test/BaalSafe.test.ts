@@ -22,7 +22,6 @@ import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { buildContractCall } from "@gnosis.pm/safe-contracts";
 import { MultiSend } from "../src/types/index";
 import { ContractFactory, ContractTransaction, utils } from "ethers";
-import { ConfigExtender } from "hardhat/types";
 import { Test } from "mocha";
 import signVote from "../src/signVote";
 import signDelegation from "../src/signDelegation";

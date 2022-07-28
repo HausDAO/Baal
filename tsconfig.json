@@ -13,10 +13,8 @@
   },
   "include": [
     "src/index.ts",
-    "src/types/",
+    "src/types/**/*.ts",
+    "src/types/common.ts",
     "abi/**/*.json"
   ],
-  "files": [
-    "./hardhat.config.ts"
-  ]
 }
