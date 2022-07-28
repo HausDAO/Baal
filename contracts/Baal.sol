@@ -1120,6 +1120,13 @@ contract BaalSummoner is ModuleProxyFactory {
         bool existingSafe
     );
 
+    event DaoReferral(
+        bytes32 referrer,
+        bool daoHadExistingSafe,
+        address daoAddress,
+        uint256 forwardedPayment
+    );
+
     constructor(
         address payable _template,
         address _gnosisSingleton,
@@ -1170,6 +1177,62 @@ contract BaalSummoner is ModuleProxyFactory {
         bytes[] calldata initializationActions,
         uint256 _saltNonce
     ) external returns (address) {
+        return _summonBaal(
+            bytes calldata initializationParams,
+            bytes[] calldata initializationActions,
+            uint256 _saltNonce
+        );
+    }
+
+    function summonBaalAndSafe(
+        bytes calldata initializationParams,
+        bytes[] calldata initializationActions,
+        uint256 _saltNonce
+    ) external returns (address) {
+        return _summonBaalAndSafe(
+            bytes calldata initializationParams,
+            bytes[] calldata initializationActions,
+            uint256 _saltNonce
+        );
+    }
+
+    function summonBaalFromReferrer(
+        bytes calldata initializationParams,
+        bytes[] calldata initializationActions,
+        uint256 _saltNonce,
+        bool existingSafe,
+        bytes32 referrer
+    ) external returns (address) {
+        address daoAddress;
+
+        if (existingSafe) {
+            daoAddress = summonBaal(
+                initializationParams,
+                initializationActions,
+                _saltNonce
+            );
+        } else {
+            daoAddress = summonBaalAndSafe(
+                initializationParams,
+                initializationActions,
+                _saltNonce
+            );
+        }
+
+        uint256 totalPayment = msg.value;
+        // add  referrer
+        dao.referrer = referrer;
+        // emit event dao refferal
+        emit DaoReferral(referrer, existingSafe, daoAddress, totalPayment);
+        // TODO payment splitter split and forward msg.value
+        return daoAddress;
+    }
+
+    function _summonBaal(
+        bytes calldata initializationParams,
+        bytes[] calldata initializationActions,
+        uint256 _saltNonce
+    ) internal returns (address) {
         (
             string memory _name, /*_name Name for erc20 `shares` accounting*/
             string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting*/
