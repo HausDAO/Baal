@@ -11,6 +11,17 @@ import type {
 
 const _abi = [
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "guard_",
+        type: "address",
+      },
+    ],
+    name: "NotIERC165Compliant",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -40,6 +51,19 @@ const _abi = [
       },
     ],
     name: "ChangedGuard",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint8",
+        name: "version",
+        type: "uint8",
+      },
+    ],
+    name: "Initialized",
     type: "event",
   },
   {

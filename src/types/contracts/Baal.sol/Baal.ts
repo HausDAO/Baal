@@ -558,6 +558,7 @@ export interface BaalInterface extends utils.Interface {
     "CancelProposal(uint256)": EventFragment;
     "ChangedGuard(address)": EventFragment;
     "GovernanceConfigSet(uint32,uint32,uint256,uint256,uint256,uint256)": EventFragment;
+    "Initialized(uint8)": EventFragment;
     "LootPaused(bool)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "ProcessProposal(uint256,bool,bool)": EventFragment;
@@ -576,6 +577,7 @@ export interface BaalInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "CancelProposal"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ChangedGuard"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "GovernanceConfigSet"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LootPaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProcessProposal"): EventFragment;
@@ -641,6 +643,13 @@ export type GovernanceConfigSetEvent = TypedEvent<
 
 export type GovernanceConfigSetEventFilter =
   TypedEventFilter<GovernanceConfigSetEvent>;
+
+export interface InitializedEventObject {
+  version: number;
+}
+export type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
+
+export type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
 
 export interface LootPausedEventObject {
   paused: boolean;
@@ -1721,6 +1730,9 @@ export interface Baal extends BaseContract {
       sponsor?: null,
       minRetention?: null
     ): GovernanceConfigSetEventFilter;
+
+    "Initialized(uint8)"(version?: null): InitializedEventFilter;
+    Initialized(version?: null): InitializedEventFilter;
 
     "LootPaused(bool)"(paused?: null): LootPausedEventFilter;
     LootPaused(paused?: null): LootPausedEventFilter;
