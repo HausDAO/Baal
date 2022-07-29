@@ -3,16 +3,21 @@ import { solidity } from "ethereum-waffle";
 import { use, expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
-import { Shares } from "../src/types/index";
+import {
+  Shares,
+  Baal,
+  BaalSummoner,
+  Poster,
+  GnosisSafe,
+  CompatibilityFallbackHandler,
+  GnosisSafeProxy,
+  TestERC20,
+  Loot,
+  MultiSend,
+  GnosisSafeProxyFactory,
+  ModuleProxyFactory,
+} from '../src/types'
 
-import { Baal } from "../src/types/index";
-import { BaalSummoner } from "../src/types/index";
-import { Poster } from "../src/types/index";
-import { GnosisSafe } from "../src/types/index";
-import { CompatibilityFallbackHandler } from "../src/types/index";
-import { GnosisSafeProxy } from "../src/types/index";
-import { TestERC20 } from "../src/types/index";
-import { Loot } from "../src/types/index";
 import {
   decodeMultiAction,
   encodeMultiAction,
@@ -20,16 +25,12 @@ import {
 } from "../src/util";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { buildContractCall } from "@gnosis.pm/safe-contracts";
-import { MultiSend } from "../src/types/index";
 import { ContractFactory, ContractTransaction, utils } from "ethers";
 import { Test } from "mocha";
 import signVote from "../src/signVote";
 import signDelegation from "../src/signDelegation";
 import signPermit from "../src/signPermit";
 import { string } from "hardhat/internal/core/params/argumentTypes";
-
-import { GnosisSafeProxyFactory } from "../src/types/index";
-import { ModuleProxyFactory } from "../src/types/index";
 import { calculateProxyAddress } from "@gnosis.pm/zodiac";
 
 use(solidity);

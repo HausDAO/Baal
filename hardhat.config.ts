@@ -11,9 +11,6 @@ import * as fs from "fs";
 import "@typechain/hardhat";
 import '@nomiclabs/hardhat-ethers'
 
-import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from "hardhat/builtin-tasks/task-names";
-import path from "path";
-
 import "./tasks/setup";
 
 // You need to export an object to set up your config
@@ -171,7 +168,6 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: "src/types",
     target: "ethers-v5",
-    externalArtifacts: []
   },
 };
 

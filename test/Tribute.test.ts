@@ -3,21 +3,23 @@ import { solidity } from "ethereum-waffle";
 import { use, expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
-import { Baal } from "../src/types/index";
-import { TestERC20 } from "../src/types/index";
-import { TributeMinion } from "../src/types/index";
-import { Loot } from "../src/types/index";
+import {
+  Baal,
+  TestERC20,
+  TributeMinion,
+  Loot,
+  MultiSend,
+  CompatibilityFallbackHandler,
+  BaalSummoner,
+  GnosisSafe,
+  Poster,
+  Shares,
+} from '../src/types';
 import { decodeMultiAction, encodeMultiAction } from "../src/util";
 import { BigNumber } from "@ethersproject/bignumber";
 import { buildContractCall } from "@gnosis.pm/safe-contracts";
-import { MultiSend } from "../src/types/index";
-import { CompatibilityFallbackHandler } from "../src/types/index";
 import { ContractFactory, ContractTransaction } from "ethers";
 import { Test } from "mocha";
-import { BaalSummoner } from "../src/types/index";
-import { GnosisSafe } from "../src/types/index";
-import { Poster } from "../src/types/index";
-import { Shares } from "../src/types/index";
 
 use(solidity);
 
