@@ -10,10 +10,9 @@ WIP: [Docs Page here](https://baal-docs.vercel.app/)
 - Transaction Hash: 0x62906ba23728bda0a1a0ffcca412371772448bac200497030462da615fc04598
 - **Factory Contract Address**: 0x0C5fd8AAdF995e11E5Ac1CD72139Ee4fd72cDeFC
 
-
 Baal is a minimal yet composable DAO template continuing work from the [`Moloch`](https://github.com/MolochVentures/moloch), [`Minion`](https://github.com/raid-guild/moloch-minion) and [`Compound`](https://github.com/compound-finance/compound-protocol/tree/master/contracts/Governance) frameworks to make it easier for people to combine and command crypto assets with intuitive membership games.
 
-*Guilds, venture clubs and control panels can benefit from Baal:* 
+*Guilds, venture clubs and control panels can benefit from Baal:*
 
 <p align="center"><img src="https://media.giphy.com/media/rgwNTGFUbNTgsgiYha/giphy.gif"></p>
 
@@ -21,21 +20,29 @@ Baal is a minimal yet composable DAO template continuing work from the [`Moloch`
 
 If you are going to just use this project feel free to clone it.  If you would like to submit any pull requests please create an issue or work on a current issue and fork the repo.  The two main groups that are contributing to this project are [DaoHaus](https://discord.com/channels/709210493549674598) and [MetaCartel](https://discord.com/channels/702325961433284609).
 
-### Setup Environment:
+### Setup Environment
 
-`npm install` - to install all of the components for the project
+`yarn install` - to install all of the components for the project
 
-### Building:
+### Building
 
 This project uses the [hardhat](https://hardhat.org/) ethereum tools for solidity compiling and running a virtual ethereum environment for testing.
 
-`npx hardhat compile` - will compile the solidity code and generate your contract artifacts (in the /artifacts directory)
+`yarn build` - will compile the solidity code and generate your contract artifacts (in the /artifacts directory), and generate all of the necessary types.
 
-### Testing:
+## Publishing
+
+the Baal contracts, types, and abis are published through the dist folder, after making changes to the repo, and when you are ready to publish the packages, do the following:
+
+1) bump the `version` in the `package.json` file.
+2) run `yarn publish`
+
+running `yarn publish` will run `yarn build` and then publish the `@daohaus/baal-contracts` package to npm.
+
+### Testing
 
 If you are looking to work on unit tests for this project be sure to read the README file in the test directory.
 
 `npx hardhat test` - run the unit tests
-
 
 <p align="center"><img src="https://media.giphy.com/media/rgwNTGFUbNTgsgiYha/giphy.gif"></p>
