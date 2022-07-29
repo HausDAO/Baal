@@ -2,18 +2,18 @@ import "@nomiclabs/hardhat-ethers";
 import { task, HardhatUserConfig } from "hardhat/config";
 import * as fs from "fs";
 
-import { BaalSummoner } from "../src/types/BaalSummoner";
-import { Baal } from "../src/types/Baal";
-import { MultiSend } from "../src/types/MultiSend";
-import { Loot } from "../src/types/Loot";
-import { Shares } from "../src/types/Shares";
-import { Poster } from "../src/types/Poster";
+import { BaalSummoner } from "../src/types/contracts/Baal.sol/BaalSummoner";
+import { Baal } from "../src/types/contracts/Baal.sol/Baal";
+import { MultiSend } from "../src/types/@gnosis.pm/safe-contracts/contracts/libraries/MultiSend";
+// import { Loot } from "../src/types/contracts/LootERC20.sol/Loot";
+// import { Shares } from "../src/types/contracts/SharesERC20.sol/Shares";
+import { Poster } from "../src/types/contracts/tools/Poster";
 // import { decodeMultiAction, encodeMultiAction, hashOperation } from './src/util'
 import { encodeMultiSend, MetaTransaction } from "@gnosis.pm/safe-contracts";
 
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
-import { TestErc20 } from "../src/types/TestErc20";
-import { TributeMinion } from "../src/types/TributeMinion";
+import { TestERC20 } from "../src/types/contracts/mock/TestERC20";
+import { TributeMinion } from "../src/types/contracts/tools/TributeMinion.sol/TributeMinion";
 
 const _addresses = {
   gnosisSingleton: "0xd9db270c1b5e3bd161e8c8503c55ceabee709552",
@@ -69,7 +69,9 @@ task("delegate", "Delegate shares")
   .setAction(async (taskArgs, hre) => {
     const Baal = await hre.ethers.getContractFactory("Baal");
     const baal = (await Baal.attach(taskArgs.dao)) as Baal;
-    const delegateVotes = await baal.delegate(taskArgs.to);
+    const Shares = await hre.ethers.getContractFactory("SharesERC20");
+    const shares = (await Shares.attach(baal.address));
+    const delegateVotes = await shares.delegate(taskArgs.to);
     console.log("Delegate votes txhash:", delegateVotes.hash);
   });
 
@@ -107,7 +109,7 @@ task("tributeprop", "Approve token and make a tribute proposal")
     const Baal = await hre.ethers.getContractFactory("Baal");
     const baal = (await Baal.attach(taskArgs.dao)) as Baal;
     const Token = await hre.ethers.getContractFactory("TestERC20");
-    const token = (await Token.attach(taskArgs.token)) as TestErc20;
+    const token = (await Token.attach(taskArgs.token)) as TestERC20;
     const Minion = await hre.ethers.getContractFactory("TributeMinion");
     const minion = (await Minion.attach(taskArgs.minion)) as TributeMinion;
     const countBefore = await baal.proposalCount();

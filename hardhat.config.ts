@@ -1,14 +1,18 @@
-import { task, HardhatUserConfig } from "hardhat/config";
+import { task, subtask, HardhatUserConfig } from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-ethers";
 import "hardhat-gas-reporter";
 import "@nomiclabs/hardhat-etherscan";
 import "solidity-coverage";
-import "hardhat-typechain";
 import "hardhat-contract-sizer";
+import "hardhat-abi-exporter";
 
 import * as fs from "fs";
-import "hardhat-typechain";
+import "@typechain/hardhat";
+import '@nomiclabs/hardhat-ethers'
+
+import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from "hardhat/builtin-tasks/task-names";
+import path from "path";
 
 import "./tasks/setup";
 
@@ -158,9 +162,16 @@ const config: HardhatUserConfig = {
       },
     ],
   },
+  abiExporter: {
+    path: './abi',
+    clear: true,
+    flat: true,
+    except: ['@gnosis.pm', '@openzeppelin'],
+  },
   typechain: {
     outDir: "src/types",
     target: "ethers-v5",
+    externalArtifacts: []
   },
 };
 
