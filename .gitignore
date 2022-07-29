@@ -5,13 +5,6 @@ cache/
 *.swp
 *.txt
 
-### START npm requirements ###
-dist/
 
-src/types/@openzeppelin
-src/types/factories/@openzeppelin
-src/types/@gnosis.pm
-!src/types/@gnosis.pm/zodiac/factory/*
-!src/types/@gnosis.pm/safe-contracts/
-!src/types/factories/@gnosis.pm
-### END npm requirements ###
+dist/
+src/types/
