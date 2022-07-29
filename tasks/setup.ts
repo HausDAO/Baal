@@ -12,7 +12,7 @@ import { Poster } from "../src/types/contracts/tools/Poster";
 import { encodeMultiSend, MetaTransaction } from "@gnosis.pm/safe-contracts";
 
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
-import { TestERC20 } from "../src/types/contracts/mock/TestErc20";
+import { TestERC20 } from "../src/types/contracts/mock/TestERC20";
 import { TributeMinion } from "../src/types/contracts/tools/TributeMinion.sol/TributeMinion";
 
 const _addresses = {
