@@ -157,6 +157,26 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20__factory>;
     getContractFactory(
+      name: "ERC721",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC721__factory>;
+    getContractFactory(
+      name: "IERC721Metadata",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721Metadata__factory>;
+    getContractFactory(
+      name: "IERC721",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721__factory>;
+    getContractFactory(
+      name: "IERC721Receiver",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721Receiver__factory>;
+    getContractFactory(
+      name: "ERC165",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC165__factory>;
+    getContractFactory(
       name: "IERC165",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
@@ -196,6 +216,18 @@ declare module "hardhat/types/runtime" {
       name: "Shares",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Shares__factory>;
+    getContractFactory(
+      name: "Baalgroni",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Baalgroni__factory>;
+    getContractFactory(
+      name: "IBaal2",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBaal2__factory>;
+    getContractFactory(
+      name: "IWRAPPER",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IWRAPPER__factory>;
     getContractFactory(
       name: "Poster",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -390,6 +422,31 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20>;
     getContractAt(
+      name: "ERC721",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC721>;
+    getContractAt(
+      name: "IERC721Metadata",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721Metadata>;
+    getContractAt(
+      name: "IERC721",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721>;
+    getContractAt(
+      name: "IERC721Receiver",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721Receiver>;
+    getContractAt(
+      name: "ERC165",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC165>;
+    getContractAt(
       name: "IERC165",
       address: string,
       signer?: ethers.Signer
@@ -439,6 +496,21 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Shares>;
+    getContractAt(
+      name: "Baalgroni",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Baalgroni>;
+    getContractAt(
+      name: "IBaal2",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBaal2>;
+    getContractAt(
+      name: "IWRAPPER",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IWRAPPER>;
     getContractAt(
       name: "Poster",
       address: string,
