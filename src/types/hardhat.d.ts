@@ -217,13 +217,13 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Shares__factory>;
     getContractFactory(
-      name: "Baalgroni",
+      name: "BaalgroniShaman",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Baalgroni__factory>;
+    ): Promise<Contracts.BaalgroniShaman__factory>;
     getContractFactory(
-      name: "IBaal2",
+      name: "BaalgroniSummoner",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IBaal2__factory>;
+    ): Promise<Contracts.BaalgroniSummoner__factory>;
     getContractFactory(
       name: "IWRAPPER",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -497,15 +497,15 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Shares>;
     getContractAt(
-      name: "Baalgroni",
+      name: "BaalgroniShaman",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.Baalgroni>;
+    ): Promise<Contracts.BaalgroniShaman>;
     getContractAt(
-      name: "IBaal2",
+      name: "BaalgroniSummoner",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IBaal2>;
+    ): Promise<Contracts.BaalgroniSummoner>;
     getContractAt(
       name: "IWRAPPER",
       address: string,

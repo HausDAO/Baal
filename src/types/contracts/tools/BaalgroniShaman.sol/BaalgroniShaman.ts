@@ -28,7 +28,7 @@ import type {
   PromiseOrValue,
 } from "../../../common";
 
-export interface BaalgroniInterface extends utils.Interface {
+export interface BaalgroniShamanInterface extends utils.Interface {
   functions: {
     "approve(address,uint256)": FunctionFragment;
     "atribute0()": FunctionFragment;
@@ -41,15 +41,17 @@ export interface BaalgroniInterface extends utils.Interface {
     "cap()": FunctionFragment;
     "core()": FunctionFragment;
     "daoCut()": FunctionFragment;
+    "factory()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "imageHash()": FunctionFragment;
     "init(address,address,uint256,uint256,uint256,uint256,bytes)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "locked(uint256)": FunctionFragment;
     "lootPerUnit()": FunctionFragment;
+    "mint(address)": FunctionFragment;
     "mod()": FunctionFragment;
     "moloch()": FunctionFragment;
     "name()": FunctionFragment;
-    "orderDrink(address)": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "price()": FunctionFragment;
@@ -80,15 +82,17 @@ export interface BaalgroniInterface extends utils.Interface {
       | "cap"
       | "core"
       | "daoCut"
+      | "factory"
       | "getApproved"
       | "imageHash"
       | "init"
       | "isApprovedForAll"
+      | "locked"
       | "lootPerUnit"
+      | "mint"
       | "mod"
       | "moloch"
       | "name"
-      | "orderDrink"
       | "owner"
       | "ownerOf"
       | "price"
@@ -129,6 +133,7 @@ export interface BaalgroniInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "cap", values?: undefined): string;
   encodeFunctionData(functionFragment: "core", values?: undefined): string;
   encodeFunctionData(functionFragment: "daoCut", values?: undefined): string;
+  encodeFunctionData(functionFragment: "factory", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
@@ -151,16 +156,20 @@ export interface BaalgroniInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "locked",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "lootPerUnit",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mint",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "mod", values?: undefined): string;
   encodeFunctionData(functionFragment: "moloch", values?: undefined): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "orderDrink",
-    values: [PromiseOrValue<string>]
-  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
@@ -231,6 +240,7 @@ export interface BaalgroniInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "cap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "core", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "daoCut", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -241,14 +251,15 @@ export interface BaalgroniInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "locked", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lootPerUnit",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mod", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "moloch", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "orderDrink", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "price", data: BytesLike): Result;
@@ -356,12 +367,12 @@ export type TransferEvent = TypedEvent<
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
-export interface Baalgroni extends BaseContract {
+export interface BaalgroniShaman extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: BaalgroniInterface;
+  interface: BaalgroniShamanInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -418,6 +429,8 @@ export interface Baalgroni extends BaseContract {
 
     daoCut(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    factory(overrides?: CallOverrides): Promise<[string]>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -442,18 +455,23 @@ export interface Baalgroni extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    locked(
+      _tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     lootPerUnit(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    mint(
+      _to: PromiseOrValue<string>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     mod(overrides?: CallOverrides): Promise<[string]>;
 
     moloch(overrides?: CallOverrides): Promise<[string]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
-
-    orderDrink(
-      _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -558,6 +576,8 @@ export interface Baalgroni extends BaseContract {
 
   daoCut(overrides?: CallOverrides): Promise<BigNumber>;
 
+  factory(overrides?: CallOverrides): Promise<string>;
+
   getApproved(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -582,18 +602,23 @@ export interface Baalgroni extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  locked(
+    _tokenId: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   lootPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
+
+  mint(
+    _to: PromiseOrValue<string>,
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   mod(overrides?: CallOverrides): Promise<string>;
 
   moloch(overrides?: CallOverrides): Promise<string>;
 
   name(overrides?: CallOverrides): Promise<string>;
-
-  orderDrink(
-    _to: PromiseOrValue<string>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -698,6 +723,8 @@ export interface Baalgroni extends BaseContract {
 
     daoCut(overrides?: CallOverrides): Promise<BigNumber>;
 
+    factory(overrides?: CallOverrides): Promise<string>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -722,18 +749,20 @@ export interface Baalgroni extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    locked(
+      _tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     lootPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mint(_to: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
 
     mod(overrides?: CallOverrides): Promise<string>;
 
     moloch(overrides?: CallOverrides): Promise<string>;
 
     name(overrides?: CallOverrides): Promise<string>;
-
-    orderDrink(
-      _to: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -884,6 +913,8 @@ export interface Baalgroni extends BaseContract {
 
     daoCut(overrides?: CallOverrides): Promise<BigNumber>;
 
+    factory(overrides?: CallOverrides): Promise<BigNumber>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -908,18 +939,23 @@ export interface Baalgroni extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    locked(
+      _tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     lootPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mint(
+      _to: PromiseOrValue<string>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
 
     mod(overrides?: CallOverrides): Promise<BigNumber>;
 
     moloch(overrides?: CallOverrides): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
-
-    orderDrink(
-      _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1025,6 +1061,8 @@ export interface Baalgroni extends BaseContract {
 
     daoCut(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1049,18 +1087,23 @@ export interface Baalgroni extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    locked(
+      _tokenId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     lootPerUnit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    mint(
+      _to: PromiseOrValue<string>,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
 
     mod(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     moloch(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    orderDrink(
-      _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

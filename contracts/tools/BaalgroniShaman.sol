@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 import "../libraries/Base64.sol";
 
@@ -17,29 +18,35 @@ interface IWRAPPER {
         returns (bool);
 }
 
-contract Baalgroni is ERC721, Ownable {
+contract BaalgroniShaman is ERC721, Ownable, Initializable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
 
+    // ERC721 CONFIG
+    string private _name; /*Name for ERC721 trackers*/
+    string private _symbol; /*Symbol for ERC721 trackers*/
+    string private _baseUri = "https://daohaus.mypinata.cloud/ipfs/";
+
     IBaal public moloch;
     IWRAPPER public wrapper;
-    uint256 public price = 200000000000000000000;
-    uint256 public cap = 200;
-    uint256 public lootPerUnit = 100;
-    uint256 public daoCut = 3;
+    BaalgroniSummoner public factory;
 
-    string public name = "Boulevardier";
-    string public core = "Bourbon";
-    string public prop = "None";
-    string public garnishe = "Orange Twist";
-    string public ice = "Up";
-    string public glassware = "Coupe";
-    string public mod = "Campari";
-    string public lengthener = "Sweet Vermouth";
+    uint256 public price; // ex. 200000000000000000000;
+    uint256 public cap; // ex. 200;
+    uint256 public lootPerUnit; // ex. 100;
+    uint256 public daoCut; // ex. 3;
+
+    string public core; // ex. "Bourbon";
+    string public property; // ex. "None";
+    string public atribute3; // ex. "Orange Twist";
+    string public atribute2; // ex. "Up";
+    string public atribute1; // ex. "Coupe";
+    string public atribute0; // ex. "Sweet Vermouth";
+    string public mod; // ex. "Campari";
+    string public imageHash;
 
     mapping(uint256 => address) public bindings;
-
 
     error InvalidIndex();
     error Bound();
@@ -52,50 +59,97 @@ contract Baalgroni is ERC721, Ownable {
     error WrapFailed();
     error TransferFailed();
 
-    constructor(address _moloch, address _wrapper) ERC721("Daogroni", "GRONI") {
+    constructor() ERC721("Template", "T") initializer {} /*Configure template to be unusable*/
+
+    // todo: ownership
+    function init(
+        address _moloch,
+        address _wrapper,
+        uint256 _price,
+        uint256 _cap,
+        uint256 _lootPerUnit,
+        uint256 _daoCut,
+        bytes memory _initializationParams
+    ) external initializer {
         moloch = IBaal(_moloch);
         wrapper = IWRAPPER(_wrapper);
+        factory = BaalgroniSummoner(msg.sender);
+        (
+            string memory _tokenName,
+            string memory _tokenSymbol,
+            string memory _core,
+            string memory _property,
+            string memory _atribute3,
+            string memory _atribute2,
+            string memory _atribute1,
+            string memory _atribute0,
+            string memory _mod,
+            string memory _imageHash
+        ) = abi.decode(
+                _initializationParams,
+                (
+                    string,
+                    string,
+                    string,
+                    string,
+                    string,
+                    string,
+                    string,
+                    string,
+                    string,
+                    string
+                )
+            );
+        _name = _tokenName;
+        _symbol = _tokenSymbol;
+        price = _price;
+        cap = _cap;
+        lootPerUnit = _lootPerUnit;
+        daoCut = _daoCut;
+        core = _core;
+        property = _property;
+        atribute3 = _atribute3;
+        atribute2 = _atribute2;
+        atribute1 = _atribute1;
+        atribute0 = _atribute0;
+        mod = _mod;
+        imageHash = _imageHash;
     }
 
-    function _baseURI() internal pure override returns (string memory) {
-        return "https://daohaus.mypinata.cloud/ipfs/";
+    function _baseURI() internal view override returns (string memory) {
+        return _baseUri;
     }
 
     // orderId is the order of the drink type in names
-    function orderDrink(address _to) public payable {
+    function mint(address _to) public payable {
         if (msg.value < price) revert NotEnough();
 
         uint256 tokenId = _tokenIdCounter.current();
-        if(tokenId >= cap) revert BarIsEmpty();
+        if (tokenId >= cap) revert BarIsEmpty();
         // wrap
         (bool success, ) = address(wrapper).call{value: price}("");
-        if(!success) revert WrapFailed();
+        if (!success) revert WrapFailed();
         // send to dao
         require(wrapper.transfer(moloch.target(), price), "Transfer failed");
 
         if (msg.value > price) {
             // Return the extra money to the minter.
             (bool success2, ) = msg.sender.call{value: msg.value - price}("");
-            if(!success2) revert TransferFailed();
+            if (!success2) revert TransferFailed();
         }
 
-        
         _safeMint(_to, tokenId + 1);
         _tokenIdCounter.increment();
 
         address[] memory _receivers = new address[](2);
         _receivers[0] = address(0xdead);
-        _receivers[1] = address(owner());
+        _receivers[1] = address(factory);
 
         uint256[] memory _amounts = new uint256[](2);
         _amounts[0] = lootPerUnit;
         _amounts[1] = daoCut;
 
-        moloch.mintLoot(
-            _receivers,
-            _amounts
-        );
-
+        moloch.mintLoot(_receivers, _amounts);
     }
 
     function bind(uint256 tokenId) public {
@@ -112,16 +166,9 @@ contract Baalgroni is ERC721, Ownable {
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = lootPerUnit;
 
-         moloch.burnLoot(
-            _sinkReceivers,
-            _amounts
-        );
+        moloch.burnLoot(_sinkReceivers, _amounts);
 
-        moloch.mintLoot(
-            _receivers,
-            _amounts
-        );
-
+        moloch.mintLoot(_receivers, _amounts);
     }
 
     function unbind(uint256 tokenId) public {
@@ -138,27 +185,16 @@ contract Baalgroni is ERC721, Ownable {
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = lootPerUnit;
 
-         moloch.mintLoot(
-            _sinkReceivers,
-            _amounts
-        );
+        moloch.mintLoot(_sinkReceivers, _amounts);
 
-        moloch.burnLoot(
-            _receivers,
-            _amounts
-        );
-
+        moloch.burnLoot(_receivers, _amounts);
     }
 
-    function _drinkState(uint256 _tokenId)
-        internal
-        view
-        returns (string memory)
-    {
+    function locked(uint256 _tokenId) public view returns (bool) {
         if (bindings[_tokenId] != address(0)) {
-            return string("-empty");
+            return true;
         } else {
-            return string("");
+            return false;
         }
     }
 
@@ -181,43 +217,40 @@ contract Baalgroni is ERC721, Ownable {
         view
         returns (string memory)
     {
-        string memory _nftName = string(
-            abi.encodePacked("BAALgroni: ", name)
-        );
-        // console.log("_nftName", _nftName);
+        string memory _nftName = string(abi.encodePacked("BAALgroni: ", _name));
 
         bytes memory _image = abi.encodePacked(
             _baseURI(),
-            "QmaCBoYHdQ9u7zwp1Sxxaig1yfuocTLzk9iAr1m1ahukBK",
+            imageHash,
             "/baalgroni-",
-            _drinkState(_tokenId),
+            locked(_tokenId) ? "bound" : "unbound",
             ".svg"
         );
 
-        bytes memory _ingredients = abi.encodePacked(
+        bytes memory _core = abi.encodePacked(
             '{"trait_type": "Core", "value": "',
             core,
             '"},',
-            '{"trait_type": "Lengtheners", "value": "',
-            lengthener,
-            '"},',
-            '{"trait_type": "Modifiers", "value": "'
+            '{"trait_type": "atribute0", "value": "',
+            atribute0,
+            '"},'
         );
 
-        bytes memory _stuff = abi.encodePacked(
+        bytes memory _sup = abi.encodePacked(
+            '{"trait_type": "Modifiers", "value": "',
             mod,
             '"},',
-            '{"trait_type": "Props", "value": "',
-            prop,
+            '{"trait_type": "Property", "value": "',
+            property,
             '"},',
-            '{"trait_type": "Garnishes", "value": "',
-            garnishe,
+            '{"trait_type": "Atribute1", "value": "',
+            atribute1,
             '"},',
-            '{"trait_type": "Ice", "value": "',
-            ice,
+            '{"trait_type": "Atribute2", "value": "',
+            atribute2,
             '"},',
-            '{"trait_type": "Glassware", "value": "',
-            glassware,
+            '{"trait_type": "Atribute3", "value": "',
+            atribute3,
             '"}'
         );
 
@@ -232,14 +265,12 @@ contract Baalgroni is ERC721, Ownable {
                                 _nftName,
                                 '", "image":"',
                                 _image,
-                                '", "description": "Drink Responsibly",',
-                                '"redeemed": "',
-                                Strings.toString(bindings[_tokenId]),
-                                '", "attributes":[{"trait_type": "Drank", "value": "',
-                                Strings.toString(bindings[_tokenId]),
+                                '", "description": "BaalgroniShaman DAO",',
+                                ' "attributes":[{"trait_type": "Locked", "value": "',
+                                Strings.toHexString(bindings[_tokenId]) ,
                                 '"},',
-                                _ingredients,
-                                _stuff,
+                                _core,
+                                _sup,
                                 "]}"
                             )
                         )
@@ -254,7 +285,7 @@ contract Baalgroni is ERC721, Ownable {
     function tokenURI(uint256 _tokenId)
         public
         view
-        override
+        override(ERC721)
         returns (string memory)
     {
         require(
@@ -263,7 +294,10 @@ contract Baalgroni is ERC721, Ownable {
         );
         return string(_constructTokenURI(_tokenId));
     }
+
+    // todo: interface 165
 }
+
 contract CloneFactory {
     // implementation of eip-1167 - see https://eips.ethereum.org/EIPS/eip-1167
     function createClone(address target) internal returns (address result) {
@@ -288,49 +322,54 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
     address payable public template;
 
     event SummonBaalgroniComplete(
-        address indexed baal,
-        address onboarder,
+        address baalgroni,
+        address moloch,
         address wrapper,
-        uint256 pricePerUnit,
-        string details,
-        bool _onlyERC20
+        uint256 price,
+        uint256 cap,
+        uint256 lootPerUnit,
+        uint256 daoCut,
+        bytes initializationParams
     );
 
     constructor(address payable _template) {
         template = _template;
-        Baalgroni _onboarder = Baalgroni(_template);
-        _onboarder.initTemplate();
     }
 
     function summonBaalgroni(
-        address _baal,
-        address payable _token,
-        uint256 _pricePerUnit,
-        string calldata _details,
-        bool _onlyERC20,
-        uint256 _platformFee, 
-        uint256 _lootPerUnit
+        address moloch,
+        address wrapper,
+        uint256 price,
+        uint256 cap,
+        uint256 lootPerUnit,
+        uint256 daoCut,
+        bytes memory initializationParams
     ) public returns (address) {
-        Baalgroni balgroni = Baalgroni(payable(createClone(template)));
-
-        balgroni.init(
-            _baal,
-            _token,
-            _pricePerUnit,
-            _onlyERC20,
-            _platformFee,
-            _lootPerUnit
+        BaalgroniShaman baalgroni = BaalgroniShaman(
+            payable(createClone(template))
         );
 
+        baalgroni.init(
+            moloch,
+            wrapper,
+            price,
+            cap,
+            lootPerUnit,
+            daoCut,
+            initializationParams
+        );
 
         emit SummonBaalgroniComplete(
-            _baal,
             address(baalgroni),
-            _token,
-            _pricePerUnit,
-            _details,
-            _onlyERC20
+            moloch,
+            wrapper,
+            price,
+            cap,
+            lootPerUnit,
+            daoCut,
+            initializationParams
         );
 
         return address(baalgroni);
     }
+}

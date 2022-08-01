@@ -3,22 +3,22 @@ import { solidity } from "ethereum-waffle";
 import { use, expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
-
-import { 
-    Baalgroni, 
-    TributeMinion, 
-    TestERC20, 
-    Baal, 
-    Loot, 
-    CompatibilityFallbackHandler,
-    BaalSummoner,
-    GnosisSafe,
-    Poster,
-    Shares } from "../src/types"
-
+import {
+  BaalgroniShaman,
+  BaalgroniSummoner,
+  TributeMinion,
+  TestERC20,
+  Baal,
+  Loot,
+  CompatibilityFallbackHandler,
+  BaalSummoner,
+  GnosisSafe,
+  Poster,
+  Shares,
+} from "../src/types";
 
 import { decodeMultiAction, encodeMultiAction } from "../src/util";
-import { BigNumber, BigNumberish  } from "@ethersproject/bignumber";
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { buildContractCall } from "@gnosis.pm/safe-contracts";
 import { MultiSend } from "../src/types/@gnosis.pm/safe-contracts/contracts/libraries/MultiSend";
 
@@ -85,7 +85,7 @@ const getNewBaalAddresses = async (
   const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
   // console.log({logs: receipt.logs})
   let baalSummonAbi = [
-    "event SummonBaal(address indexed baal, address indexed loot, address indexed shares, address safe)",
+    "event SummonBaal(address indexed baal, address indexed loot, address indexed shares, address safe, bool existingSafe)",
   ];
   let iface = new ethers.utils.Interface(baalSummonAbi);
   let log = iface.parseLog(receipt.logs[receipt.logs.length - 1]);
@@ -103,6 +103,19 @@ const deploymentConfig = {
   QUORUM_PERCENT: 0,
   TOKEN_NAME: "wrapped ETH",
   TOKEN_SYMBOL: "WETH",
+};
+
+const baalgroniConfig = {
+  TOKENNAME: "baalgroni",
+  TOKENSYMBOL: "bg",
+  CORE: "core",
+  PROPERTY: "prop",
+  ATRIBUTE3: "attr3",
+  ATRIBUTE2: "attr2",
+  ATRIBUTE1: "attr1",
+  ATRIBUTE0: "attr0",
+  MOD: "mode",
+  IMAGEHASH: "1234",
 };
 
 const metadataConfig = {
@@ -181,41 +194,37 @@ const getBaalParams = async function (
   return {
     initParams: abiCoder.encode(
       ["string", "string"],
-      [
-        config.TOKEN_NAME,
-        config.TOKEN_SYMBOL
-      ]
+      [config.TOKEN_NAME, config.TOKEN_SYMBOL]
     ),
     initalizationActions,
   };
 };
 const setShamanProposal = async function (
-    baal: Baal,
-    multisend: MultiSend,
-    shaman: string,
-    permission: BigNumberish
-  ) {
-    const setShaman = await baal.interface.encodeFunctionData("setShamans", [
-      [shaman],
-      [permission],
-    ]);
-    const setShamanAction = encodeMultiAction(
-      multisend,
-      [setShaman],
-      [baal.address],
-      [BigNumber.from(0)],
-      [0]
-    );
-    await baal.submitProposal(setShamanAction, 0, 0, "");
-    const proposalId = await baal.proposalCount();
-    await baal.submitVote(proposalId, true);
-    await moveForwardPeriods(2);
-    await baal.processProposal(proposalId, setShamanAction);
-    return proposalId;
-  };
+  baal: Baal,
+  multisend: MultiSend,
+  shaman: string,
+  permission: BigNumberish
+) {
+  const setShaman = await baal.interface.encodeFunctionData("setShamans", [
+    [shaman],
+    [permission],
+  ]);
+  const setShamanAction = encodeMultiAction(
+    multisend,
+    [setShaman],
+    [baal.address],
+    [BigNumber.from(0)],
+    [0]
+  );
+  await baal.submitProposal(setShamanAction, 0, 0, "");
+  const proposalId = await baal.proposalCount();
+  await baal.submitVote(proposalId, true);
+  await moveForwardPeriods(2);
+  await baal.processProposal(proposalId, setShamanAction);
+  return proposalId;
+};
 
-
-describe("Onboarder type", function () {
+describe("Baalgroni type", function () {
   let baal: Baal;
   let lootSingleton: Loot;
   let LootFactory: ContractFactory;
@@ -262,9 +271,9 @@ describe("Onboarder type", function () {
 
   let encodedInitParams: any;
 
-  let baalgroni: Baalgroni;
+  let baalgroni: BaalgroniShaman;
   let baalgroniSummoner: BaalgroniSummoner;
-  let onboarderAddress: string;
+  let baalgroniAddress: string;
 
   const loot = 500;
   const shares = 100;
@@ -308,8 +317,6 @@ describe("Onboarder type", function () {
 
     await weth.transfer(applicant.address, 1000);
 
-    
-
     multisend = (await MultisendContract.deploy()) as MultiSend;
     gnosisSafeSingleton = (await GnosisSafe.deploy()) as GnosisSafe;
     const handler =
@@ -317,20 +324,21 @@ describe("Onboarder type", function () {
     const proxy = await GnosisSafeProxyFactory.deploy();
     const moduleProxyFactory = await ModuleProxyFactory.deploy();
 
-    const OnboarderShamanContract = await ethers.getContractFactory(
-        "OnboarderShaman"
-      );
-      baalgroni = (await OnboarderShamanContract.deploy()) as Baalgroni;
+    const BaalgroniShamanContract = await ethers.getContractFactory(
+      "BaalgroniShaman"
+    );
+    baalgroni = (await BaalgroniShamanContract.deploy()) as BaalgroniShaman;
 
-      console.log(baalgroni.address);
-      
+    console.log("baalgroni template addr", baalgroni.address);
 
-      const OnboarderShamanSummonerContract = await ethers.getContractFactory(
-        "BaalgroniSummoner"
-      );
-      baalgroniSummoner = (await OnboarderShamanSummonerContract.deploy(baalgroni.address)) as BaalgroniSummoner;
+    const BaalgroniShamanSummonerContract = await ethers.getContractFactory(
+      "BaalgroniSummoner"
+    );
+    baalgroniSummoner = (await BaalgroniShamanSummonerContract.deploy(
+      baalgroni.address
+    )) as BaalgroniSummoner;
 
-
+    console.log("baalgroniSummoner addr", baalgroniSummoner.address);
 
     baalSummoner = (await BaalSummoner.deploy(
       baalSingleton.address,
@@ -340,9 +348,10 @@ describe("Onboarder type", function () {
       proxy.address,
       moduleProxyFactory.address,
       lootSingleton.address,
-      sharesSingleton.address,
+      sharesSingleton.address
     )) as BaalSummoner;
-    
+
+    console.log("baalSummoner addr", baalSummoner.address);
 
     encodedInitParams = await getBaalParams(
       baalSingleton,
@@ -365,6 +374,7 @@ describe("Onboarder type", function () {
       101
     );
     const addresses = await getNewBaalAddresses(tx);
+    console.log("addresses", addresses);
 
     baal = BaalFactory.attach(addresses.baal) as Baal;
     gnosisSafe = BaalFactory.attach(addresses.safe) as GnosisSafe;
@@ -403,62 +413,133 @@ describe("Onboarder type", function () {
       expiration: 0,
     };
 
-    let summonOnboarder;
-    summonOnboarder = await baalgroniSummoner.summonBaalgroni(
-        baal.address, // baal
-        weth.address, // wrapper
-        ethers.utils.parseEther("1.0"), // price per unit
-        "test", // details
-        false, // erc20
-        3,
-        100
-        ) 
+    const bconfig = abiCoder.encode(
+      [
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+      ],
+      [
+        baalgroniConfig.TOKENNAME,
+        baalgroniConfig.TOKENSYMBOL,
+        baalgroniConfig.CORE,
+        baalgroniConfig.PROPERTY,
+        baalgroniConfig.ATRIBUTE3,
+        baalgroniConfig.ATRIBUTE2,
+        baalgroniConfig.ATRIBUTE1,
+        baalgroniConfig.ATRIBUTE0,
+        baalgroniConfig.MOD,
+        baalgroniConfig.IMAGEHASH,
+      ]
+    );
+
+    let summonBaalgroni;
+    summonBaalgroni = await baalgroniSummoner.summonBaalgroni(
+      baal.address, // baal
+      weth.address, // wrapper
+      ethers.utils.parseEther("1.0"), // price per unit
+      200,
+      100,
+      3,
+      bconfig
+    );
     // console.log(summoner);
 
-    let result = await summonOnboarder.wait();
-    if(result && result.events && result.events[0] && result.events[0].args && result.events[0].args.onboarder){
-        console.log('onboarder', result.events[0].args.onboarder);
-        onboarderAddress = result.events[0].args.onboarder;
+    let result = await summonBaalgroni.wait();
+    if (
+      result &&
+      result.events &&
+      result.events[1] &&
+      result.events[1].args &&
+      result.events[1].args.baalgroni
+    ) {
+      console.log("baalgroni event", result.events[1].args.baalgroni);
+      baalgroniAddress = result.events[1].args.baalgroni;
     }
-
-
   });
 
-
-  describe.only("onboarder tribute", function () {
-
-
+  describe.only("baalgroni tribute", function () {
     it("allows external address to send funds and get loot", async function () {
-    const onboarder = baalgroni.attach(onboarderAddress);
+      const bgroni = baalgroni.attach(baalgroniAddress);
 
-    const applicantOnboarder = onboarder.connect(applicant);
+      const applicantBaalgroni = bgroni.connect(applicant);
 
-    const id = await setShamanProposal(baal, multisend, onboarderAddress, 7);
-    const propStatus = await baal.getProposalStatus(id);
+      const id = await setShamanProposal(baal, multisend, baalgroniAddress, 7);
+      const propStatus = await baal.getProposalStatus(id);
 
-    console.log('propStatus', propStatus);
-    
+      console.log("propStatus", propStatus);
 
-    console.log('before', await applicant.getBalance());
-    console.log('loot before', await lootToken.balanceOf(applicant.address));
-    console.log('safe before balance', await weth.balanceOf(gnosisSafe.address));
-    
-    await applicant.sendTransaction({
-        to: onboarderAddress,
-        value: ethers.utils.parseEther("1.0"), // Sends exactly 1.0 ether
+      console.log("receiver eth before", await applicant.getBalance());
+      console.log(
+        "receiver loot before",
+        await lootToken.balanceOf(applicant.address)
+      );
+      console.log(
+        "factory loot before",
+        await lootToken.balanceOf(bgroni.factory())
+      );
+      console.log(
+        "safe weth before ",
+        await weth.balanceOf(gnosisSafe.address)
+      );
+      console.log("baal total before", await baal.totalSupply());
+      console.log("baal total loot before", await baal.totalLoot());
+      console.log(
+        "safe weth balance before",
+        await weth.balanceOf(gnosisSafe.address)
+      );
+
+      await applicantBaalgroni.mint(applicant.address, {
+        value: ethers.utils.parseEther("1.0"),
       });
-    
 
-    console.log('after', await applicant.getBalance());
-    console.log('loot after', await lootToken.balanceOf(applicant.address));
-    console.log('loot for factory after', await lootToken.balanceOf(baalgroniSummoner.address));
-    console.log('baal total', await baal.totalSupply());
-    console.log('baal total loot', await baal.totalLoot());
-    console.log('safe new balance', await weth.balanceOf(gnosisSafe.address));
+      console.log("receiver eth after", await applicant.getBalance());
+      console.log(
+        "receiver nft after",
+        await bgroni.balanceOf(applicant.address)
+      );
+      console.log(
+        "receiver loot after",
+        await lootToken.balanceOf(applicant.address)
+      );
+      console.log(
+        "factory loot after",
+        await lootToken.balanceOf(baalgroniSummoner.address)
+      );
+      console.log("baal total after", await baal.totalSupply());
+      console.log("baal total loot after", await baal.totalLoot());
+      console.log(
+        "safe new balance after",
+        await weth.balanceOf(gnosisSafe.address)
+      );
 
+      await applicantBaalgroni.bind(1);
 
-    
+      console.log(
+        "receiver loot after bind",
+        await lootToken.balanceOf(applicant.address)
+      );
 
+      console.log(
+        "uri", 
+        await bgroni.tokenURI(1)
+      );
+
+      await applicantBaalgroni.unbind(1);
+
+      console.log(
+        "receiver loot after unbind",
+        await lootToken.balanceOf(applicant.address)
+      );
+
+      
     });
   });
 });

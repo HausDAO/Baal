@@ -13,6 +13,8 @@ contract TestERC20 {
 
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);
+    event  Deposit(address indexed dst, uint wad);
+    event  Withdrawal(address indexed src, uint wad);
 
     constructor(string memory _name, string memory _symbol, uint256 _totalSupply) {
         name = _name;
@@ -47,5 +49,20 @@ contract TestERC20 {
         balanceOf[to] += amount;
         emit Transfer(from, to, amount);
         return true;
+    }
+
+    receive() external payable  {
+        deposit();
+    }
+    function deposit() public payable {
+        balanceOf[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+    function withdraw(uint wad) public {
+        require(balanceOf[msg.sender] >= wad);
+        balanceOf[msg.sender] -= wad;
+        address payable addr = payable(msg.sender);
+        addr.transfer(wad);
+        emit Withdrawal(msg.sender, wad);
     }
 }

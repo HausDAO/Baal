@@ -11,6 +11,43 @@ import type {
 
 const _abi = [
   {
+    inputs: [
+      {
+        internalType: "address[]",
+        name: "to",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "amount",
+        type: "uint256[]",
+      },
+    ],
+    name: "burnLoot",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "shaman",
+        type: "address",
+      },
+    ],
+    name: "isManager",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "lootPaused",
     outputs: [
@@ -24,6 +61,43 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address[]",
+        name: "to",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "amount",
+        type: "uint256[]",
+      },
+    ],
+    name: "mintLoot",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "shaman",
+        type: "address",
+      },
+    ],
+    name: "shamans",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "sharesPaused",
     outputs: [
@@ -31,6 +105,19 @@ const _abi = [
         internalType: "bool",
         name: "",
         type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "target",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "nonpayable",

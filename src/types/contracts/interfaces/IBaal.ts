@@ -4,6 +4,7 @@
 import type {
   BaseContract,
   BigNumber,
+  BigNumberish,
   BytesLike,
   CallOverrides,
   ContractTransaction,
@@ -24,28 +25,62 @@ import type {
 
 export interface IBaalInterface extends utils.Interface {
   functions: {
+    "burnLoot(address[],uint256[])": FunctionFragment;
+    "isManager(address)": FunctionFragment;
     "lootPaused()": FunctionFragment;
+    "mintLoot(address[],uint256[])": FunctionFragment;
+    "shamans(address)": FunctionFragment;
     "sharesPaused()": FunctionFragment;
+    "target()": FunctionFragment;
   };
 
   getFunction(
-    nameOrSignatureOrTopic: "lootPaused" | "sharesPaused"
+    nameOrSignatureOrTopic:
+      | "burnLoot"
+      | "isManager"
+      | "lootPaused"
+      | "mintLoot"
+      | "shamans"
+      | "sharesPaused"
+      | "target"
   ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "burnLoot",
+    values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isManager",
+    values: [PromiseOrValue<string>]
+  ): string;
   encodeFunctionData(
     functionFragment: "lootPaused",
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "mintLoot",
+    values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "shamans",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "sharesPaused",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "target", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "burnLoot", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isManager", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lootPaused", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintLoot", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "shamans", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "sharesPaused",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "target", data: BytesLike): Result;
 
   events: {};
 }
@@ -77,16 +112,64 @@ export interface IBaal extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    burnLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    isManager(
+      shaman: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     lootPaused(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    mintLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    shamans(
+      shaman: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     sharesPaused(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    target(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
   };
 
+  burnLoot(
+    to: PromiseOrValue<string>[],
+    amount: PromiseOrValue<BigNumberish>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  isManager(
+    shaman: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   lootPaused(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  mintLoot(
+    to: PromiseOrValue<string>[],
+    amount: PromiseOrValue<BigNumberish>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  shamans(
+    shaman: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -94,30 +177,110 @@ export interface IBaal extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  target(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
+    burnLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    isManager(
+      shaman: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     lootPaused(overrides?: CallOverrides): Promise<boolean>;
 
+    mintLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    shamans(
+      shaman: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     sharesPaused(overrides?: CallOverrides): Promise<boolean>;
+
+    target(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
+    burnLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    isManager(
+      shaman: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     lootPaused(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    mintLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    shamans(
+      shaman: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     sharesPaused(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    target(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    burnLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    isManager(
+      shaman: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     lootPaused(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    mintLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    shamans(
+      shaman: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     sharesPaused(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    target(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
