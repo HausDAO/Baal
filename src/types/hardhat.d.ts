@@ -225,6 +225,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BaalgroniSummoner__factory>;
     getContractFactory(
+      name: "IERC5192",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC5192__factory>;
+    getContractFactory(
       name: "IWRAPPER",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IWRAPPER__factory>;
@@ -506,6 +510,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.BaalgroniSummoner>;
+    getContractAt(
+      name: "IERC5192",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC5192>;
     getContractAt(
       name: "IWRAPPER",
       address: string,

@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
@@ -18,7 +19,15 @@ interface IWRAPPER {
         returns (bool);
 }
 
-contract BaalgroniShaman is ERC721, Ownable, Initializable {
+interface IERC5192 {
+  /// @notice Returns the locking status of an Soulbound Token
+  /// @dev SBTs assigned to zero address are considered invalid, and queries
+  /// about them do throw.
+  /// @param tokenId The identifier for an SBT.
+  function locked(uint256 tokenId) external view returns (bool);
+}
+
+contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
@@ -26,7 +35,6 @@ contract BaalgroniShaman is ERC721, Ownable, Initializable {
     // ERC721 CONFIG
     string private _name; /*Name for ERC721 trackers*/
     string private _symbol; /*Symbol for ERC721 trackers*/
-    string private _baseUri = "https://daohaus.mypinata.cloud/ipfs/";
 
     IBaal public moloch;
     IWRAPPER public wrapper;
@@ -48,6 +56,16 @@ contract BaalgroniShaman is ERC721, Ownable, Initializable {
 
     mapping(uint256 => address) public bindings;
 
+    event Bind(
+        address baalgroni,
+        uint256 tokedId
+    );
+
+    event Unbind(
+        address baalgroni,
+        uint256 tokedId
+    );
+
     error InvalidIndex();
     error Bound();
     error Unbound();
@@ -58,6 +76,7 @@ contract BaalgroniShaman is ERC721, Ownable, Initializable {
     error BarIsEmpty();
     error WrapFailed();
     error TransferFailed();
+    error OnlyLootHolderCanUnbind();
 
     constructor() ERC721("Template", "T") initializer {} /*Configure template to be unusable*/
 
@@ -116,11 +135,7 @@ contract BaalgroniShaman is ERC721, Ownable, Initializable {
         imageHash = _imageHash;
     }
 
-    function _baseURI() internal view override returns (string memory) {
-        return _baseUri;
-    }
-
-    // orderId is the order of the drink type in names
+    
     function mint(address _to) public payable {
         if (msg.value < price) revert NotEnough();
 
@@ -169,11 +184,15 @@ contract BaalgroniShaman is ERC721, Ownable, Initializable {
         moloch.burnLoot(_sinkReceivers, _amounts);
 
         moloch.mintLoot(_receivers, _amounts);
+
+        emit Bind(msg.sender, tokenId);
     }
 
     function unbind(uint256 tokenId) public {
         if (bindings[tokenId] == address(0)) revert Unbound();
         if (bindings[tokenId] != msg.sender) revert OnlyOwnerCanUnbind();
+        IERC20 lootToken = IERC20(moloch.lootToken());
+        if (lootToken.balanceOf(msg.sender) < lootPerUnit) revert OnlyLootHolderCanUnbind();
         bindings[tokenId] = address(0);
 
         address[] memory _sinkReceivers = new address[](1);
@@ -188,9 +207,11 @@ contract BaalgroniShaman is ERC721, Ownable, Initializable {
         moloch.mintLoot(_sinkReceivers, _amounts);
 
         moloch.burnLoot(_receivers, _amounts);
+
+        emit Unbind(msg.sender, tokenId);
     }
 
-    function locked(uint256 _tokenId) public view returns (bool) {
+    function locked(uint256 _tokenId) public view override(IERC5192) returns (bool) {
         if (bindings[_tokenId] != address(0)) {
             return true;
         } else {
@@ -295,7 +316,11 @@ contract BaalgroniShaman is ERC721, Ownable, Initializable {
         return string(_constructTokenURI(_tokenId));
     }
 
-    // todo: interface 165
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721) returns (bool) {
+        return
+            interfaceId == type(IERC5192).interfaceId ||
+            super.supportsInterface(interfaceId);
+    }
 }
 
 contract CloneFactory {

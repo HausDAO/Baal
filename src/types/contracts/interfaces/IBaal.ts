@@ -28,6 +28,7 @@ export interface IBaalInterface extends utils.Interface {
     "burnLoot(address[],uint256[])": FunctionFragment;
     "isManager(address)": FunctionFragment;
     "lootPaused()": FunctionFragment;
+    "lootToken()": FunctionFragment;
     "mintLoot(address[],uint256[])": FunctionFragment;
     "shamans(address)": FunctionFragment;
     "sharesPaused()": FunctionFragment;
@@ -39,6 +40,7 @@ export interface IBaalInterface extends utils.Interface {
       | "burnLoot"
       | "isManager"
       | "lootPaused"
+      | "lootToken"
       | "mintLoot"
       | "shamans"
       | "sharesPaused"
@@ -57,6 +59,7 @@ export interface IBaalInterface extends utils.Interface {
     functionFragment: "lootPaused",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "lootToken", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "mintLoot",
     values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
@@ -74,6 +77,7 @@ export interface IBaalInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "burnLoot", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isManager", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lootPaused", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "lootToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mintLoot", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "shamans", data: BytesLike): Result;
   decodeFunctionResult(
@@ -127,6 +131,10 @@ export interface IBaal extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    lootToken(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     mintLoot(
       to: PromiseOrValue<string>[],
       amount: PromiseOrValue<BigNumberish>[],
@@ -159,6 +167,10 @@ export interface IBaal extends BaseContract {
   ): Promise<ContractTransaction>;
 
   lootPaused(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  lootToken(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -195,6 +207,8 @@ export interface IBaal extends BaseContract {
 
     lootPaused(overrides?: CallOverrides): Promise<boolean>;
 
+    lootToken(overrides?: CallOverrides): Promise<string>;
+
     mintLoot(
       to: PromiseOrValue<string>[],
       amount: PromiseOrValue<BigNumberish>[],
@@ -226,6 +240,10 @@ export interface IBaal extends BaseContract {
     ): Promise<BigNumber>;
 
     lootPaused(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    lootToken(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -262,6 +280,10 @@ export interface IBaal extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     lootPaused(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    lootToken(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

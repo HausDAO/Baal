@@ -61,6 +61,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "lootToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address[]",

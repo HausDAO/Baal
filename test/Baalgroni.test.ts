@@ -440,6 +440,8 @@ describe("Baalgroni type", function () {
       ]
     );
 
+    console.log("init params", bconfig);
+
     let summonBaalgroni;
     summonBaalgroni = await baalgroniSummoner.summonBaalgroni(
       baal.address, // baal
@@ -466,7 +468,7 @@ describe("Baalgroni type", function () {
   });
 
   describe.only("baalgroni tribute", function () {
-    it("allows external address to send funds and get loot", async function () {
+    it("allows external address to mint NFT with funds and get loot", async function () {
       const bgroni = baalgroni.attach(baalgroniAddress);
 
       const applicantBaalgroni = bgroni.connect(applicant);
@@ -527,10 +529,7 @@ describe("Baalgroni type", function () {
         await lootToken.balanceOf(applicant.address)
       );
 
-      console.log(
-        "uri", 
-        await bgroni.tokenURI(1)
-      );
+      console.log("uri", await bgroni.tokenURI(1));
 
       await applicantBaalgroni.unbind(1);
 
@@ -538,8 +537,88 @@ describe("Baalgroni type", function () {
         "receiver loot after unbind",
         await lootToken.balanceOf(applicant.address)
       );
+    });
+    it("allows external address to mint, bind and ragequit and fail to unbind", async function () {
+      const bgroni = baalgroni.attach(baalgroniAddress);
 
-      
+      const applicantBaalgroni = bgroni.connect(applicant);
+
+      const id = await setShamanProposal(baal, multisend, baalgroniAddress, 7);
+      const propStatus = await baal.getProposalStatus(id);
+
+      console.log("propStatus", propStatus);
+
+      console.log("receiver eth before", await applicant.getBalance());
+      console.log(
+        "receiver loot before",
+        await lootToken.balanceOf(applicant.address)
+      );
+      console.log(
+        "factory loot before",
+        await lootToken.balanceOf(bgroni.factory())
+      );
+      console.log(
+        "safe weth before ",
+        await weth.balanceOf(gnosisSafe.address)
+      );
+      console.log("baal total before", await baal.totalSupply());
+      console.log("baal total loot before", await baal.totalLoot());
+      console.log(
+        "safe weth balance before",
+        await weth.balanceOf(gnosisSafe.address)
+      );
+
+      await applicantBaalgroni.mint(applicant.address, {
+        value: ethers.utils.parseEther("1.0"),
+      });
+
+      console.log("receiver eth after", await applicant.getBalance());
+      console.log(
+        "receiver nft after",
+        await bgroni.balanceOf(applicant.address)
+      );
+      console.log(
+        "receiver loot after",
+        await lootToken.balanceOf(applicant.address)
+      );
+      console.log(
+        "factory loot after",
+        await lootToken.balanceOf(baalgroniSummoner.address)
+      );
+      console.log("baal total after", await baal.totalSupply());
+      console.log("baal total loot after", await baal.totalLoot());
+      console.log(
+        "safe new balance after",
+        await weth.balanceOf(gnosisSafe.address)
+      );
+
+      await applicantBaalgroni.bind(1);
+
+      const applicantLoot = await lootToken.balanceOf(applicant.address);
+
+      console.log("receiver loot after bind", applicantLoot);
+
+      console.log("uri", await bgroni.tokenURI(1));
+
+      await applicantBaal.ragequit(applicant.address, 0, applicantLoot, [
+        weth.address,
+      ]);
+
+      console.log(
+        "receiver loot after ragequit",
+        await lootToken.balanceOf(applicant.address)
+      );
+
+      // could unbind if has loot
+      // await applicantBaalgroni.mint(applicant.address, {
+      //   value: ethers.utils.parseEther("1.0"),
+      // });
+
+      // await applicantBaalgroni.bind(2);
+
+      await expect(applicantBaalgroni.unbind(1)).to.be.revertedWith(
+        `OnlyLootHolderCanUnbind`
+      );
     });
   });
 });

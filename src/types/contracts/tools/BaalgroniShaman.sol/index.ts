@@ -3,4 +3,5 @@
 /* eslint-disable */
 export type { BaalgroniShaman } from "./BaalgroniShaman";
 export type { BaalgroniSummoner } from "./BaalgroniSummoner";
+export type { IERC5192 } from "./IERC5192";
 export type { IWRAPPER } from "./IWRAPPER";

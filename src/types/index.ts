@@ -110,6 +110,8 @@ export type { BaalgroniShaman } from "./contracts/tools/BaalgroniShaman.sol/Baal
 export { BaalgroniShaman__factory } from "./factories/contracts/tools/BaalgroniShaman.sol/BaalgroniShaman__factory";
 export type { BaalgroniSummoner } from "./contracts/tools/BaalgroniShaman.sol/BaalgroniSummoner";
 export { BaalgroniSummoner__factory } from "./factories/contracts/tools/BaalgroniShaman.sol/BaalgroniSummoner__factory";
+export type { IERC5192 } from "./contracts/tools/BaalgroniShaman.sol/IERC5192";
+export { IERC5192__factory } from "./factories/contracts/tools/BaalgroniShaman.sol/IERC5192__factory";
 export type { IWRAPPER } from "./contracts/tools/BaalgroniShaman.sol/IWRAPPER";
 export { IWRAPPER__factory } from "./factories/contracts/tools/BaalgroniShaman.sol/IWRAPPER__factory";
 export type { Poster } from "./contracts/tools/Poster";

@@ -3,4 +3,5 @@
 /* eslint-disable */
 export { BaalgroniShaman__factory } from "./BaalgroniShaman__factory";
 export { BaalgroniSummoner__factory } from "./BaalgroniSummoner__factory";
+export { IERC5192__factory } from "./IERC5192__factory";
 export { IWRAPPER__factory } from "./IWRAPPER__factory";
