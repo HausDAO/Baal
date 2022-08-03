@@ -212,6 +212,87 @@ task("infoprops", "Current Proposal info")
     console.log("the last proposal sponsored is:", lastSponsored);
   });
 
+task("shamanprop", "Submits a new shaman proposal")
+  .addParam("dao", "Dao address")
+  .addParam("shaman", "shaman address")
+  .addParam("perms", "shaman perms")
+  .addParam(
+    "expiration",
+    "seconds after grace that proposal expires, 0 for none"
+  )
+  .addOptionalParam("meta", "updated meta data")
+  .setAction(async (taskArgs, hre) => {
+    const encodeMultiAction2 = (
+      multisend: MultiSend,
+      actions: string[],
+      tos: string[],
+      values: BigNumber[],
+      operations: number[]
+    ) => {
+      let metatransactions: MetaTransaction[] = [];
+      for (let index = 0; index < actions.length; index++) {
+        metatransactions.push({
+          to: tos[index],
+          value: values[index],
+          data: actions[index],
+          operation: operations[index],
+        });
+      }
+      const encodedMetatransactions = encodeMultiSend(metatransactions);
+      const multi_action = multisend.interface.encodeFunctionData("multiSend", [
+        encodedMetatransactions,
+      ]);
+      return multi_action;
+    };
+
+    const MultisendContract = await hre.ethers.getContractFactory("MultiSend");
+    const multisend = (await MultisendContract.attach(
+      _addresses.gnosisMultisendLibrary
+    )) as MultiSend;
+
+    const Baal = await hre.ethers.getContractFactory("Baal");
+    const baal = (await Baal.attach(taskArgs.dao)) as Baal;
+    const countBefore = await baal.proposalCount();
+    console.log("countBefore", countBefore);
+
+    const setShamanAction = await baal.interface.encodeFunctionData(
+      "setShamans",
+      [[taskArgs.shaman], [taskArgs.perms]]
+    );
+    const metadataConfig = {
+      CONTENT: taskArgs.meta || '{"name":"test proposal"}',
+      TAG: "daohaus.proposal.metadata",
+    };
+
+    const encodedAction = encodeMultiAction2(
+      multisend,
+      [setShamanAction],
+      [baal.address],
+      [BigNumber.from(0)],
+      [0]
+    );
+
+    const block = await hre.ethers.provider.getBlock("latest");
+    const now = await block.timestamp;
+    const voting = await baal.votingPeriod();
+    const grace = await baal.gracePeriod();
+
+    console.log("********encoded data*********");
+    console.log(encodedAction);
+    console.log("*****************************");
+    // TODO: poster should happen here probably, if in encodeAction it will run after processing
+    const submit = await baal.submitProposal(
+      encodedAction,
+      parseInt(taskArgs.expiration)
+        ? now + voting + grace + parseInt(taskArgs.expiration)
+        : 0,
+      0,
+      metadataConfig.CONTENT // hre.ethers.utils.id("all hail baal")
+    );
+    console.log("tx:", submit.hash);
+
+  })
+
 task("memberprop", "Submits a new member proposal")
   .addParam("dao", "Dao address")
   .addParam("applicant", "applicant address")
