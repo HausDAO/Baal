@@ -26,10 +26,12 @@ import type {
 export interface IBaalInterface extends utils.Interface {
   functions: {
     "burnLoot(address[],uint256[])": FunctionFragment;
+    "burnShares(address[],uint256[])": FunctionFragment;
     "isManager(address)": FunctionFragment;
     "lootPaused()": FunctionFragment;
     "lootToken()": FunctionFragment;
     "mintLoot(address[],uint256[])": FunctionFragment;
+    "mintShares(address[],uint256[])": FunctionFragment;
     "shamans(address)": FunctionFragment;
     "sharesPaused()": FunctionFragment;
     "target()": FunctionFragment;
@@ -38,10 +40,12 @@ export interface IBaalInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "burnLoot"
+      | "burnShares"
       | "isManager"
       | "lootPaused"
       | "lootToken"
       | "mintLoot"
+      | "mintShares"
       | "shamans"
       | "sharesPaused"
       | "target"
@@ -49,6 +53,10 @@ export interface IBaalInterface extends utils.Interface {
 
   encodeFunctionData(
     functionFragment: "burnLoot",
+    values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "burnShares",
     values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
   ): string;
   encodeFunctionData(
@@ -65,6 +73,10 @@ export interface IBaalInterface extends utils.Interface {
     values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
   ): string;
   encodeFunctionData(
+    functionFragment: "mintShares",
+    values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "shamans",
     values: [PromiseOrValue<string>]
   ): string;
@@ -75,10 +87,12 @@ export interface IBaalInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "target", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "burnLoot", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burnShares", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isManager", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lootPaused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lootToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mintLoot", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintShares", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "shamans", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "sharesPaused",
@@ -122,6 +136,12 @@ export interface IBaal extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    burnShares(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     isManager(
       shaman: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -136,6 +156,12 @@ export interface IBaal extends BaseContract {
     ): Promise<ContractTransaction>;
 
     mintLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    mintShares(
       to: PromiseOrValue<string>[],
       amount: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -161,6 +187,12 @@ export interface IBaal extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  burnShares(
+    to: PromiseOrValue<string>[],
+    amount: PromiseOrValue<BigNumberish>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   isManager(
     shaman: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -175,6 +207,12 @@ export interface IBaal extends BaseContract {
   ): Promise<ContractTransaction>;
 
   mintLoot(
+    to: PromiseOrValue<string>[],
+    amount: PromiseOrValue<BigNumberish>[],
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  mintShares(
     to: PromiseOrValue<string>[],
     amount: PromiseOrValue<BigNumberish>[],
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -200,6 +238,12 @@ export interface IBaal extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    burnShares(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     isManager(
       shaman: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -210,6 +254,12 @@ export interface IBaal extends BaseContract {
     lootToken(overrides?: CallOverrides): Promise<string>;
 
     mintLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mintShares(
       to: PromiseOrValue<string>[],
       amount: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
@@ -234,6 +284,12 @@ export interface IBaal extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    burnShares(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     isManager(
       shaman: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -248,6 +304,12 @@ export interface IBaal extends BaseContract {
     ): Promise<BigNumber>;
 
     mintLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    mintShares(
       to: PromiseOrValue<string>[],
       amount: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -274,6 +336,12 @@ export interface IBaal extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    burnShares(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     isManager(
       shaman: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -288,6 +356,12 @@ export interface IBaal extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     mintLoot(
+      to: PromiseOrValue<string>[],
+      amount: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mintShares(
       to: PromiseOrValue<string>[],
       amount: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }

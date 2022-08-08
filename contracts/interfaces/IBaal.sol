@@ -5,6 +5,8 @@ interface IBaal {
     function lootPaused() external returns (bool);
     function sharesPaused() external returns (bool);
     function mintLoot(address[] calldata to, uint256[] calldata amount) external;
+    function burnShares(address[] calldata to, uint256[] calldata amount) external;
+    function mintShares(address[] calldata to, uint256[] calldata amount) external;
     function burnLoot(address[] calldata to, uint256[] calldata amount) external;
     function shamans(address shaman) external returns(uint256);
     function isManager(address shaman) external returns(bool);

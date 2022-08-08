@@ -31,7 +31,7 @@ export interface BaalgroniSummonerInterface extends utils.Interface {
   functions: {
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "summonBaalgroni(address,address,uint256,uint256,uint256,uint256,bytes)": FunctionFragment;
+    "summonBaalgroni(address,address,bool,uint256,uint256,uint256,uint256,address[],uint256[],bytes)": FunctionFragment;
     "template()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
@@ -55,10 +55,13 @@ export interface BaalgroniSummonerInterface extends utils.Interface {
     values: [
       PromiseOrValue<string>,
       PromiseOrValue<string>,
+      PromiseOrValue<boolean>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>[],
+      PromiseOrValue<BigNumberish>[],
       PromiseOrValue<BytesLike>
     ]
   ): string;
@@ -85,7 +88,7 @@ export interface BaalgroniSummonerInterface extends utils.Interface {
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
-    "SummonBaalgroniComplete(address,address,address,uint256,uint256,uint256,uint256,bytes)": EventFragment;
+    "SummonBaalgroniComplete(address,address,address,bool,uint256,uint256,uint256,uint256,address[],uint256[],bytes)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
@@ -108,14 +111,29 @@ export interface SummonBaalgroniCompleteEventObject {
   baalgroni: string;
   moloch: string;
   wrapper: string;
+  shares: boolean;
   price: BigNumber;
   cap: BigNumber;
   lootPerUnit: BigNumber;
-  daoCut: BigNumber;
+  expiry: BigNumber;
+  cuts: string[];
+  amounts: BigNumber[];
   initializationParams: string;
 }
 export type SummonBaalgroniCompleteEvent = TypedEvent<
-  [string, string, string, BigNumber, BigNumber, BigNumber, BigNumber, string],
+  [
+    string,
+    string,
+    string,
+    boolean,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    string[],
+    BigNumber[],
+    string
+  ],
   SummonBaalgroniCompleteEventObject
 >;
 
@@ -158,10 +176,13 @@ export interface BaalgroniSummoner extends BaseContract {
     summonBaalgroni(
       moloch: PromiseOrValue<string>,
       wrapper: PromiseOrValue<string>,
+      shares: PromiseOrValue<boolean>,
       price: PromiseOrValue<BigNumberish>,
       cap: PromiseOrValue<BigNumberish>,
       lootPerUnit: PromiseOrValue<BigNumberish>,
-      daoCut: PromiseOrValue<BigNumberish>,
+      expiry: PromiseOrValue<BigNumberish>,
+      cuts: PromiseOrValue<string>[],
+      amounts: PromiseOrValue<BigNumberish>[],
       initializationParams: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -183,10 +204,13 @@ export interface BaalgroniSummoner extends BaseContract {
   summonBaalgroni(
     moloch: PromiseOrValue<string>,
     wrapper: PromiseOrValue<string>,
+    shares: PromiseOrValue<boolean>,
     price: PromiseOrValue<BigNumberish>,
     cap: PromiseOrValue<BigNumberish>,
     lootPerUnit: PromiseOrValue<BigNumberish>,
-    daoCut: PromiseOrValue<BigNumberish>,
+    expiry: PromiseOrValue<BigNumberish>,
+    cuts: PromiseOrValue<string>[],
+    amounts: PromiseOrValue<BigNumberish>[],
     initializationParams: PromiseOrValue<BytesLike>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -206,10 +230,13 @@ export interface BaalgroniSummoner extends BaseContract {
     summonBaalgroni(
       moloch: PromiseOrValue<string>,
       wrapper: PromiseOrValue<string>,
+      shares: PromiseOrValue<boolean>,
       price: PromiseOrValue<BigNumberish>,
       cap: PromiseOrValue<BigNumberish>,
       lootPerUnit: PromiseOrValue<BigNumberish>,
-      daoCut: PromiseOrValue<BigNumberish>,
+      expiry: PromiseOrValue<BigNumberish>,
+      cuts: PromiseOrValue<string>[],
+      amounts: PromiseOrValue<BigNumberish>[],
       initializationParams: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -232,24 +259,30 @@ export interface BaalgroniSummoner extends BaseContract {
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
 
-    "SummonBaalgroniComplete(address,address,address,uint256,uint256,uint256,uint256,bytes)"(
+    "SummonBaalgroniComplete(address,address,address,bool,uint256,uint256,uint256,uint256,address[],uint256[],bytes)"(
       baalgroni?: null,
       moloch?: null,
       wrapper?: null,
+      shares?: null,
       price?: null,
       cap?: null,
       lootPerUnit?: null,
-      daoCut?: null,
+      expiry?: null,
+      cuts?: null,
+      amounts?: null,
       initializationParams?: null
     ): SummonBaalgroniCompleteEventFilter;
     SummonBaalgroniComplete(
       baalgroni?: null,
       moloch?: null,
       wrapper?: null,
+      shares?: null,
       price?: null,
       cap?: null,
       lootPerUnit?: null,
-      daoCut?: null,
+      expiry?: null,
+      cuts?: null,
+      amounts?: null,
       initializationParams?: null
     ): SummonBaalgroniCompleteEventFilter;
   };
@@ -264,10 +297,13 @@ export interface BaalgroniSummoner extends BaseContract {
     summonBaalgroni(
       moloch: PromiseOrValue<string>,
       wrapper: PromiseOrValue<string>,
+      shares: PromiseOrValue<boolean>,
       price: PromiseOrValue<BigNumberish>,
       cap: PromiseOrValue<BigNumberish>,
       lootPerUnit: PromiseOrValue<BigNumberish>,
-      daoCut: PromiseOrValue<BigNumberish>,
+      expiry: PromiseOrValue<BigNumberish>,
+      cuts: PromiseOrValue<string>[],
+      amounts: PromiseOrValue<BigNumberish>[],
       initializationParams: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -290,10 +326,13 @@ export interface BaalgroniSummoner extends BaseContract {
     summonBaalgroni(
       moloch: PromiseOrValue<string>,
       wrapper: PromiseOrValue<string>,
+      shares: PromiseOrValue<boolean>,
       price: PromiseOrValue<BigNumberish>,
       cap: PromiseOrValue<BigNumberish>,
       lootPerUnit: PromiseOrValue<BigNumberish>,
-      daoCut: PromiseOrValue<BigNumberish>,
+      expiry: PromiseOrValue<BigNumberish>,
+      cuts: PromiseOrValue<string>[],
+      amounts: PromiseOrValue<BigNumberish>[],
       initializationParams: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;

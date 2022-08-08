@@ -38,20 +38,19 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
 
     IBaal public moloch;
     IWRAPPER public wrapper;
-    BaalgroniSummoner public factory;
 
     uint256 public price; // ex. 200000000000000000000;
     uint256 public cap; // ex. 200;
     uint256 public lootPerUnit; // ex. 100;
     uint256 public daoCut; // ex. 3;
+    uint256 public expiry;
+    address[] public cuts; // ex. 3;
+    uint256[] public amounts; // ex. 3;
+
+    bool public shares;
 
     string public core; // ex. "Bourbon";
     string public property; // ex. "None";
-    string public atribute3; // ex. "Orange Twist";
-    string public atribute2; // ex. "Up";
-    string public atribute1; // ex. "Coupe";
-    string public atribute0; // ex. "Sweet Vermouth";
-    string public mod; // ex. "Campari";
     string public imageHash;
 
     mapping(uint256 => address) public bindings;
@@ -73,7 +72,8 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
     error OnlyOwnerCanBind();
     error NotEnough();
     error InvalidOrder();
-    error BarIsEmpty();
+    error CapMet();
+    error Expired();
     error WrapFailed();
     error TransferFailed();
     error OnlyLootHolderCanUnbind();
@@ -84,25 +84,23 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
     function init(
         address _moloch,
         address _wrapper,
+        bool _shares,
         uint256 _price,
         uint256 _cap,
         uint256 _lootPerUnit,
-        uint256 _daoCut,
+        uint256 _expiry,
+        address[] memory  _cuts,
+        uint256[] memory _amounts,
         bytes memory _initializationParams
     ) external initializer {
         moloch = IBaal(_moloch);
         wrapper = IWRAPPER(_wrapper);
-        factory = BaalgroniSummoner(msg.sender);
+
         (
             string memory _tokenName,
             string memory _tokenSymbol,
             string memory _core,
             string memory _property,
-            string memory _atribute3,
-            string memory _atribute2,
-            string memory _atribute1,
-            string memory _atribute0,
-            string memory _mod,
             string memory _imageHash
         ) = abi.decode(
                 _initializationParams,
@@ -111,36 +109,34 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
                     string,
                     string,
                     string,
-                    string,
-                    string,
-                    string,
-                    string,
-                    string,
-                    string
+                    string                
                 )
             );
-        _name = _tokenName;
-        _symbol = _tokenSymbol;
+        
         price = _price;
         cap = _cap;
         lootPerUnit = _lootPerUnit;
-        daoCut = _daoCut;
+        expiry = _expiry;
+
+        cuts = _cuts;
+        amounts = _amounts;
+
+        _name = _tokenName;
+        _symbol = _tokenSymbol;
         core = _core;
         property = _property;
-        atribute3 = _atribute3;
-        atribute2 = _atribute2;
-        atribute1 = _atribute1;
-        atribute0 = _atribute0;
-        mod = _mod;
         imageHash = _imageHash;
+
+        shares = _shares;
     }
 
     
     function mint(address _to) public payable {
         if (msg.value < price) revert NotEnough();
+        if (expiry > 0 && expiry < block.timestamp) revert Expired();
 
         uint256 tokenId = _tokenIdCounter.current();
-        if (tokenId >= cap) revert BarIsEmpty();
+        if (tokenId >= cap) revert CapMet();
         // wrap
         (bool success, ) = address(wrapper).call{value: price}("");
         if (!success) revert WrapFailed();
@@ -156,15 +152,24 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         _safeMint(_to, tokenId + 1);
         _tokenIdCounter.increment();
 
-        address[] memory _receivers = new address[](2);
+        address[] memory _receivers = new address[](cuts.length + 1);
         _receivers[0] = address(0xdead);
-        _receivers[1] = address(factory);
+        for (uint256 i = 1; i < cuts.length + 1; i++) {
+            _receivers[i] = cuts[i-1];
+        }
 
-        uint256[] memory _amounts = new uint256[](2);
+        uint256[] memory _amounts = new uint256[](amounts.length + 1);
         _amounts[0] = lootPerUnit;
-        _amounts[1] = daoCut;
+        for (uint256 i = 1; i < amounts.length + 1; i++) {
+            _amounts[i] = amounts[i-1];
+        }
 
-        moloch.mintLoot(_receivers, _amounts);
+        if(shares){
+            moloch.mintShares(_receivers, _amounts);
+
+        } else {
+            moloch.mintLoot(_receivers, _amounts);
+        }
     }
 
     function bind(uint256 tokenId) public {
@@ -181,9 +186,13 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = lootPerUnit;
 
-        moloch.burnLoot(_sinkReceivers, _amounts);
-
-        moloch.mintLoot(_receivers, _amounts);
+        if(shares){
+            moloch.burnShares(_sinkReceivers, _amounts);
+            moloch.mintShares(_receivers, _amounts);
+        } else {
+            moloch.burnLoot(_sinkReceivers, _amounts);
+            moloch.mintLoot(_receivers, _amounts);
+        }
 
         emit Bind(msg.sender, tokenId);
     }
@@ -204,9 +213,13 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = lootPerUnit;
 
-        moloch.mintLoot(_sinkReceivers, _amounts);
-
-        moloch.burnLoot(_receivers, _amounts);
+        if(shares){
+            moloch.mintShares(_sinkReceivers, _amounts);
+            moloch.burnShares(_receivers, _amounts);
+        } else {
+            moloch.mintLoot(_sinkReceivers, _amounts);
+            moloch.burnLoot(_receivers, _amounts);
+        }        
 
         emit Unbind(msg.sender, tokenId);
     }
@@ -251,27 +264,12 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         bytes memory _core = abi.encodePacked(
             '{"trait_type": "Core", "value": "',
             core,
-            '"},',
-            '{"trait_type": "atribute0", "value": "',
-            atribute0,
             '"},'
         );
 
         bytes memory _sup = abi.encodePacked(
-            '{"trait_type": "Modifiers", "value": "',
-            mod,
-            '"},',
             '{"trait_type": "Property", "value": "',
-            property,
-            '"},',
-            '{"trait_type": "Atribute1", "value": "',
-            atribute1,
-            '"},',
-            '{"trait_type": "Atribute2", "value": "',
-            atribute2,
-            '"},',
-            '{"trait_type": "Atribute3", "value": "',
-            atribute3,
+            property,  
             '"}'
         );
 
@@ -350,10 +348,13 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
         address baalgroni,
         address moloch,
         address wrapper,
+        bool shares,
         uint256 price,
         uint256 cap,
         uint256 lootPerUnit,
-        uint256 daoCut,
+        uint256 expiry,
+        address[] cuts,
+        uint256[] amounts,
         bytes initializationParams
     );
 
@@ -364,10 +365,13 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
     function summonBaalgroni(
         address moloch,
         address wrapper,
+        bool shares,
         uint256 price,
         uint256 cap,
         uint256 lootPerUnit,
-        uint256 daoCut,
+        uint256 expiry,
+        address[] memory cuts,
+        uint256[] memory amounts,
         bytes memory initializationParams
     ) public returns (address) {
         BaalgroniShaman baalgroni = BaalgroniShaman(
@@ -377,10 +381,13 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
         baalgroni.init(
             moloch,
             wrapper,
+            shares,
             price,
             cap,
             lootPerUnit,
-            daoCut,
+            expiry,
+            cuts,
+            amounts,
             initializationParams
         );
 
@@ -388,10 +395,13 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
             address(baalgroni),
             moloch,
             wrapper,
+            shares,
             price,
             cap,
             lootPerUnit,
-            daoCut,
+            expiry,
+            cuts,
+            amounts,
             initializationParams
         );
 

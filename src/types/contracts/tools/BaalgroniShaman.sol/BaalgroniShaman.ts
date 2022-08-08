@@ -30,26 +30,23 @@ import type {
 
 export interface BaalgroniShamanInterface extends utils.Interface {
   functions: {
+    "amounts(uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
-    "atribute0()": FunctionFragment;
-    "atribute1()": FunctionFragment;
-    "atribute2()": FunctionFragment;
-    "atribute3()": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "bind(uint256)": FunctionFragment;
     "bindings(uint256)": FunctionFragment;
     "cap()": FunctionFragment;
     "core()": FunctionFragment;
+    "cuts(uint256)": FunctionFragment;
     "daoCut()": FunctionFragment;
-    "factory()": FunctionFragment;
+    "expiry()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "imageHash()": FunctionFragment;
-    "init(address,address,uint256,uint256,uint256,uint256,bytes)": FunctionFragment;
+    "init(address,address,bool,uint256,uint256,uint256,uint256,address[],uint256[],bytes)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "locked(uint256)": FunctionFragment;
     "lootPerUnit()": FunctionFragment;
     "mint(address)": FunctionFragment;
-    "mod()": FunctionFragment;
     "moloch()": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
@@ -58,6 +55,7 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "shares()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
@@ -68,18 +66,16 @@ export interface BaalgroniShamanInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
+      | "amounts"
       | "approve"
-      | "atribute0"
-      | "atribute1"
-      | "atribute2"
-      | "atribute3"
       | "balanceOf"
       | "bind"
       | "bindings"
       | "cap"
       | "core"
+      | "cuts"
       | "daoCut"
-      | "factory"
+      | "expiry"
       | "getApproved"
       | "imageHash"
       | "init"
@@ -87,7 +83,6 @@ export interface BaalgroniShamanInterface extends utils.Interface {
       | "locked"
       | "lootPerUnit"
       | "mint"
-      | "mod"
       | "moloch"
       | "name"
       | "ownerOf"
@@ -96,6 +91,7 @@ export interface BaalgroniShamanInterface extends utils.Interface {
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
+      | "shares"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
@@ -105,13 +101,13 @@ export interface BaalgroniShamanInterface extends utils.Interface {
   ): FunctionFragment;
 
   encodeFunctionData(
+    functionFragment: "amounts",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "approve",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
-  encodeFunctionData(functionFragment: "atribute0", values?: undefined): string;
-  encodeFunctionData(functionFragment: "atribute1", values?: undefined): string;
-  encodeFunctionData(functionFragment: "atribute2", values?: undefined): string;
-  encodeFunctionData(functionFragment: "atribute3", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [PromiseOrValue<string>]
@@ -126,8 +122,12 @@ export interface BaalgroniShamanInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "cap", values?: undefined): string;
   encodeFunctionData(functionFragment: "core", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "cuts",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
   encodeFunctionData(functionFragment: "daoCut", values?: undefined): string;
-  encodeFunctionData(functionFragment: "factory", values?: undefined): string;
+  encodeFunctionData(functionFragment: "expiry", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
@@ -138,10 +138,13 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     values: [
       PromiseOrValue<string>,
       PromiseOrValue<string>,
+      PromiseOrValue<boolean>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>[],
+      PromiseOrValue<BigNumberish>[],
       PromiseOrValue<BytesLike>
     ]
   ): string;
@@ -161,7 +164,6 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     functionFragment: "mint",
     values: [PromiseOrValue<string>]
   ): string;
-  encodeFunctionData(functionFragment: "mod", values?: undefined): string;
   encodeFunctionData(functionFragment: "moloch", values?: undefined): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
@@ -191,6 +193,7 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
+  encodeFunctionData(functionFragment: "shares", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [PromiseOrValue<BytesLike>]
@@ -214,18 +217,16 @@ export interface BaalgroniShamanInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "wrapper", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "amounts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "atribute0", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "atribute1", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "atribute2", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "atribute3", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bind", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bindings", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cap", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "core", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "cuts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "daoCut", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "expiry", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -242,7 +243,6 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "mod", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "moloch", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
@@ -260,6 +260,7 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "shares", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -376,19 +377,16 @@ export interface BaalgroniShaman extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    amounts(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    atribute0(overrides?: CallOverrides): Promise<[string]>;
-
-    atribute1(overrides?: CallOverrides): Promise<[string]>;
-
-    atribute2(overrides?: CallOverrides): Promise<[string]>;
-
-    atribute3(overrides?: CallOverrides): Promise<[string]>;
 
     balanceOf(
       owner: PromiseOrValue<string>,
@@ -409,9 +407,14 @@ export interface BaalgroniShaman extends BaseContract {
 
     core(overrides?: CallOverrides): Promise<[string]>;
 
+    cuts(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     daoCut(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    factory(overrides?: CallOverrides): Promise<[string]>;
+    expiry(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -423,10 +426,13 @@ export interface BaalgroniShaman extends BaseContract {
     init(
       _moloch: PromiseOrValue<string>,
       _wrapper: PromiseOrValue<string>,
+      _shares: PromiseOrValue<boolean>,
       _price: PromiseOrValue<BigNumberish>,
       _cap: PromiseOrValue<BigNumberish>,
       _lootPerUnit: PromiseOrValue<BigNumberish>,
-      _daoCut: PromiseOrValue<BigNumberish>,
+      _expiry: PromiseOrValue<BigNumberish>,
+      _cuts: PromiseOrValue<string>[],
+      _amounts: PromiseOrValue<BigNumberish>[],
       _initializationParams: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -448,8 +454,6 @@ export interface BaalgroniShaman extends BaseContract {
       _to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    mod(overrides?: CallOverrides): Promise<[string]>;
 
     moloch(overrides?: CallOverrides): Promise<[string]>;
 
@@ -485,6 +489,8 @@ export interface BaalgroniShaman extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    shares(overrides?: CallOverrides): Promise<[boolean]>;
+
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -512,19 +518,16 @@ export interface BaalgroniShaman extends BaseContract {
     wrapper(overrides?: CallOverrides): Promise<[string]>;
   };
 
+  amounts(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   approve(
     to: PromiseOrValue<string>,
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  atribute0(overrides?: CallOverrides): Promise<string>;
-
-  atribute1(overrides?: CallOverrides): Promise<string>;
-
-  atribute2(overrides?: CallOverrides): Promise<string>;
-
-  atribute3(overrides?: CallOverrides): Promise<string>;
 
   balanceOf(
     owner: PromiseOrValue<string>,
@@ -545,9 +548,14 @@ export interface BaalgroniShaman extends BaseContract {
 
   core(overrides?: CallOverrides): Promise<string>;
 
+  cuts(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   daoCut(overrides?: CallOverrides): Promise<BigNumber>;
 
-  factory(overrides?: CallOverrides): Promise<string>;
+  expiry(overrides?: CallOverrides): Promise<BigNumber>;
 
   getApproved(
     tokenId: PromiseOrValue<BigNumberish>,
@@ -559,10 +567,13 @@ export interface BaalgroniShaman extends BaseContract {
   init(
     _moloch: PromiseOrValue<string>,
     _wrapper: PromiseOrValue<string>,
+    _shares: PromiseOrValue<boolean>,
     _price: PromiseOrValue<BigNumberish>,
     _cap: PromiseOrValue<BigNumberish>,
     _lootPerUnit: PromiseOrValue<BigNumberish>,
-    _daoCut: PromiseOrValue<BigNumberish>,
+    _expiry: PromiseOrValue<BigNumberish>,
+    _cuts: PromiseOrValue<string>[],
+    _amounts: PromiseOrValue<BigNumberish>[],
     _initializationParams: PromiseOrValue<BytesLike>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -584,8 +595,6 @@ export interface BaalgroniShaman extends BaseContract {
     _to: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  mod(overrides?: CallOverrides): Promise<string>;
 
   moloch(overrides?: CallOverrides): Promise<string>;
 
@@ -621,6 +630,8 @@ export interface BaalgroniShaman extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  shares(overrides?: CallOverrides): Promise<boolean>;
+
   supportsInterface(
     interfaceId: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
@@ -648,19 +659,16 @@ export interface BaalgroniShaman extends BaseContract {
   wrapper(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    amounts(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    atribute0(overrides?: CallOverrides): Promise<string>;
-
-    atribute1(overrides?: CallOverrides): Promise<string>;
-
-    atribute2(overrides?: CallOverrides): Promise<string>;
-
-    atribute3(overrides?: CallOverrides): Promise<string>;
 
     balanceOf(
       owner: PromiseOrValue<string>,
@@ -681,9 +689,14 @@ export interface BaalgroniShaman extends BaseContract {
 
     core(overrides?: CallOverrides): Promise<string>;
 
+    cuts(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     daoCut(overrides?: CallOverrides): Promise<BigNumber>;
 
-    factory(overrides?: CallOverrides): Promise<string>;
+    expiry(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -695,10 +708,13 @@ export interface BaalgroniShaman extends BaseContract {
     init(
       _moloch: PromiseOrValue<string>,
       _wrapper: PromiseOrValue<string>,
+      _shares: PromiseOrValue<boolean>,
       _price: PromiseOrValue<BigNumberish>,
       _cap: PromiseOrValue<BigNumberish>,
       _lootPerUnit: PromiseOrValue<BigNumberish>,
-      _daoCut: PromiseOrValue<BigNumberish>,
+      _expiry: PromiseOrValue<BigNumberish>,
+      _cuts: PromiseOrValue<string>[],
+      _amounts: PromiseOrValue<BigNumberish>[],
       _initializationParams: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -717,8 +733,6 @@ export interface BaalgroniShaman extends BaseContract {
     lootPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(_to: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-
-    mod(overrides?: CallOverrides): Promise<string>;
 
     moloch(overrides?: CallOverrides): Promise<string>;
 
@@ -753,6 +767,8 @@ export interface BaalgroniShaman extends BaseContract {
       approved: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    shares(overrides?: CallOverrides): Promise<boolean>;
 
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
@@ -829,19 +845,16 @@ export interface BaalgroniShaman extends BaseContract {
   };
 
   estimateGas: {
+    amounts(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    atribute0(overrides?: CallOverrides): Promise<BigNumber>;
-
-    atribute1(overrides?: CallOverrides): Promise<BigNumber>;
-
-    atribute2(overrides?: CallOverrides): Promise<BigNumber>;
-
-    atribute3(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
       owner: PromiseOrValue<string>,
@@ -862,9 +875,14 @@ export interface BaalgroniShaman extends BaseContract {
 
     core(overrides?: CallOverrides): Promise<BigNumber>;
 
+    cuts(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     daoCut(overrides?: CallOverrides): Promise<BigNumber>;
 
-    factory(overrides?: CallOverrides): Promise<BigNumber>;
+    expiry(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -876,10 +894,13 @@ export interface BaalgroniShaman extends BaseContract {
     init(
       _moloch: PromiseOrValue<string>,
       _wrapper: PromiseOrValue<string>,
+      _shares: PromiseOrValue<boolean>,
       _price: PromiseOrValue<BigNumberish>,
       _cap: PromiseOrValue<BigNumberish>,
       _lootPerUnit: PromiseOrValue<BigNumberish>,
-      _daoCut: PromiseOrValue<BigNumberish>,
+      _expiry: PromiseOrValue<BigNumberish>,
+      _cuts: PromiseOrValue<string>[],
+      _amounts: PromiseOrValue<BigNumberish>[],
       _initializationParams: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -901,8 +922,6 @@ export interface BaalgroniShaman extends BaseContract {
       _to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    mod(overrides?: CallOverrides): Promise<BigNumber>;
 
     moloch(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -938,6 +957,8 @@ export interface BaalgroniShaman extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    shares(overrides?: CallOverrides): Promise<BigNumber>;
+
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -966,19 +987,16 @@ export interface BaalgroniShaman extends BaseContract {
   };
 
   populateTransaction: {
+    amounts(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     approve(
       to: PromiseOrValue<string>,
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
-
-    atribute0(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    atribute1(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    atribute2(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    atribute3(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     balanceOf(
       owner: PromiseOrValue<string>,
@@ -999,9 +1017,14 @@ export interface BaalgroniShaman extends BaseContract {
 
     core(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    cuts(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     daoCut(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    expiry(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -1013,10 +1036,13 @@ export interface BaalgroniShaman extends BaseContract {
     init(
       _moloch: PromiseOrValue<string>,
       _wrapper: PromiseOrValue<string>,
+      _shares: PromiseOrValue<boolean>,
       _price: PromiseOrValue<BigNumberish>,
       _cap: PromiseOrValue<BigNumberish>,
       _lootPerUnit: PromiseOrValue<BigNumberish>,
-      _daoCut: PromiseOrValue<BigNumberish>,
+      _expiry: PromiseOrValue<BigNumberish>,
+      _cuts: PromiseOrValue<string>[],
+      _amounts: PromiseOrValue<BigNumberish>[],
       _initializationParams: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -1038,8 +1064,6 @@ export interface BaalgroniShaman extends BaseContract {
       _to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
-
-    mod(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     moloch(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1074,6 +1098,8 @@ export interface BaalgroniShaman extends BaseContract {
       approved: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    shares(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,

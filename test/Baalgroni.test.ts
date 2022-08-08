@@ -105,17 +105,19 @@ const deploymentConfig = {
   TOKEN_SYMBOL: "WETH",
 };
 
-const baalgroniConfig = {
+const baalgroniMetaConfig = {
   TOKENNAME: "baalgroni",
   TOKENSYMBOL: "bg",
   CORE: "core",
   PROPERTY: "prop",
-  ATRIBUTE3: "attr3",
-  ATRIBUTE2: "attr2",
-  ATRIBUTE1: "attr1",
-  ATRIBUTE0: "attr0",
-  MOD: "mode",
   IMAGEHASH: "1234",
+};
+
+const baalgroniConfig = {
+  PRICE: ethers.utils.parseEther("1.0"),
+  CAP: 200,
+  LOOTPERUNIT: 100,
+  EXPIRY: 999999999999999
 };
 
 const metadataConfig = {
@@ -413,13 +415,9 @@ describe("Baalgroni type", function () {
       expiration: 0,
     };
 
-    const bconfig = abiCoder.encode(
+
+    const bmetaconfig = abiCoder.encode(
       [
-        "string",
-        "string",
-        "string",
-        "string",
-        "string",
         "string",
         "string",
         "string",
@@ -427,30 +425,37 @@ describe("Baalgroni type", function () {
         "string",
       ],
       [
-        baalgroniConfig.TOKENNAME,
-        baalgroniConfig.TOKENSYMBOL,
-        baalgroniConfig.CORE,
-        baalgroniConfig.PROPERTY,
-        baalgroniConfig.ATRIBUTE3,
-        baalgroniConfig.ATRIBUTE2,
-        baalgroniConfig.ATRIBUTE1,
-        baalgroniConfig.ATRIBUTE0,
-        baalgroniConfig.MOD,
-        baalgroniConfig.IMAGEHASH,
+        baalgroniMetaConfig.TOKENNAME,
+        baalgroniMetaConfig.TOKENSYMBOL,
+        baalgroniMetaConfig.CORE,
+        baalgroniMetaConfig.PROPERTY,
+        baalgroniMetaConfig.IMAGEHASH,
       ]
     );
 
-    console.log("init params", bconfig);
+    // address moloch,
+    // address wrapper,
+    // bool shares,
+    // uint256 price,
+    // uint256 cap,
+    // uint256 lootPerUnit,
+    // uint256 expiry,
+    // address[] memory cuts,
+    // uint256[] memory amounts,
+    // bytes memory initializationParams
 
     let summonBaalgroni;
     summonBaalgroni = await baalgroniSummoner.summonBaalgroni(
       baal.address, // baal
       weth.address, // wrapper
-      ethers.utils.parseEther("1.0"), // price per unit
-      200,
-      100,
-      3,
-      bconfig
+      false,
+      baalgroniConfig.PRICE,
+      baalgroniConfig.CAP,
+      baalgroniConfig.LOOTPERUNIT,
+      baalgroniConfig.EXPIRY,
+      [baalgroniSummoner.address,s4.address],
+      [3,10],
+      bmetaconfig
     );
     // console.log(summoner);
 
@@ -485,7 +490,7 @@ describe("Baalgroni type", function () {
       );
       console.log(
         "factory loot before",
-        await lootToken.balanceOf(bgroni.factory())
+        await lootToken.balanceOf(baalgroniSummoner.address)
       );
       console.log(
         "safe weth before ",
@@ -514,6 +519,10 @@ describe("Baalgroni type", function () {
       console.log(
         "factory loot after",
         await lootToken.balanceOf(baalgroniSummoner.address)
+      );
+      console.log(
+        "s4 loot after",
+        await lootToken.balanceOf(s4.address)
       );
       console.log("baal total after", await baal.totalSupply());
       console.log("baal total loot after", await baal.totalLoot());
@@ -555,7 +564,7 @@ describe("Baalgroni type", function () {
       );
       console.log(
         "factory loot before",
-        await lootToken.balanceOf(bgroni.factory())
+        await lootToken.balanceOf(baalgroniSummoner.address)
       );
       console.log(
         "safe weth before ",
@@ -584,6 +593,10 @@ describe("Baalgroni type", function () {
       console.log(
         "factory loot after",
         await lootToken.balanceOf(baalgroniSummoner.address)
+      );
+      console.log(
+        "s4 loot after",
+        await lootToken.balanceOf(s4.address)
       );
       console.log("baal total after", await baal.totalSupply());
       console.log("baal total loot after", await baal.totalLoot());

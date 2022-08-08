@@ -31,6 +31,24 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "address[]",
+        name: "to",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "amount",
+        type: "uint256[]",
+      },
+    ],
+    name: "burnShares",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "shaman",
         type: "address",
@@ -87,6 +105,24 @@ const _abi = [
       },
     ],
     name: "mintLoot",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address[]",
+        name: "to",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "amount",
+        type: "uint256[]",
+      },
+    ],
+    name: "mintShares",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
