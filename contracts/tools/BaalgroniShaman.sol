@@ -41,7 +41,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
 
     uint256 public price; // ex. 200000000000000000000;
     uint256 public cap; // ex. 200;
-    uint256 public lootPerUnit; // ex. 100;
+    uint256 public tokensPerUnit; // ex. 100;
     uint256 public daoCut; // ex. 3;
     uint256 public expiry;
     address[] public cuts; // ex. 3;
@@ -77,6 +77,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
     error WrapFailed();
     error TransferFailed();
     error OnlyLootHolderCanUnbind();
+    error OnlyShareHolderCanUnbind();
 
     constructor() ERC721("Template", "T") initializer {} /*Configure template to be unusable*/
 
@@ -115,7 +116,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         
         price = _price;
         cap = _cap;
-        lootPerUnit = _lootPerUnit;
+        tokensPerUnit = _lootPerUnit;
         expiry = _expiry;
 
         cuts = _cuts;
@@ -159,7 +160,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         }
 
         uint256[] memory _amounts = new uint256[](amounts.length + 1);
-        _amounts[0] = lootPerUnit;
+        _amounts[0] = tokensPerUnit;
         for (uint256 i = 1; i < amounts.length + 1; i++) {
             _amounts[i] = amounts[i-1];
         }
@@ -184,7 +185,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         _receivers[0] = msg.sender;
 
         uint256[] memory _amounts = new uint256[](1);
-        _amounts[0] = lootPerUnit;
+        _amounts[0] = tokensPerUnit;
 
         if(shares){
             moloch.burnShares(_sinkReceivers, _amounts);
@@ -201,7 +202,9 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         if (bindings[tokenId] == address(0)) revert Unbound();
         if (bindings[tokenId] != msg.sender) revert OnlyOwnerCanUnbind();
         IERC20 lootToken = IERC20(moloch.lootToken());
-        if (lootToken.balanceOf(msg.sender) < lootPerUnit) revert OnlyLootHolderCanUnbind();
+        IERC20 sharesToken = IERC20(moloch.sharesToken());
+        if (!shares && lootToken.balanceOf(msg.sender) < tokensPerUnit) revert OnlyLootHolderCanUnbind();
+        if (shares && sharesToken.balanceOf(msg.sender) < tokensPerUnit) revert OnlyShareHolderCanUnbind();
         bindings[tokenId] = address(0);
 
         address[] memory _sinkReceivers = new address[](1);
@@ -211,7 +214,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         _receivers[0] = msg.sender;
 
         uint256[] memory _amounts = new uint256[](1);
-        _amounts[0] = lootPerUnit;
+        _amounts[0] = tokensPerUnit;
 
         if(shares){
             moloch.mintShares(_sinkReceivers, _amounts);
@@ -351,7 +354,7 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
         bool shares,
         uint256 price,
         uint256 cap,
-        uint256 lootPerUnit,
+        uint256 tokensPerUnit,
         uint256 expiry,
         address[] cuts,
         uint256[] amounts,
@@ -368,7 +371,7 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
         bool shares,
         uint256 price,
         uint256 cap,
-        uint256 lootPerUnit,
+        uint256 tokensPerUnit,
         uint256 expiry,
         address[] memory cuts,
         uint256[] memory amounts,
@@ -384,7 +387,7 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
             shares,
             price,
             cap,
-            lootPerUnit,
+            tokensPerUnit,
             expiry,
             cuts,
             amounts,
@@ -398,7 +401,7 @@ contract BaalgroniSummoner is CloneFactory, Ownable {
             shares,
             price,
             cap,
-            lootPerUnit,
+            tokensPerUnit,
             expiry,
             cuts,
             amounts,

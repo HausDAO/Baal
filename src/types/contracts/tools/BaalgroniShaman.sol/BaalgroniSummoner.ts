@@ -114,7 +114,7 @@ export interface SummonBaalgroniCompleteEventObject {
   shares: boolean;
   price: BigNumber;
   cap: BigNumber;
-  lootPerUnit: BigNumber;
+  tokensPerUnit: BigNumber;
   expiry: BigNumber;
   cuts: string[];
   amounts: BigNumber[];
@@ -179,7 +179,7 @@ export interface BaalgroniSummoner extends BaseContract {
       shares: PromiseOrValue<boolean>,
       price: PromiseOrValue<BigNumberish>,
       cap: PromiseOrValue<BigNumberish>,
-      lootPerUnit: PromiseOrValue<BigNumberish>,
+      tokensPerUnit: PromiseOrValue<BigNumberish>,
       expiry: PromiseOrValue<BigNumberish>,
       cuts: PromiseOrValue<string>[],
       amounts: PromiseOrValue<BigNumberish>[],
@@ -207,7 +207,7 @@ export interface BaalgroniSummoner extends BaseContract {
     shares: PromiseOrValue<boolean>,
     price: PromiseOrValue<BigNumberish>,
     cap: PromiseOrValue<BigNumberish>,
-    lootPerUnit: PromiseOrValue<BigNumberish>,
+    tokensPerUnit: PromiseOrValue<BigNumberish>,
     expiry: PromiseOrValue<BigNumberish>,
     cuts: PromiseOrValue<string>[],
     amounts: PromiseOrValue<BigNumberish>[],
@@ -233,7 +233,7 @@ export interface BaalgroniSummoner extends BaseContract {
       shares: PromiseOrValue<boolean>,
       price: PromiseOrValue<BigNumberish>,
       cap: PromiseOrValue<BigNumberish>,
-      lootPerUnit: PromiseOrValue<BigNumberish>,
+      tokensPerUnit: PromiseOrValue<BigNumberish>,
       expiry: PromiseOrValue<BigNumberish>,
       cuts: PromiseOrValue<string>[],
       amounts: PromiseOrValue<BigNumberish>[],
@@ -266,7 +266,7 @@ export interface BaalgroniSummoner extends BaseContract {
       shares?: null,
       price?: null,
       cap?: null,
-      lootPerUnit?: null,
+      tokensPerUnit?: null,
       expiry?: null,
       cuts?: null,
       amounts?: null,
@@ -279,7 +279,7 @@ export interface BaalgroniSummoner extends BaseContract {
       shares?: null,
       price?: null,
       cap?: null,
-      lootPerUnit?: null,
+      tokensPerUnit?: null,
       expiry?: null,
       cuts?: null,
       amounts?: null,
@@ -300,7 +300,7 @@ export interface BaalgroniSummoner extends BaseContract {
       shares: PromiseOrValue<boolean>,
       price: PromiseOrValue<BigNumberish>,
       cap: PromiseOrValue<BigNumberish>,
-      lootPerUnit: PromiseOrValue<BigNumberish>,
+      tokensPerUnit: PromiseOrValue<BigNumberish>,
       expiry: PromiseOrValue<BigNumberish>,
       cuts: PromiseOrValue<string>[],
       amounts: PromiseOrValue<BigNumberish>[],
@@ -329,7 +329,7 @@ export interface BaalgroniSummoner extends BaseContract {
       shares: PromiseOrValue<boolean>,
       price: PromiseOrValue<BigNumberish>,
       cap: PromiseOrValue<BigNumberish>,
-      lootPerUnit: PromiseOrValue<BigNumberish>,
+      tokensPerUnit: PromiseOrValue<BigNumberish>,
       expiry: PromiseOrValue<BigNumberish>,
       cuts: PromiseOrValue<string>[],
       amounts: PromiseOrValue<BigNumberish>[],

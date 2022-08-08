@@ -34,6 +34,7 @@ export interface IBaalInterface extends utils.Interface {
     "mintShares(address[],uint256[])": FunctionFragment;
     "shamans(address)": FunctionFragment;
     "sharesPaused()": FunctionFragment;
+    "sharesToken()": FunctionFragment;
     "target()": FunctionFragment;
   };
 
@@ -48,6 +49,7 @@ export interface IBaalInterface extends utils.Interface {
       | "mintShares"
       | "shamans"
       | "sharesPaused"
+      | "sharesToken"
       | "target"
   ): FunctionFragment;
 
@@ -84,6 +86,10 @@ export interface IBaalInterface extends utils.Interface {
     functionFragment: "sharesPaused",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "sharesToken",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "target", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "burnLoot", data: BytesLike): Result;
@@ -96,6 +102,10 @@ export interface IBaalInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "shamans", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "sharesPaused",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "sharesToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "target", data: BytesLike): Result;
@@ -176,6 +186,10 @@ export interface IBaal extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    sharesToken(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     target(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -227,6 +241,10 @@ export interface IBaal extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  sharesToken(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   target(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -271,6 +289,8 @@ export interface IBaal extends BaseContract {
     ): Promise<BigNumber>;
 
     sharesPaused(overrides?: CallOverrides): Promise<boolean>;
+
+    sharesToken(overrides?: CallOverrides): Promise<string>;
 
     target(overrides?: CallOverrides): Promise<string>;
   };
@@ -324,6 +344,10 @@ export interface IBaal extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    sharesToken(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     target(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -373,6 +397,10 @@ export interface IBaal extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     sharesPaused(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    sharesToken(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

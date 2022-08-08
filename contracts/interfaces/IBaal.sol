@@ -12,4 +12,5 @@ interface IBaal {
     function isManager(address shaman) external returns(bool);
     function target() external returns(address);
     function lootToken() external returns(address);
+    function sharesToken() external returns(address);
 }

@@ -116,7 +116,7 @@ const baalgroniMetaConfig = {
 const baalgroniConfig = {
   PRICE: ethers.utils.parseEther("1.0"),
   CAP: 200,
-  LOOTPERUNIT: 100,
+  TOKENSPERUNIT: 100,
   EXPIRY: 999999999999999
 };
 
@@ -438,7 +438,7 @@ describe("Baalgroni type", function () {
     // bool shares,
     // uint256 price,
     // uint256 cap,
-    // uint256 lootPerUnit,
+    // uint256 tokensPerUnit,
     // uint256 expiry,
     // address[] memory cuts,
     // uint256[] memory amounts,
@@ -451,7 +451,7 @@ describe("Baalgroni type", function () {
       false,
       baalgroniConfig.PRICE,
       baalgroniConfig.CAP,
-      baalgroniConfig.LOOTPERUNIT,
+      baalgroniConfig.TOKENSPERUNIT,
       baalgroniConfig.EXPIRY,
       [baalgroniSummoner.address,s4.address],
       [3,10],

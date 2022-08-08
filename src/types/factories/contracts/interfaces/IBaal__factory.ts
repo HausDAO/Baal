@@ -161,6 +161,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "sharesToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "target",
     outputs: [
       {

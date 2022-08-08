@@ -45,7 +45,6 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     "init(address,address,bool,uint256,uint256,uint256,uint256,address[],uint256[],bytes)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "locked(uint256)": FunctionFragment;
-    "lootPerUnit()": FunctionFragment;
     "mint(address)": FunctionFragment;
     "moloch()": FunctionFragment;
     "name()": FunctionFragment;
@@ -59,6 +58,7 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
+    "tokensPerUnit()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "unbind(uint256)": FunctionFragment;
     "wrapper()": FunctionFragment;
@@ -81,7 +81,6 @@ export interface BaalgroniShamanInterface extends utils.Interface {
       | "init"
       | "isApprovedForAll"
       | "locked"
-      | "lootPerUnit"
       | "mint"
       | "moloch"
       | "name"
@@ -95,6 +94,7 @@ export interface BaalgroniShamanInterface extends utils.Interface {
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
+      | "tokensPerUnit"
       | "transferFrom"
       | "unbind"
       | "wrapper"
@@ -157,10 +157,6 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "lootPerUnit",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "mint",
     values: [PromiseOrValue<string>]
   ): string;
@@ -204,6 +200,10 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
+    functionFragment: "tokensPerUnit",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferFrom",
     values: [
       PromiseOrValue<string>,
@@ -238,10 +238,6 @@ export interface BaalgroniShamanInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "locked", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "lootPerUnit",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "moloch", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
@@ -267,6 +263,10 @@ export interface BaalgroniShamanInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokensPerUnit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
     data: BytesLike
@@ -448,8 +448,6 @@ export interface BaalgroniShaman extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    lootPerUnit(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     mint(
       _to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -502,6 +500,8 @@ export interface BaalgroniShaman extends BaseContract {
       _tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    tokensPerUnit(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transferFrom(
       from: PromiseOrValue<string>,
@@ -589,8 +589,6 @@ export interface BaalgroniShaman extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  lootPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
-
   mint(
     _to: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -643,6 +641,8 @@ export interface BaalgroniShaman extends BaseContract {
     _tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  tokensPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
 
   transferFrom(
     from: PromiseOrValue<string>,
@@ -730,8 +730,6 @@ export interface BaalgroniShaman extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    lootPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
-
     mint(_to: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
 
     moloch(overrides?: CallOverrides): Promise<string>;
@@ -781,6 +779,8 @@ export interface BaalgroniShaman extends BaseContract {
       _tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    tokensPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferFrom(
       from: PromiseOrValue<string>,
@@ -916,8 +916,6 @@ export interface BaalgroniShaman extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    lootPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
-
     mint(
       _to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -970,6 +968,8 @@ export interface BaalgroniShaman extends BaseContract {
       _tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    tokensPerUnit(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferFrom(
       from: PromiseOrValue<string>,
@@ -1058,8 +1058,6 @@ export interface BaalgroniShaman extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    lootPerUnit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     mint(
       _to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -1112,6 +1110,8 @@ export interface BaalgroniShaman extends BaseContract {
       _tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    tokensPerUnit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferFrom(
       from: PromiseOrValue<string>,
