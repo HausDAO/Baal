@@ -633,5 +633,111 @@ describe("Baalgroni type", function () {
         `OnlyLootHolderCanUnbind`
       );
     });
+    it("allows external address to batch mint NFT with funds and get loot", async function () {
+      const bgroni = baalgroni.attach(baalgroniAddress);
+
+      const applicantBaalgroni = bgroni.connect(applicant);
+      const s2Baalgroni = bgroni.connect(s2);
+      const s3Baalgroni = bgroni.connect(s3);
+
+
+      const id = await setShamanProposal(baal, multisend, baalgroniAddress, 7);
+      const propStatus = await baal.getProposalStatus(id);
+
+      console.log("propStatus", propStatus);
+
+      console.log("receiver eth before", await applicant.getBalance());
+      console.log(
+        "receiver loot before",
+        await lootToken.balanceOf(applicant.address)
+      );
+      console.log(
+        "factory loot before",
+        await lootToken.balanceOf(baalgroniSummoner.address)
+      );
+      console.log(
+        "safe weth before ",
+        await weth.balanceOf(gnosisSafe.address)
+      );
+      console.log("baal total before", await baal.totalSupply());
+      console.log("baal total loot before", await baal.totalLoot());
+      console.log(
+        "safe weth balance before",
+        await weth.balanceOf(gnosisSafe.address)
+      );
+
+      await applicantBaalgroni.batchMint([applicant.address, s2.address, s3.address], {
+        value: ethers.utils.parseEther("3.0"),
+      });
+
+      console.log("receiver eth after", await applicant.getBalance());
+      console.log(
+        "receiver nft after",
+        await bgroni.balanceOf(applicant.address)
+      );
+      console.log(
+        "receiver s2 nft after",
+        await bgroni.balanceOf(s2.address)
+      );
+      console.log(
+        "receiver s3 nft after",
+        await bgroni.balanceOf(s3.address)
+      );
+      console.log(
+        "receiver loot after",
+        await lootToken.balanceOf(applicant.address)
+      );
+      console.log(
+        "receiver s2 loot after",
+        await lootToken.balanceOf(s2.address)
+      );
+      console.log(
+        "receiver s3 loot after",
+        await lootToken.balanceOf(s3.address)
+      );
+      console.log(
+        "factory loot after",
+        await lootToken.balanceOf(baalgroniSummoner.address)
+      );
+      console.log(
+        "s4 loot after",
+        await lootToken.balanceOf(s4.address)
+      );
+      console.log("baal total after", await baal.totalSupply());
+      console.log("baal total loot after", await baal.totalLoot());
+      console.log(
+        "safe new balance after",
+        await weth.balanceOf(gnosisSafe.address)
+      );
+
+      await applicantBaalgroni.bind(1);
+      await s2Baalgroni.bind(2);
+      await s3Baalgroni.bind(3);
+
+      console.log(
+        "receiver loot after bind",
+        await lootToken.balanceOf(applicant.address)
+      );
+      console.log(
+        "receiver s2 loot after bind",
+        await lootToken.balanceOf(s2.address)
+      );
+      console.log(
+        "receiver s3 loot after bind",
+        await lootToken.balanceOf(s3.address)
+      );
+
+      console.log("uri", await bgroni.tokenURI(1));
+
+      await applicantBaalgroni.unbind(1);
+
+
+      console.log(
+        "receiver loot after unbind",
+        await lootToken.balanceOf(applicant.address)
+      );
+
+
+    });
   });
 });

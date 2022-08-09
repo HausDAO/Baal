@@ -20,14 +20,14 @@ interface IWRAPPER {
 }
 
 interface IERC5192 {
-  /// @notice Returns the locking status of an Soulbound Token
-  /// @dev SBTs assigned to zero address are considered invalid, and queries
-  /// about them do throw.
-  /// @param tokenId The identifier for an SBT.
-  function locked(uint256 tokenId) external view returns (bool);
+    /// @notice Returns the locking status of an Soulbound Token
+    /// @dev SBTs assigned to zero address are considered invalid, and queries
+    /// about them do throw.
+    /// @param tokenId The identifier for an SBT.
+    function locked(uint256 tokenId) external view returns (bool);
 }
 
-contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
+contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
@@ -55,15 +55,9 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
 
     mapping(uint256 => address) public bindings;
 
-    event Bind(
-        address baalgroni,
-        uint256 tokedId
-    );
+    event Bind(address baalgroni, uint256 tokedId);
 
-    event Unbind(
-        address baalgroni,
-        uint256 tokedId
-    );
+    event Unbind(address baalgroni, uint256 tokedId);
 
     error InvalidIndex();
     error Bound();
@@ -81,7 +75,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
 
     constructor() ERC721("Template", "T") initializer {} /*Configure template to be unusable*/
 
-    // todo: ownership
+    
     function init(
         address _moloch,
         address _wrapper,
@@ -90,7 +84,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         uint256 _cap,
         uint256 _lootPerUnit,
         uint256 _expiry,
-        address[] memory  _cuts,
+        address[] memory _cuts,
         uint256[] memory _amounts,
         bytes memory _initializationParams
     ) external initializer {
@@ -105,15 +99,9 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
             string memory _imageHash
         ) = abi.decode(
                 _initializationParams,
-                (
-                    string,
-                    string,
-                    string,
-                    string,
-                    string                
-                )
+                (string, string, string, string, string)
             );
-        
+
         price = _price;
         cap = _cap;
         tokensPerUnit = _lootPerUnit;
@@ -131,13 +119,32 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         shares = _shares;
     }
 
-    
-    function mint(address _to) public payable {
-        if (msg.value < price) revert NotEnough();
-        if (expiry > 0 && expiry < block.timestamp) revert Expired();
+    function batchMint(address[] memory _tos) public payable {
+        // wrap
+        (bool success, ) = address(wrapper).call{value: price * _tos.length}(
+            ""
+        );
+        if (!success) revert WrapFailed();
+        // send to dao
+        require(
+            wrapper.transfer(moloch.target(), price * _tos.length),
+            "Transfer failed"
+        );
 
-        uint256 tokenId = _tokenIdCounter.current();
-        if (tokenId >= cap) revert CapMet();
+        if (msg.value > price * _tos.length) {
+            // Return the extra money to the minter.
+            (bool success2, ) = msg.sender.call{
+                value: msg.value - (price * _tos.length)
+            }("");
+            if (!success2) revert TransferFailed();
+        }
+
+        for (uint256 i = 0; i < _tos.length; i++) {
+            _mint(_tos[i]);
+        }
+    }
+
+    function mint(address _to) public payable {
         // wrap
         (bool success, ) = address(wrapper).call{value: price}("");
         if (!success) revert WrapFailed();
@@ -150,24 +157,32 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
             if (!success2) revert TransferFailed();
         }
 
+        _mint(_to);
+    }
+
+    function _mint(address _to) private {
+        if (expiry > 0 && expiry < block.timestamp) revert Expired();
+        if (msg.value < price) revert NotEnough();
+        uint256 tokenId = _tokenIdCounter.current();
+        if (tokenId >= cap) revert CapMet();
+
         _safeMint(_to, tokenId + 1);
         _tokenIdCounter.increment();
 
         address[] memory _receivers = new address[](cuts.length + 1);
         _receivers[0] = address(0xdead);
         for (uint256 i = 1; i < cuts.length + 1; i++) {
-            _receivers[i] = cuts[i-1];
+            _receivers[i] = cuts[i - 1];
         }
 
         uint256[] memory _amounts = new uint256[](amounts.length + 1);
         _amounts[0] = tokensPerUnit;
         for (uint256 i = 1; i < amounts.length + 1; i++) {
-            _amounts[i] = amounts[i-1];
+            _amounts[i] = amounts[i - 1];
         }
 
-        if(shares){
+        if (shares) {
             moloch.mintShares(_receivers, _amounts);
-
         } else {
             moloch.mintLoot(_receivers, _amounts);
         }
@@ -187,7 +202,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = tokensPerUnit;
 
-        if(shares){
+        if (shares) {
             moloch.burnShares(_sinkReceivers, _amounts);
             moloch.mintShares(_receivers, _amounts);
         } else {
@@ -203,8 +218,10 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         if (bindings[tokenId] != msg.sender) revert OnlyOwnerCanUnbind();
         IERC20 lootToken = IERC20(moloch.lootToken());
         IERC20 sharesToken = IERC20(moloch.sharesToken());
-        if (!shares && lootToken.balanceOf(msg.sender) < tokensPerUnit) revert OnlyLootHolderCanUnbind();
-        if (shares && sharesToken.balanceOf(msg.sender) < tokensPerUnit) revert OnlyShareHolderCanUnbind();
+        if (!shares && lootToken.balanceOf(msg.sender) < tokensPerUnit)
+            revert OnlyLootHolderCanUnbind();
+        if (shares && sharesToken.balanceOf(msg.sender) < tokensPerUnit)
+            revert OnlyShareHolderCanUnbind();
         bindings[tokenId] = address(0);
 
         address[] memory _sinkReceivers = new address[](1);
@@ -216,18 +233,23 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = tokensPerUnit;
 
-        if(shares){
+        if (shares) {
             moloch.mintShares(_sinkReceivers, _amounts);
             moloch.burnShares(_receivers, _amounts);
         } else {
             moloch.mintLoot(_sinkReceivers, _amounts);
             moloch.burnLoot(_receivers, _amounts);
-        }        
+        }
 
         emit Unbind(msg.sender, tokenId);
     }
 
-    function locked(uint256 _tokenId) public view override(IERC5192) returns (bool) {
+    function locked(uint256 _tokenId)
+        public
+        view
+        override(IERC5192)
+        returns (bool)
+    {
         if (bindings[_tokenId] != address(0)) {
             return true;
         } else {
@@ -272,7 +294,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
 
         bytes memory _sup = abi.encodePacked(
             '{"trait_type": "Property", "value": "',
-            property,  
+            property,
             '"}'
         );
 
@@ -289,7 +311,7 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
                                 _image,
                                 '", "description": "BaalgroniShaman DAO",',
                                 ' "attributes":[{"trait_type": "Locked", "value": "',
-                                Strings.toHexString(bindings[_tokenId]) ,
+                                Strings.toHexString(bindings[_tokenId]),
                                 '"},',
                                 _core,
                                 _sup,
@@ -317,7 +339,13 @@ contract BaalgroniShaman is ERC721, Initializable, IERC5192 {
         return string(_constructTokenURI(_tokenId));
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721)
+        returns (bool)
+    {
         return
             interfaceId == type(IERC5192).interfaceId ||
             super.supportsInterface(interfaceId);
