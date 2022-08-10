@@ -38,6 +38,8 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
 
     IBaal public moloch;
     IWRAPPER public wrapper;
+    IERC20 private lootToken;
+    IERC20 private sharesToken;
 
     uint256 public price; // ex. 200000000000000000000;
     uint256 public cap; // ex. 200;
@@ -90,6 +92,8 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     ) external initializer {
         moloch = IBaal(_moloch);
         wrapper = IWRAPPER(_wrapper);
+        lootToken = IERC20(moloch.lootToken());
+        sharesToken = IERC20(moloch.sharesToken());
 
         (
             string memory _tokenName,
@@ -216,8 +220,7 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     function unbind(uint256 tokenId) public {
         if (bindings[tokenId] == address(0)) revert Unbound();
         if (bindings[tokenId] != msg.sender) revert OnlyOwnerCanUnbind();
-        IERC20 lootToken = IERC20(moloch.lootToken());
-        IERC20 sharesToken = IERC20(moloch.sharesToken());
+        
         if (!shares && lootToken.balanceOf(msg.sender) < tokensPerUnit)
             revert OnlyLootHolderCanUnbind();
         if (shares && sharesToken.balanceOf(msg.sender) < tokensPerUnit)
@@ -278,6 +281,8 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     {
         string memory _nftName = string(abi.encodePacked("BAALgroni: ", _name));
 
+        uint256 xp = shares ? sharesToken.balanceOf(msg.sender) : lootToken.balanceOf(msg.sender);
+
         bytes memory _image = abi.encodePacked(
             _baseURI(),
             imageHash,
@@ -295,6 +300,9 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
         bytes memory _sup = abi.encodePacked(
             '{"trait_type": "Property", "value": "',
             property,
+            '"},',
+            '{"trait_type": "Trainer_XP", "value": "',
+            Strings.toString(xp),
             '"}'
         );
 
