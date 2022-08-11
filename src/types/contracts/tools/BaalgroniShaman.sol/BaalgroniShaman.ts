@@ -439,7 +439,7 @@ export interface BaalgroniShaman extends BaseContract {
     ): Promise<[BigNumber]>;
 
     batchMint(
-      _tos: PromiseOrValue<string>[],
+      tos: PromiseOrValue<string>[],
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -479,7 +479,7 @@ export interface BaalgroniShaman extends BaseContract {
       _shares: PromiseOrValue<boolean>,
       _price: PromiseOrValue<BigNumberish>,
       _cap: PromiseOrValue<BigNumberish>,
-      _lootPerUnit: PromiseOrValue<BigNumberish>,
+      _tokensPerUnit: PromiseOrValue<BigNumberish>,
       _expiry: PromiseOrValue<BigNumberish>,
       _cuts: PromiseOrValue<string>[],
       _amounts: PromiseOrValue<BigNumberish>[],
@@ -494,12 +494,12 @@ export interface BaalgroniShaman extends BaseContract {
     ): Promise<[boolean]>;
 
     locked(
-      _tokenId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     mint(
-      _to: PromiseOrValue<string>,
+      to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -553,7 +553,7 @@ export interface BaalgroniShaman extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     tokenURI(
-      _tokenId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -596,7 +596,7 @@ export interface BaalgroniShaman extends BaseContract {
   ): Promise<BigNumber>;
 
   batchMint(
-    _tos: PromiseOrValue<string>[],
+    tos: PromiseOrValue<string>[],
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -636,7 +636,7 @@ export interface BaalgroniShaman extends BaseContract {
     _shares: PromiseOrValue<boolean>,
     _price: PromiseOrValue<BigNumberish>,
     _cap: PromiseOrValue<BigNumberish>,
-    _lootPerUnit: PromiseOrValue<BigNumberish>,
+    _tokensPerUnit: PromiseOrValue<BigNumberish>,
     _expiry: PromiseOrValue<BigNumberish>,
     _cuts: PromiseOrValue<string>[],
     _amounts: PromiseOrValue<BigNumberish>[],
@@ -651,12 +651,12 @@ export interface BaalgroniShaman extends BaseContract {
   ): Promise<boolean>;
 
   locked(
-    _tokenId: PromiseOrValue<BigNumberish>,
+    tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   mint(
-    _to: PromiseOrValue<string>,
+    to: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -710,7 +710,7 @@ export interface BaalgroniShaman extends BaseContract {
   symbol(overrides?: CallOverrides): Promise<string>;
 
   tokenURI(
-    _tokenId: PromiseOrValue<BigNumberish>,
+    tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
 
@@ -753,7 +753,7 @@ export interface BaalgroniShaman extends BaseContract {
     ): Promise<BigNumber>;
 
     batchMint(
-      _tos: PromiseOrValue<string>[],
+      tos: PromiseOrValue<string>[],
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -793,7 +793,7 @@ export interface BaalgroniShaman extends BaseContract {
       _shares: PromiseOrValue<boolean>,
       _price: PromiseOrValue<BigNumberish>,
       _cap: PromiseOrValue<BigNumberish>,
-      _lootPerUnit: PromiseOrValue<BigNumberish>,
+      _tokensPerUnit: PromiseOrValue<BigNumberish>,
       _expiry: PromiseOrValue<BigNumberish>,
       _cuts: PromiseOrValue<string>[],
       _amounts: PromiseOrValue<BigNumberish>[],
@@ -808,11 +808,11 @@ export interface BaalgroniShaman extends BaseContract {
     ): Promise<boolean>;
 
     locked(
-      _tokenId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    mint(_to: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+    mint(to: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
 
     moloch(overrides?: CallOverrides): Promise<string>;
 
@@ -862,7 +862,7 @@ export interface BaalgroniShaman extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<string>;
 
     tokenURI(
-      _tokenId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -962,7 +962,7 @@ export interface BaalgroniShaman extends BaseContract {
     ): Promise<BigNumber>;
 
     batchMint(
-      _tos: PromiseOrValue<string>[],
+      tos: PromiseOrValue<string>[],
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1002,7 +1002,7 @@ export interface BaalgroniShaman extends BaseContract {
       _shares: PromiseOrValue<boolean>,
       _price: PromiseOrValue<BigNumberish>,
       _cap: PromiseOrValue<BigNumberish>,
-      _lootPerUnit: PromiseOrValue<BigNumberish>,
+      _tokensPerUnit: PromiseOrValue<BigNumberish>,
       _expiry: PromiseOrValue<BigNumberish>,
       _cuts: PromiseOrValue<string>[],
       _amounts: PromiseOrValue<BigNumberish>[],
@@ -1017,12 +1017,12 @@ export interface BaalgroniShaman extends BaseContract {
     ): Promise<BigNumber>;
 
     locked(
-      _tokenId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     mint(
-      _to: PromiseOrValue<string>,
+      to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1076,7 +1076,7 @@ export interface BaalgroniShaman extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenURI(
-      _tokenId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1120,7 +1120,7 @@ export interface BaalgroniShaman extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     batchMint(
-      _tos: PromiseOrValue<string>[],
+      tos: PromiseOrValue<string>[],
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1160,7 +1160,7 @@ export interface BaalgroniShaman extends BaseContract {
       _shares: PromiseOrValue<boolean>,
       _price: PromiseOrValue<BigNumberish>,
       _cap: PromiseOrValue<BigNumberish>,
-      _lootPerUnit: PromiseOrValue<BigNumberish>,
+      _tokensPerUnit: PromiseOrValue<BigNumberish>,
       _expiry: PromiseOrValue<BigNumberish>,
       _cuts: PromiseOrValue<string>[],
       _amounts: PromiseOrValue<BigNumberish>[],
@@ -1175,12 +1175,12 @@ export interface BaalgroniShaman extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     locked(
-      _tokenId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     mint(
-      _to: PromiseOrValue<string>,
+      to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1234,7 +1234,7 @@ export interface BaalgroniShaman extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenURI(
-      _tokenId: PromiseOrValue<BigNumberish>,
+      tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

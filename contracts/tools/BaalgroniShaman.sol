@@ -77,14 +77,28 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
 
     constructor() ERC721("Template", "T") initializer {} /*Configure template to be unusable*/
 
-    
+    // ****************
+    // INIT FUNCTION
+    // ****************
+
+    /// @notice initialize the function from factory
+    /// @param _moloch The DAO this is a shaman for
+    /// @param _wrapper A native token wrapper contract
+    /// @param _shares is this minting shares or loot
+    /// @param _price the price for a single NFT
+    /// @param _cap the total amount of NFTs
+    /// @param _tokensPerUnit number of shares/loot per nft sold
+    /// @param _expiry when to disable this shaman from minting
+    /// @param _cuts linked list of addresses to split tokens to on initial mint
+    /// @param _amounts linked list of amounts to split to _cuts on initial mint
+    /// @param _initializationParams bytes some metadata strings
     function init(
         address _moloch,
         address _wrapper,
         bool _shares,
         uint256 _price,
         uint256 _cap,
-        uint256 _lootPerUnit,
+        uint256 _tokensPerUnit,
         uint256 _expiry,
         address[] memory _cuts,
         uint256[] memory _amounts,
@@ -108,47 +122,134 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
 
         price = _price;
         cap = _cap;
-        tokensPerUnit = _lootPerUnit;
+        tokensPerUnit = _tokensPerUnit;
         expiry = _expiry;
-
         cuts = _cuts;
         amounts = _amounts;
-
         _name = _tokenName;
         _symbol = _tokenSymbol;
         core = _core;
         property = _property;
         imageHash = _imageHash;
-
         shares = _shares;
     }
 
-    function batchMint(address[] memory _tos) public payable {
+    // ****************
+    // INTERNAL FUNCTIONS
+    // ****************
+
+    /// @notice mint NFT, bind to address and issues tokens to address and cuts
+    /// @param to address to receive 
+    function _mint(address to) private {
+        if (expiry > 0 && expiry < block.timestamp) revert Expired();
+        if (msg.value < price) revert NotEnough();
+        _tokenIdCounter.increment();
+        uint256 tokenId = _tokenIdCounter.current();
+        if (tokenId > cap) revert CapMet();
+
+        _safeMint(to, tokenId);
+        _bind(tokenId, to);
+        _unsink(to);
+
+        // loop to fill cut receivers
+        address[] memory _receivers = new address[](cuts.length);
+        for (uint256 i = 0; i < cuts.length ; i++) {
+            _receivers[i] = cuts[i ];
+        }
+
+        // loop to fill amount per cut
+        uint256[] memory _amounts = new uint256[](amounts.length);
+        for (uint256 i = 0; i < amounts.length; i++) {
+            _amounts[i] = amounts[i];
+        }
+
+        // mint loot to cuts
+        moloch.mintLoot(_receivers, _amounts);
+
+    }
+
+    /// @notice to keep treasury ratio correct a dead address needs to hold tokens
+    function _sink() private {
+        address[] memory _sinkReceivers = new address[](1);
+        _sinkReceivers[0] = address(0xbaa1);
+
+        uint256[] memory _amounts = new uint256[](1);
+        _amounts[0] = tokensPerUnit;
+
+        if (shares) {
+            moloch.burnShares(_sinkReceivers, _amounts);
+        } else {
+            moloch.burnLoot(_sinkReceivers, _amounts);
+        }
+    }
+
+    /// @notice remove tokens from the dead address and give them to the receiver
+    /// @param to address to receive 
+    function _unsink(address to) private {
+        address[] memory _receivers = new address[](1);
+        _receivers[0] = to;
+
+        uint256[] memory _amounts = new uint256[](1);
+        _amounts[0] = tokensPerUnit;
+
+        if (shares) {
+            moloch.mintShares(_receivers, _amounts);
+        } else {
+            moloch.mintLoot(_receivers, _amounts);
+        }
+    }
+
+    /// @notice make nft non transferable
+    /// @param tokenId NFT to bind by ID
+    /// @param to address to bind to
+    function _bind(uint256 tokenId, address to) private {
+        bindings[tokenId] = to; 
+        emit Bind(to, tokenId);
+    }
+
+    /// @notice make nft transferable
+    /// @param tokenId NFT to bind by ID
+    /// @param to address to bind to
+    function _unbind(uint256 tokenId, address to) private {
+        bindings[tokenId] = address(0);
+        emit Unbind(to, tokenId);
+    }
+
+    // ****************
+    // EXTERNAL FUNCTIONS
+    // ****************
+
+    /// @notice mint a batch of NFTs to multiple addresses
+    /// @param tos addresses to receive 
+    function batchMint(address[] memory tos) public payable {
         // wrap
-        (bool success, ) = address(wrapper).call{value: price * _tos.length}(
+        (bool success, ) = address(wrapper).call{value: price * tos.length}(
             ""
         );
         if (!success) revert WrapFailed();
         // send to dao
         require(
-            wrapper.transfer(moloch.target(), price * _tos.length),
+            wrapper.transfer(moloch.target(), price * tos.length),
             "Transfer failed"
         );
 
-        if (msg.value > price * _tos.length) {
+        if (msg.value > price * tos.length) {
             // Return the extra money to the minter.
             (bool success2, ) = msg.sender.call{
-                value: msg.value - (price * _tos.length)
+                value: msg.value - (price * tos.length)
             }("");
             if (!success2) revert TransferFailed();
         }
 
-        for (uint256 i = 0; i < _tos.length; i++) {
-            _mint(_tos[i]);
+        for (uint256 i = 0; i < tos.length; i++) {
+            _unsink(tos[i]);
+            _mint(tos[i]);
         }
     }
 
-    function mint(address _to) public payable {
+    /// @notice mint a NFT to an addresses
+    /// @param to addresses to receive 
+    function mint(address to) public payable {
         // wrap
         (bool success, ) = address(wrapper).call{value: price}("");
         if (!success) revert WrapFailed();
@@ -161,112 +262,60 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
             if (!success2) revert TransferFailed();
         }
 
-        _mint(_to);
+        _mint(to);
     }
 
-    function _mint(address _to) private {
-        if (expiry > 0 && expiry < block.timestamp) revert Expired();
-        if (msg.value < price) revert NotEnough();
-        uint256 tokenId = _tokenIdCounter.current();
-        if (tokenId >= cap) revert CapMet();
-
-        _safeMint(_to, tokenId + 1);
-        _tokenIdCounter.increment();
-
-        address[] memory _receivers = new address[](cuts.length + 1);
-        _receivers[0] = address(0xdead);
-        for (uint256 i = 1; i < cuts.length + 1; i++) {
-            _receivers[i] = cuts[i - 1];
-        }
-
-        uint256[] memory _amounts = new uint256[](amounts.length + 1);
-        _amounts[0] = tokensPerUnit;
-        for (uint256 i = 1; i < amounts.length + 1; i++) {
-            _amounts[i] = amounts[i - 1];
-        }
-
-        if (shares) {
-            moloch.mintShares(_receivers, _amounts);
-        } else {
-            moloch.mintLoot(_receivers, _amounts);
-        }
-    }
-
+    /// @notice bind NFT
+    /// @param tokenId NFT to bind
     function bind(uint256 tokenId) public {
         if (ownerOf(tokenId) != msg.sender) revert OnlyOwnerCanBind();
-        if (bindings[tokenId] != address(0)) revert Bound();
-        bindings[tokenId] = msg.sender;
-
-        address[] memory _sinkReceivers = new address[](1);
-        _sinkReceivers[0] = address(0xdead);
-
-        address[] memory _receivers = new address[](1);
-        _receivers[0] = msg.sender;
-
-        uint256[] memory _amounts = new uint256[](1);
-        _amounts[0] = tokensPerUnit;
-
-        if (shares) {
-            moloch.burnShares(_sinkReceivers, _amounts);
-            moloch.mintShares(_receivers, _amounts);
-        } else {
-            moloch.burnLoot(_sinkReceivers, _amounts);
-            moloch.mintLoot(_receivers, _amounts);
-        }
-
-        emit Bind(msg.sender, tokenId);
+        if (locked(tokenId)) revert Bound();
+        _bind(tokenId, msg.sender);
+        _unsink(msg.sender);
     }
 
+    /// @notice unbind NFT
+    /// @param tokenId NFT to unbind
     function unbind(uint256 tokenId) public {
-        if (bindings[tokenId] == address(0)) revert Unbound();
+        if (!locked(tokenId)) revert Unbound();
         if (bindings[tokenId] != msg.sender) revert OnlyOwnerCanUnbind();
         
         if (!shares && lootToken.balanceOf(msg.sender) < tokensPerUnit)
             revert OnlyLootHolderCanUnbind();
         if (shares && sharesToken.balanceOf(msg.sender) < tokensPerUnit)
             revert OnlyShareHolderCanUnbind();
-        bindings[tokenId] = address(0);
 
-        address[] memory _sinkReceivers = new address[](1);
-        _sinkReceivers[0] = address(0xdead);
-
-        address[] memory _receivers = new address[](1);
-        _receivers[0] = msg.sender;
-
-        uint256[] memory _amounts = new uint256[](1);
-        _amounts[0] = tokensPerUnit;
-
-        if (shares) {
-            moloch.mintShares(_sinkReceivers, _amounts);
-            moloch.burnShares(_receivers, _amounts);
-        } else {
-            moloch.mintLoot(_sinkReceivers, _amounts);
-            moloch.burnLoot(_receivers, _amounts);
-        }
-
-        emit Unbind(msg.sender, tokenId);
+        _unbind(tokenId, msg.sender);
+        _unsink(msg.sender);
+        
     }
 
-    function locked(uint256 _tokenId)
+    /// @notice is the current token soulbound
+    /// @param tokenId NFT to bind
+    function locked(uint256 tokenId)
         public
         view
         override(IERC5192)
         returns (bool)
     {
-        if (bindings[_tokenId] != address(0)) {
+        if (bindings[tokenId] != address(0)) {
             return true;
         } else {
             return false;
         }
     }
 
+    /// @notice override before transfer so token can be non transferable
+    /// @param from address
+    /// @param to address
+    /// @param tokenId of NFT to transfer
     function _beforeTokenTransfer(
         address from,
         address to,
         uint256 tokenId
     ) internal override(ERC721) {
+        if (from != address(0) && locked(tokenId)) revert Bound();
         super._beforeTokenTransfer(from, to, tokenId);
-        if (bindings[tokenId] != address(0)) revert Bound();
     }
 
     /**  Constructs the tokenURI, separated out from the public function as its a big function.
@@ -274,7 +323,7 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
      * svg has a image tag that can be updated by the owner (dao)
      * param: _tokenId the tokenId
      */
-    function _constructTokenURI(uint256 _tokenId)
+    function _constructTokenURI(uint256 tokenId)
         internal
         view
         returns (string memory)
@@ -287,7 +336,7 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
             _baseURI(),
             imageHash,
             "/baalgroni-",
-            locked(_tokenId) ? "bound" : "unbound",
+            locked(tokenId) ? "bound" : "unbound",
             ".svg"
         );
 
@@ -319,7 +368,7 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
                                 _image,
                                 '", "description": "BaalgroniShaman DAO",',
                                 ' "attributes":[{"trait_type": "Locked", "value": "',
-                                Strings.toHexString(bindings[_tokenId]),
+                                Strings.toHexString(bindings[tokenId]),
                                 '"},',
                                 _core,
                                 _sup,
@@ -332,19 +381,19 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     }
 
     /* Returns the json data associated with this token ID
-     * param _tokenId the token ID
+     * param tokenId the token ID
      */
-    function tokenURI(uint256 _tokenId)
+    function tokenURI(uint256 tokenId)
         public
         view
         override(ERC721)
         returns (string memory)
     {
         require(
-            _exists(_tokenId),
+            _exists(tokenId),
             "ERC721Metadata: URI query for nonexistent token"
         );
-        return string(_constructTokenURI(_tokenId));
+        return string(_constructTokenURI(tokenId));
     }
 
     function supportsInterface(bytes4 interfaceId)

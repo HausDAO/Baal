@@ -502,11 +502,14 @@ describe("Baalgroni type", function () {
         "safe weth balance before",
         await weth.balanceOf(gnosisSafe.address)
       );
+      console.log("------Mint-------");
+      
 
       await applicantBaalgroni.mint(applicant.address, {
         value: ethers.utils.parseEther("1.0"),
       });
-
+      console.log('is bound?', await applicantBaalgroni.locked(1));
+      
       console.log("receiver eth after", await applicant.getBalance());
       console.log(
         "receiver nft after",
@@ -530,7 +533,19 @@ describe("Baalgroni type", function () {
         "safe new balance after",
         await weth.balanceOf(gnosisSafe.address)
       );
+     
 
+      console.log("------Unbind-------");
+
+      await applicantBaalgroni.unbind(1);
+
+      console.log(
+        "receiver loot after unbind",
+        await lootToken.balanceOf(applicant.address)
+      );
+
+      console.log("------Bind-------");
+      
       await applicantBaalgroni.bind(1);
 
       console.log(
@@ -539,13 +554,6 @@ describe("Baalgroni type", function () {
       );
 
       console.log("uri", await bgroni.tokenURI(1));
-
-      await applicantBaalgroni.unbind(1);
-
-      console.log(
-        "receiver loot after unbind",
-        await lootToken.balanceOf(applicant.address)
-      );
     });
     it("allows external address to mint, bind and ragequit and fail to unbind", async function () {
       const bgroni = baalgroni.attach(baalgroniAddress);
@@ -577,6 +585,8 @@ describe("Baalgroni type", function () {
         await weth.balanceOf(gnosisSafe.address)
       );
 
+      console.log("------Mint-------");
+
       await applicantBaalgroni.mint(applicant.address, {
         value: ethers.utils.parseEther("1.0"),
       });
@@ -605,33 +615,25 @@ describe("Baalgroni type", function () {
         await weth.balanceOf(gnosisSafe.address)
       );
 
-      await applicantBaalgroni.bind(1);
-
       const applicantLoot = await lootToken.balanceOf(applicant.address);
-
-      console.log("receiver loot after bind", applicantLoot);
-
-      console.log("uri", await bgroni.tokenURI(1));
 
       await applicantBaal.ragequit(applicant.address, 0, applicantLoot, [
         weth.address,
       ]);
+
+      console.log("------Ragequit-------");
 
       console.log(
         "receiver loot after ragequit",
         await lootToken.balanceOf(applicant.address)
       );
 
-      // could unbind if has loot
-      // await applicantBaalgroni.mint(applicant.address, {
-      //   value: ethers.utils.parseEther("1.0"),
-      // });
-
-      // await applicantBaalgroni.bind(2);
+      console.log("------Unbind-------");
 
       await expect(applicantBaalgroni.unbind(1)).to.be.revertedWith(
         `OnlyLootHolderCanUnbind`
       );
+      
     });
     it("allows external address to batch mint NFT with funds and get loot", async function () {
       const bgroni = baalgroni.attach(baalgroniAddress);
@@ -666,6 +668,7 @@ describe("Baalgroni type", function () {
         await weth.balanceOf(gnosisSafe.address)
       );
 
+      console.log("------Batch Mint-------");
       await applicantBaalgroni.batchMint([applicant.address, s2.address, s3.address], {
         value: ethers.utils.parseEther("3.0"),
       });
@@ -710,6 +713,21 @@ describe("Baalgroni type", function () {
         await weth.balanceOf(gnosisSafe.address)
       );
 
+      console.log("------UnBind-------");
+
+      await applicantBaalgroni.unbind(1);
+      await s2Baalgroni.unbind(2);
+      await s3Baalgroni.unbind(3);
+
+
+      console.log(
+        "receiver loot after unbind",
+        await lootToken.balanceOf(applicant.address)
+      );
+
+
+      console.log("------Bind-------");
+      
       await applicantBaalgroni.bind(1);
       await s2Baalgroni.bind(2);
       await s3Baalgroni.bind(3);
@@ -728,15 +746,6 @@ describe("Baalgroni type", function () {
       );
 
       console.log("uri", await bgroni.tokenURI(1));
-
-      await applicantBaalgroni.unbind(1);
-
-
-      console.log(
-        "receiver loot after unbind",
-        await lootToken.balanceOf(applicant.address)
-      );
-
 
     });
   });
