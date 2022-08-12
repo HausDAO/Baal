@@ -52,8 +52,9 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     bool public shares;
 
     string public core; // ex. "Bourbon";
-    string public property; // ex. "None";
-    string public imageHash;
+    string public property; // ex. "Aged";
+    // use pinned file upload with file baalgroni-bound/baalgroni-unbound
+    string public imageHash; 
 
     mapping(uint256 => address) public bindings;
 
