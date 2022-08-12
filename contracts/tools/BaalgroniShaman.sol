@@ -61,6 +61,7 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable {
 
     event Unbind(address baalgroni, uint256 tokedId);
 
+    // TODO: isManager checks
     error InvalidIndex();
     error Bound();
     error Unbound();
@@ -444,7 +445,7 @@ contract CloneFactory {
 }
 
 contract BaalgroniSummoner is CloneFactory {
-    address payable public template;
+    address public template;
 
     event SummonBaalgroniComplete(
         address baalgroni,
@@ -460,8 +461,9 @@ contract BaalgroniSummoner is CloneFactory {
         bytes initializationParams
     );
 
-    constructor(address payable _template) {
-        template = _template;
+    constructor() {
+        BaalgroniShaman baalgroni = new BaalgroniShaman();
+        template = address(baalgroni);
     }
 
     function summonBaalgroni(
@@ -477,7 +479,7 @@ contract BaalgroniSummoner is CloneFactory {
         bytes memory initializationParams
     ) public returns (address) {
         BaalgroniShaman baalgroni = BaalgroniShaman(
-            payable(createClone(template))
+            createClone(template)
         );
 
         baalgroni.init(
