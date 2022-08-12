@@ -29,27 +29,14 @@ import type {
 
 export interface BaalgroniSummonerInterface extends utils.Interface {
   functions: {
-    "owner()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
     "summonBaalgroni(address,address,bool,uint256,uint256,uint256,uint256,address[],uint256[],bytes)": FunctionFragment;
     "template()": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
   };
 
   getFunction(
-    nameOrSignatureOrTopic:
-      | "owner"
-      | "renounceOwnership"
-      | "summonBaalgroni"
-      | "template"
-      | "transferOwnership"
+    nameOrSignatureOrTopic: "summonBaalgroni" | "template"
   ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "summonBaalgroni",
     values: [
@@ -66,46 +53,19 @@ export interface BaalgroniSummonerInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(functionFragment: "template", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [PromiseOrValue<string>]
-  ): string;
 
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "summonBaalgroni",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "template", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
 
   events: {
-    "OwnershipTransferred(address,address)": EventFragment;
     "SummonBaalgroniComplete(address,address,address,bool,uint256,uint256,uint256,uint256,address[],uint256[],bytes)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SummonBaalgroniComplete"): EventFragment;
 }
-
-export interface OwnershipTransferredEventObject {
-  previousOwner: string;
-  newOwner: string;
-}
-export type OwnershipTransferredEvent = TypedEvent<
-  [string, string],
-  OwnershipTransferredEventObject
->;
-
-export type OwnershipTransferredEventFilter =
-  TypedEventFilter<OwnershipTransferredEvent>;
 
 export interface SummonBaalgroniCompleteEventObject {
   baalgroni: string;
@@ -167,12 +127,6 @@ export interface BaalgroniSummoner extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     summonBaalgroni(
       moloch: PromiseOrValue<string>,
       wrapper: PromiseOrValue<string>,
@@ -188,18 +142,7 @@ export interface BaalgroniSummoner extends BaseContract {
     ): Promise<ContractTransaction>;
 
     template(overrides?: CallOverrides): Promise<[string]>;
-
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
   };
-
-  owner(overrides?: CallOverrides): Promise<string>;
-
-  renounceOwnership(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
 
   summonBaalgroni(
     moloch: PromiseOrValue<string>,
@@ -217,16 +160,7 @@ export interface BaalgroniSummoner extends BaseContract {
 
   template(overrides?: CallOverrides): Promise<string>;
 
-  transferOwnership(
-    newOwner: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
-    owner(overrides?: CallOverrides): Promise<string>;
-
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
     summonBaalgroni(
       moloch: PromiseOrValue<string>,
       wrapper: PromiseOrValue<string>,
@@ -242,23 +176,9 @@ export interface BaalgroniSummoner extends BaseContract {
     ): Promise<string>;
 
     template(overrides?: CallOverrides): Promise<string>;
-
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
   };
 
   filters: {
-    "OwnershipTransferred(address,address)"(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
-    ): OwnershipTransferredEventFilter;
-    OwnershipTransferred(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
-    ): OwnershipTransferredEventFilter;
-
     "SummonBaalgroniComplete(address,address,address,bool,uint256,uint256,uint256,uint256,address[],uint256[],bytes)"(
       baalgroni?: null,
       moloch?: null,
@@ -288,12 +208,6 @@ export interface BaalgroniSummoner extends BaseContract {
   };
 
   estimateGas: {
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     summonBaalgroni(
       moloch: PromiseOrValue<string>,
       wrapper: PromiseOrValue<string>,
@@ -309,20 +223,9 @@ export interface BaalgroniSummoner extends BaseContract {
     ): Promise<BigNumber>;
 
     template(overrides?: CallOverrides): Promise<BigNumber>;
-
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceOwnership(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     summonBaalgroni(
       moloch: PromiseOrValue<string>,
       wrapper: PromiseOrValue<string>,
@@ -338,10 +241,5 @@ export interface BaalgroniSummoner extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     template(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    transferOwnership(
-      newOwner: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
   };
 }

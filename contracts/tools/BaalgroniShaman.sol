@@ -3,7 +3,6 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
@@ -27,7 +26,7 @@ interface IERC5192 {
     function locked(uint256 tokenId) external view returns (bool);
 }
 
-contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
+contract BaalgroniShaman is ERC721, IERC5192, Initializable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
@@ -54,7 +53,7 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     string public core; // ex. "Bourbon";
     string public property; // ex. "Aged";
     // use pinned file upload with file baalgroni-bound/baalgroni-unbound
-    string public imageHash; 
+    string public imageHash;
 
     mapping(uint256 => address) public bindings;
 
@@ -140,7 +139,7 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     // ****************
 
     /// @notice mint NFT, bind to address and issues tokens to address and cuts
-    /// @param to address to receive 
+    /// @param to address to receive
     function _mint(address to) private {
         if (expiry > 0 && expiry < block.timestamp) revert Expired();
         if (msg.value < price) revert NotEnough();
@@ -150,12 +149,12 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
 
         _safeMint(to, tokenId);
         _bind(tokenId, to);
-        _unsink(to);
+        _mintTokens(to);
 
         // loop to fill cut receivers
         address[] memory _receivers = new address[](cuts.length);
-        for (uint256 i = 0; i < cuts.length ; i++) {
-            _receivers[i] = cuts[i ];
+        for (uint256 i = 0; i < cuts.length; i++) {
+            _receivers[i] = cuts[i];
         }
 
         // loop to fill amount per cut
@@ -166,13 +165,12 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
 
         // mint loot to cuts
         moloch.mintLoot(_receivers, _amounts);
-
     }
 
     /// @notice to keep treasury ratio correct a dead address needs to hold tokens
-    function _sink() private {
+    function _burnTokens(address _to) private {
         address[] memory _sinkReceivers = new address[](1);
-        _sinkReceivers[0] = address(0xbaa1);
+        _sinkReceivers[0] = address(_to);
 
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = tokensPerUnit;
@@ -185,8 +183,8 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     }
 
     /// @notice remove tokens from the dead address and give them to the receiver
-    /// @param to address to receive 
-    function _unsink(address to) private {
+    /// @param to address to receive
+    function _mintTokens(address to) private {
         address[] memory _receivers = new address[](1);
         _receivers[0] = to;
 
@@ -204,7 +202,7 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     /// @param tokenId NFT to bind by ID
     /// @param to address to bind to
     function _bind(uint256 tokenId, address to) private {
-        bindings[tokenId] = to; 
+        bindings[tokenId] = to;
         emit Bind(to, tokenId);
     }
 
@@ -221,12 +219,10 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     // ****************
 
     /// @notice mint a batch of NFTs to multiple addresses
-    /// @param tos addresses to receive 
+    /// @param tos addresses to receive
     function batchMint(address[] memory tos) public payable {
         // wrap
-        (bool success, ) = address(wrapper).call{value: price * tos.length}(
-            ""
-        );
+        (bool success, ) = address(wrapper).call{value: price * tos.length}("");
         if (!success) revert WrapFailed();
         // send to dao
         require(
@@ -243,13 +239,13 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
         }
 
         for (uint256 i = 0; i < tos.length; i++) {
-            _unsink(tos[i]);
+            _mintTokens(tos[i]);
             _mint(tos[i]);
         }
     }
 
     /// @notice mint a NFT to an addresses
-    /// @param to addresses to receive 
+    /// @param to addresses to receive
     function mint(address to) public payable {
         // wrap
         (bool success, ) = address(wrapper).call{value: price}("");
@@ -266,29 +262,30 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
         _mint(to);
     }
 
-    /// @notice bind NFT
+    /// @notice bind NFT, issues shares/loot to owner
     /// @param tokenId NFT to bind
     function bind(uint256 tokenId) public {
         if (ownerOf(tokenId) != msg.sender) revert OnlyOwnerCanBind();
         if (locked(tokenId)) revert Bound();
         _bind(tokenId, msg.sender);
-        _unsink(msg.sender);
+        _mintTokens(msg.sender);
+        _burnTokens(address(0xbaa1));
     }
 
-    /// @notice unbind NFT
+    /// @notice unbind NFT, issues shares/loot to owner
     /// @param tokenId NFT to unbind
     function unbind(uint256 tokenId) public {
         if (!locked(tokenId)) revert Unbound();
         if (bindings[tokenId] != msg.sender) revert OnlyOwnerCanUnbind();
-        
+
         if (!shares && lootToken.balanceOf(msg.sender) < tokensPerUnit)
             revert OnlyLootHolderCanUnbind();
         if (shares && sharesToken.balanceOf(msg.sender) < tokensPerUnit)
             revert OnlyShareHolderCanUnbind();
 
         _unbind(tokenId, msg.sender);
-        _unsink(msg.sender);
-        
+        _burnTokens(msg.sender);
+        _mintTokens(address(0xbaa1));
     }
 
     /// @notice is the current token soulbound
@@ -306,6 +303,10 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
         }
     }
 
+    // ****************
+    // OVERRIDE FUNCTIONS
+    // ****************
+
     /// @notice override before transfer so token can be non transferable
     /// @param from address
     /// @param to address
@@ -317,6 +318,16 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     ) internal override(ERC721) {
         if (from != address(0) && locked(tokenId)) revert Bound();
         super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    /// @notice Returns the name of the token.
+    function name() public view override(ERC721) returns (string memory) {
+        return _name;
+    }
+
+    /// @notice Returns the symbol of this token
+    function symbol() public view override(ERC721) returns (string memory) {
+        return _symbol;
     }
 
     /**  Constructs the tokenURI, separated out from the public function as its a big function.
@@ -331,14 +342,16 @@ contract BaalgroniShaman is ERC721, IERC5192, Initializable, Ownable {
     {
         string memory _nftName = string(abi.encodePacked("BAALgroni: ", _name));
 
-        uint256 xp = shares ? sharesToken.balanceOf(msg.sender) : lootToken.balanceOf(msg.sender);
+        uint256 xp = shares
+            ? sharesToken.balanceOf(ownerOf(tokenId))
+            : lootToken.balanceOf(ownerOf(tokenId));
 
         bytes memory _image = abi.encodePacked(
             _baseURI(),
             imageHash,
             "/baalgroni-",
             locked(tokenId) ? "bound" : "unbound",
-            ".svg"
+            ".png"
         );
 
         bytes memory _core = abi.encodePacked(
@@ -430,7 +443,7 @@ contract CloneFactory {
     }
 }
 
-contract BaalgroniSummoner is CloneFactory, Ownable {
+contract BaalgroniSummoner is CloneFactory {
     address payable public template;
 
     event SummonBaalgroniComplete(

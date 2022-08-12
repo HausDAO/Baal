@@ -110,7 +110,7 @@ const baalgroniMetaConfig = {
   TOKENSYMBOL: "bg",
   CORE: "core",
   PROPERTY: "prop",
-  IMAGEHASH: "1234",
+  IMAGEHASH: "https://gateway.pinata.cloud/ipfs/QmRpz4a4uVTz68xpnBdGEizmPiBntmNvv2TxAQzD2aDmEE",
 };
 
 const baalgroniConfig = {
@@ -432,6 +432,7 @@ describe("Baalgroni type", function () {
         baalgroniMetaConfig.IMAGEHASH,
       ]
     );
+    console.log("config parammmmmmmms", bmetaconfig)
 
     // address moloch,
     // address wrapper,
