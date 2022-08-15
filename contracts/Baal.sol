@@ -7,7 +7,7 @@
 ███      █    █     ▀
         █    █
        ▀    ▀*/
-pragma solidity >=0.8.0;
+pragma solidity 0.8.13;
 
 import "@gnosis.pm/safe-contracts/contracts/base/Executor.sol";
 import "@gnosis.pm/safe-contracts/contracts/GnosisSafe.sol";
@@ -1143,7 +1143,6 @@ contract BaalSummoner is ModuleProxyFactory {
         moduleProxyFactory = ModuleProxyFactory(_moduleProxyFactory);
         lootSingleton = _lootSingleton;
         sharesSingleton = _sharesSingleton;
-        
     }
 
     function encodeMultisend(bytes[] memory _calls, address _target)
