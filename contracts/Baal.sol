@@ -288,7 +288,7 @@ contract Baal is CloneFactory, Module {
     /// @notice Summon Baal with voting configuration & initial array of `members` accounts with `shares` & `loot` weights.
     /// @param _initializationParams Encoded setup information.
     function setUp(bytes memory _initializationParams)
-        external
+        public
         override(FactoryFriendly)
         initializer
     {
@@ -312,12 +312,14 @@ contract Baal is CloneFactory, Module {
         avatar = _avatar;
         target = _avatar; /*Set target to same address as avatar on setup - can be changed later via setTarget, though probably not a good idea*/
 
+        require(_lootSingleton != address(0), "!lootSingleton");
         lootToken = IBaalToken(createClone(_lootSingleton)); /*Clone loot singleton using EIP1167 minimal proxy pattern*/
         lootToken.setUp(
             string(abi.encodePacked(_name, " LOOT")),
             string(abi.encodePacked(_symbol, "-LOOT"))
         ); /*TODO this naming feels too opinionated*/
 
+        require(_sharesSingleton != address(0), "!sharesSingleton");
         sharesToken = IBaalToken(createClone(_sharesSingleton)); /*Clone loot singleton using EIP1167 minimal proxy pattern*/
         sharesToken.setUp(_name, _symbol);
 
@@ -1128,6 +1130,9 @@ contract BaalSummoner is ModuleProxyFactory {
         address _lootSingleton, 
         address _sharesSingleton 
     ) {
+        require(_lootSingleton != address(0), "!lootSingleton");
+        require(_sharesSingleton != address(0), "!sharesSingleton");
+        require(_gnosisSingleton != address(0), "!gnosisSingleton");
         template = _template;
         gnosisSingleton = _gnosisSingleton;
         gnosisFallbackLibrary = _gnosisFallbackLibrary;
