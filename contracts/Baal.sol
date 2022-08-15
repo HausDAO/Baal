@@ -121,7 +121,6 @@ contract Baal is CloneFactory, Module {
     address multisendLibrary; /*address of multisend library*/
 
     // SIGNATURE HELPERS
-    mapping(address => uint256) public nonces; /*maps record of states for signing & validating signatures*/
     bytes32 constant DOMAIN_TYPEHASH =
         keccak256(
             "EIP712Domain(string name,uint256 chainId,address verifyingContract)"
