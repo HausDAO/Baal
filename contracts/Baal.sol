@@ -116,9 +116,9 @@ contract Baal is CloneFactory, Module {
     mapping(uint256 => Proposal) public proposals; /*maps `proposal id` to struct details*/
 
     // MISCELLANEOUS PARAMS
-    uint256 status; /*internal reentrancy check tracking value*/
+    uint256 public status; /*internal reentrancy check tracking value*/
     uint32 public latestSponsoredProposalId; /* the id of the last proposal to be sponsored */
-    address multisendLibrary; /*address of multisend library*/
+    address public multisendLibrary; /*address of multisend library*/
 
     // SIGNATURE HELPERS
     bytes32 constant DOMAIN_TYPEHASH =
@@ -264,7 +264,7 @@ contract Baal is CloneFactory, Module {
     event LootPaused(bool paused); /*emits when loot is paused or unpaused*/
 
     function encodeMultisend(bytes[] memory _calls, address _target)
-        public
+        external
         pure
         returns (bytes memory encodedMultisend)
     {
@@ -288,7 +288,7 @@ contract Baal is CloneFactory, Module {
     /// @notice Summon Baal with voting configuration & initial array of `members` accounts with `shares` & `loot` weights.
     /// @param _initializationParams Encoded setup information.
     function setUp(bytes memory _initializationParams)
-        public
+        external
         override(FactoryFriendly)
         initializer
     {

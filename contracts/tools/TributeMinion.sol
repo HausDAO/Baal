@@ -17,7 +17,7 @@ contract TributeMinion {
         bool released;
         address safe;
     }
-    mapping(address => mapping(uint256 => Escrow)) escrows;
+    mapping(address => mapping(uint256 => Escrow)) public escrows;
 
     function encodeTributeProposal(
         address baal,
