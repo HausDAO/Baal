@@ -32,6 +32,8 @@ interface IBaalToken {
 
     function totalSupply() external view returns (uint256);
 
+    function getPriorVotes(address account, uint256 timeStamp) external view returns (uint256);
+
     // below is shares token specific
     struct Checkpoint {
         /*Baal checkpoint for marking number of delegated votes*/
@@ -508,7 +510,7 @@ contract Baal is CloneFactory, Module {
         Proposal storage prop = proposals[id]; /*alias proposal storage pointers*/
         require(state(id) == ProposalState.Voting, "!voting");
 
-        uint256 balance = getPriorVotes(voter, prop.votingStarts); /*fetch & gas-optimize voting weight at proposal creation time*/
+        uint256 balance = sharesToken.getPriorVotes(voter, prop.votingStarts); /*fetch & gas-optimize voting weight at proposal creation time*/
 
         require(balance > 0, "!member"); /* check that user has shares*/
         require(!memberVoted[voter][id], "voted"); /*check vote not already cast*/
@@ -618,7 +620,7 @@ contract Baal is CloneFactory, Module {
         require(state(id) == ProposalState.Voting, "!voting");
         require(
             msg.sender == prop.sponsor ||
-                getPriorVotes(prop.sponsor, block.timestamp - 1) <
+                sharesToken.getPriorVotes(prop.sponsor, block.timestamp - 1) <
                 sponsorThreshold ||
                 isGovernor(msg.sender),
             "!cancellable"
@@ -965,45 +967,6 @@ contract Baal is CloneFactory, Module {
             votes = nCheckpoints != 0
                 ? sharesToken.getCheckpoint(account, nCheckpoints - 1).votes
                 : 0;
-        }
-    }
-
-    /// @notice Returns the prior number of `votes` for `account` as of `timeStamp`.
-    /// @param account The user to check `votes` for.
-    /// @param timeStamp The unix time to check `votes` for.
-    /// @return votes Prior `votes` delegated to `account`.
-    function getPriorVotes(address account, uint256 timeStamp)
-        public
-        view
-        returns (uint256 votes)
-    {
-        require(timeStamp < block.timestamp, "!determined"); /* Prior votes must be in the past*/
-
-        uint256 nCheckpoints = sharesToken.numCheckpoints(account);
-        if (nCheckpoints == 0) return 0;
-
-        unchecked {
-            if (
-                sharesToken
-                    .getCheckpoint(account, nCheckpoints - 1)
-                    .fromTimeStamp <= timeStamp
-            ) return sharesToken.getCheckpoint(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
-            if (sharesToken.getCheckpoint(account, 0).fromTimeStamp > timeStamp)
-                return 0;
-            uint256 lower = 0;
-            uint256 upper = nCheckpoints - 1;
-            while (upper > lower) {
-                /* Binary search to look for highest timestamp before desired timestamp*/
-                uint256 center = upper - (upper - lower) / 2;
-                IBaalToken.Checkpoint memory cp = sharesToken.getCheckpoint(
-                    account,
-                    center
-                );
-                if (cp.fromTimeStamp == timeStamp) return cp.votes;
-                else if (cp.fromTimeStamp < timeStamp) lower = center;
-                else upper = center - 1;
-            }
-            votes = sharesToken.getCheckpoint(account, lower).votes;
         }
     }
 

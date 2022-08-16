@@ -251,9 +251,48 @@ contract Shares is ERC20, ERC20Permit, Initializable {
         emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
     }
 
+    /// @notice Returns the prior number of `votes` for `account` as of `timeStamp`.
+    /// @param account The user to check `votes` for.
+    /// @param timeStamp The unix time to check `votes` for.
+    /// @return votes Prior `votes` delegated to `account`.
+    function getPriorVotes(address account, uint256 timeStamp)
+        public
+        view
+        returns (uint256 votes)
+    {
+        require(timeStamp < block.timestamp, "!determined"); /* Prior votes must be in the past*/
 
-    function getCheckpoint(address delegatee, uint256 nCheckpoints) public view returns(Checkpoint memory) {
-        return checkpoints[delegatee][nCheckpoints]; 
+        uint256 nCheckpoints = numCheckpoints[account];
+        if (nCheckpoints == 0) return 0;
+
+        unchecked {
+            if (
+                getCheckpoint(account, nCheckpoints - 1).fromTimeStamp <=
+                timeStamp
+            ) return getCheckpoint(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
+            if (getCheckpoint(account, 0).fromTimeStamp > timeStamp) return 0;
+            uint256 lower = 0;
+            uint256 upper = nCheckpoints - 1;
+            while (upper > lower) {
+                /* Binary search to look for highest timestamp before desired timestamp*/
+                uint256 center = upper - (upper - lower) / 2;
+                Checkpoint memory cp = getCheckpoint(
+                    account,
+                    center
+                );
+                if (cp.fromTimeStamp == timeStamp) return cp.votes;
+                else if (cp.fromTimeStamp < timeStamp) lower = center;
+                else upper = center - 1;
+            }
+            votes = getCheckpoint(account, lower).votes;
+        }
+    }
+
+    function getCheckpoint(address delegatee, uint256 nCheckpoints)
+        public
+        view
+        returns (Checkpoint memory)
+    {
+        return checkpoints[delegatee][nCheckpoints];
     }
 }
-
