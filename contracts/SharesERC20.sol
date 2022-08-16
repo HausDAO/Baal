@@ -110,15 +110,6 @@ contract Shares is ERC20, ERC20Permit, ERC20Votes, Initializable {
             "!transferable"
         );
         console.log("shares: before transfer", from, to, amount);
-
-        // TODO need to set delegates
-        /*If recipient is receiving their first shares, auto-self delegate*/
-        if (balanceOf(to) == 0 && numCheckpoints(to) == 0 && amount > 0) {
-            console.log("shares: before transfer, first share", from, to, amount);
-            // TODO: cant self delegate?
-            // _delegate(address(0), to);
-
-        }
     }
 
     function _afterTokenTransfer(address from, address to, uint256 amount)
@@ -127,6 +118,17 @@ contract Shares is ERC20, ERC20Permit, ERC20Votes, Initializable {
     {
         super._afterTokenTransfer(from, to, amount);
         console.log("shares: after transfer", from, to, amount);
+        console.log("shares: after transfer balance of", balanceOf(to));
+                // TODO need to set delegates
+        /*If recipient is receiving their first shares, auto-self delegate*/
+        if (numCheckpoints(to) == 0 && amount > 0) {
+            console.log("shares: after transfer, first share", from, to, amount);
+            // TODO: cant self delegate?
+            // _delegate(address(0), to);
+            initDelegate(to);
+
+        }
+        
         
     }
 
@@ -138,6 +140,10 @@ contract Shares is ERC20, ERC20Permit, ERC20Votes, Initializable {
 
     function _burn(address recipient, uint256 amount) internal override(ERC20Votes, ERC20) {
         super._burn(recipient, amount);
+    }
+
+    function initDelegate(address delegatee) internal {
+        _delegate(address(0), delegatee);
     }
 
 }
