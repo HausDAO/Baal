@@ -9,8 +9,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "./interfaces/IBaal.sol";
 
-import "hardhat/console.sol";
-
 /// @title Shares
 /// @notice Accounting for Baal non voting shares
 contract Shares is ERC20, ERC20Permit, ERC20Votes, Initializable {
@@ -77,7 +75,6 @@ contract Shares is ERC20, ERC20Permit, ERC20Votes, Initializable {
     /// @param recipient Address to receive loot
     /// @param amount Amount to mint
     function mint(address recipient, uint256 amount) external baalOnly {
-        console.log("shares mint", recipient, amount);
         unchecked {
             if (totalSupply() + amount <= type(uint256).max / 2) {
                 _mint(recipient, amount);
@@ -109,7 +106,6 @@ contract Shares is ERC20, ERC20Permit, ERC20Votes, Initializable {
                 !baal.sharesPaused(),
             "!transferable"
         );
-        console.log("shares: before transfer", from, to, amount);
     }
 
     function _afterTokenTransfer(address from, address to, uint256 amount)
@@ -117,33 +113,20 @@ contract Shares is ERC20, ERC20Permit, ERC20Votes, Initializable {
         override(ERC20Votes, ERC20)
     {
         super._afterTokenTransfer(from, to, amount);
-        console.log("shares: after transfer", from, to, amount);
-        console.log("shares: after transfer balance of", balanceOf(to));
-                // TODO need to set delegates
         /*If recipient is receiving their first shares, auto-self delegate*/
+        // TODO: should check that balance of 'to' was 0 before?
         if (numCheckpoints(to) == 0 && amount > 0) {
-            console.log("shares: after transfer, first share", from, to, amount);
-            // TODO: cant self delegate?
-            // _delegate(address(0), to);
-            initDelegate(to);
-
+            _delegate(to, to);
         }
-        
-        
+
     }
 
     function _mint(address recipient, uint256 amount) internal override(ERC20Votes, ERC20) {
         super._mint(recipient, amount);
-        console.log("shares: mint", recipient, amount);
-
     }
 
     function _burn(address recipient, uint256 amount) internal override(ERC20Votes, ERC20) {
         super._burn(recipient, amount);
-    }
-
-    function initDelegate(address delegatee) internal {
-        _delegate(address(0), delegatee);
     }
 
 }

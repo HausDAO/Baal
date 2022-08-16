@@ -468,7 +468,7 @@ describe("Baal contract", function () {
     shamanSharesToken = sharesToken.connect(shaman);
     summonerSharesToken = sharesToken.connect(summoner);
 
-    // TODO: does not self delegate
+    // TODO: if needs to self delegate
     //summonerSharesToken.delegate(summoner.address);
 
     const selfTransferAction = encodeMultiAction(
@@ -492,7 +492,7 @@ describe("Baal contract", function () {
   });
 
   describe("constructor", function () {
-    it.only("verify deployment parameters", async function () {
+    it("verify deployment parameters", async function () {
       const now = await blockTime();
 
       // const decimals = await baal.decimals()
@@ -523,21 +523,18 @@ describe("Baal contract", function () {
       expect(summonerLoot).to.equal(loot);
 
       const summonerVotes = await baal.getCurrentVotes(summoner.address);
-      console.log('summonerVotes', summonerVotes);
 
-      // expect(summonerVotes).to.equal(shares); // shares = 100
+      expect(summonerVotes).to.equal(shares); // shares = 100
 
       const summonerSelfDelegates = await sharesToken.delegates(
         summoner.address
       );
-      console.log('summonerSelfDelegates', summonerSelfDelegates);
       
-      // expect(summonerSelfDelegates).to.equal(summoner.address);
+      expect(summonerSelfDelegates).to.equal(summoner.address);
 
       const summonerShares = await sharesToken.balanceOf(summoner.address);
-      console.log('summonerShares', summonerShares);
       
-      // expect(summonerShares).to.equal(shares);
+      expect(summonerShares).to.equal(shares);
 
       const totalLoot = await baal.totalLoot();
       expect(totalLoot).to.equal(loot); // loot = 500
@@ -1662,14 +1659,14 @@ describe("Baal contract", function () {
 
   describe("erc20 shares - transfer", function () {
     it("transfer to first time recipient - auto self delegates", async function () {
-      const beforeTransferTimestamp = await blockTime();
+      // const beforeTransferTimestamp = await blockTime();
 
       await summonerSharesToken.transfer(
         shaman.address,
         deploymentConfig.SPONSOR_THRESHOLD
       );
 
-      const afterTransferTimestamp = await blockTime();
+      // const afterTransferTimestamp = await blockTime();
       const summonerBalance = await sharesToken.balanceOf(summoner.address);
       const summonerVotes = await baal.getCurrentVotes(summoner.address);
       const shamanBalance = await sharesToken.balanceOf(shaman.address);
@@ -1685,17 +1682,19 @@ describe("Baal contract", function () {
       const shamanCheckpoints = await sharesToken.numCheckpoints(
         shaman.address
       );
+      
       const summonerCP0 = await sharesToken.checkpoints(summoner.address, 0);
       const summonerCP1 = await sharesToken.checkpoints(summoner.address, 1);
       const shamanCP0 = await sharesToken.checkpoints(shaman.address, 0);
-      const shamanCP1 = await sharesToken.checkpoints(shaman.address, 1);
+      // TODO: this does not fail very nice
+      // const shamanCP1 = await sharesToken.checkpoints(shaman.address, 1);
       expect(summonerCheckpoints).to.equal(2);
       expect(shamanCheckpoints).to.equal(1);
       expect(summonerCP0.votes).to.equal(100);
       expect(summonerCP1.votes).to.equal(99);
       expect(shamanCP0.votes).to.equal(1);
-      expect(shamanCP1.fromBlock).to.equal(0); // checkpoint DNE
-      // expect(shamanCP1.fromTimeStamp).to.equal(0); // checkpoint DNE
+      // expect(shamanCP1.fromBlock).to.equal(0); // checkpoint DNE
+      // // expect(shamanCP1.fromTimeStamp).to.equal(0); // checkpoint DNE
 
       const delegate = await sharesToken.delegates(shaman.address);
       expect(delegate).to.equal(shaman.address);
@@ -1732,12 +1731,14 @@ describe("Baal contract", function () {
       const shamanCheckpoints = await sharesToken.numCheckpoints(
         shaman.address
       );
+      console.log('summonerCheckpoints', summonerCheckpoints);
+      console.log('shamanCheckpoints', shamanCheckpoints);
       const summonerCP0 = await sharesToken.checkpoints(summoner.address, 0);
-      const shamanCP0 = await sharesToken.checkpoints(shaman.address, 0);
+      // const shamanCP0 = await sharesToken.checkpoints(shaman.address, 0);
       expect(summonerCheckpoints).to.equal(1);
       expect(shamanCheckpoints).to.equal(0);
       expect(summonerCP0.votes).to.equal(100);
-      expect(shamanCP0.fromBlock).to.equal(0); // checkpoint DNE
+      // expect(shamanCP0.fromBlock).to.equal(0); // checkpoint DNE
       // expect(shamanCP0.fromTimeStamp).to.equal(0); // checkpoint DNE
     });
 
@@ -1859,13 +1860,13 @@ describe("Baal contract", function () {
       const summonerCP0 = await sharesToken.checkpoints(summoner.address, 0);
       const summonerCP1 = await sharesToken.checkpoints(summoner.address, 1);
       const shamanCP0 = await sharesToken.checkpoints(shaman.address, 0);
-      const shamanCP1 = await sharesToken.checkpoints(shaman.address, 1);
+      // const shamanCP1 = await sharesToken.checkpoints(shaman.address, 1);
       expect(summonerCheckpoints).to.equal(2);
       expect(shamanCheckpoints).to.equal(1);
       expect(summonerCP0.votes).to.equal(100);
       expect(summonerCP1.votes).to.equal(99);
       expect(shamanCP0.votes).to.equal(1);
-      expect(shamanCP1.fromBlock).to.equal(0); // checkpoint DNE
+      //expect(shamanCP1.fromBlock).to.equal(0); // checkpoint DNE
       // expect(shamanCP1.fromTimeStamp).to.equal(0); // checkpoint DNE
     });
 
@@ -2304,6 +2305,7 @@ describe("Baal contract", function () {
       await shamanBaal.mintShares([shaman.address], [100]); // add another 100 shares for shaman
       await shamanBaal.submitVote(1, yes);
       const prop = await baal.proposals(1);
+      // TODO: fails
       expect(prop.yesVotes).to.equal(200); // 100 summoner and 1st 100 from shaman are counted
       expect(prop.maxTotalSharesAndLootAtYesVote).to.equal(shares + loot + 200);
     });
@@ -2324,6 +2326,7 @@ describe("Baal contract", function () {
       await shamanBaal.ragequit(shaman.address, 50, 0, [weth.address]);
       await shamanBaal.submitVote(1, yes);
       const prop = await baal.proposals(1);
+      // TODO: fails
       expect(prop.yesVotes).to.equal(200); // 100 summoner and 1st 100 from shaman are counted (not affected by rq)
       expect(prop.maxTotalSharesAndLootAtYesVote).to.equal(shares + loot + 100); // unchanged
     });
