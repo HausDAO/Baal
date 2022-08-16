@@ -468,6 +468,8 @@ describe("Baal contract", function () {
     shamanSharesToken = sharesToken.connect(shaman);
     summonerSharesToken = sharesToken.connect(summoner);
 
+    summonerSharesToken.delegate(summoner.address);
+
     const selfTransferAction = encodeMultiAction(
       multisend,
       ["0x"],
@@ -489,7 +491,7 @@ describe("Baal contract", function () {
   });
 
   describe("constructor", function () {
-    it("verify deployment parameters", async function () {
+    it.only("verify deployment parameters", async function () {
       const now = await blockTime();
 
       // const decimals = await baal.decimals()
@@ -520,14 +522,20 @@ describe("Baal contract", function () {
       expect(summonerLoot).to.equal(loot);
 
       const summonerVotes = await baal.getCurrentVotes(summoner.address);
+      console.log('summonerVotes', summonerVotes);
+
       expect(summonerVotes).to.equal(shares); // shares = 100
 
       const summonerSelfDelegates = await sharesToken.delegates(
         summoner.address
       );
+      console.log('summonerSelfDelegates', summonerSelfDelegates);
+      
       expect(summonerSelfDelegates).to.equal(summoner.address);
 
       const summonerShares = await sharesToken.balanceOf(summoner.address);
+      console.log('summonerShares', summonerShares);
+      
       expect(summonerShares).to.equal(shares);
 
       const totalLoot = await baal.totalLoot();
