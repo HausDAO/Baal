@@ -468,6 +468,7 @@ describe("Baal contract", function () {
     shamanSharesToken = sharesToken.connect(shaman);
     summonerSharesToken = sharesToken.connect(summoner);
 
+    // TODO: does not self delegate
     summonerSharesToken.delegate(summoner.address);
 
     const selfTransferAction = encodeMultiAction(
