@@ -1859,14 +1859,14 @@ describe("Baal contract", function () {
 
     it("require fails - shares paused", async function () {
       await shamanBaal.setAdminConfig(true, false); // pause shares
-      await sharesToken.approve(
-        shaman.address,
+      await shamanSharesToken.approve(
+        summoner.address,
         deploymentConfig.SPONSOR_THRESHOLD
       );
       await expect(
-        sharesToken.transferFrom(
-          summoner.address,
+        summonerSharesToken.transferFrom(
           shaman.address,
+          summoner.address,
           deploymentConfig.SPONSOR_THRESHOLD
         )
       ).to.be.revertedWith(revertMessages.sharesTransferPaused);
@@ -1958,7 +1958,7 @@ describe("Baal contract", function () {
     });
 
     it("require fails - insufficient balance", async function () {
-      await lootToken.approve(shaman.address, 500);
+      await lootToken.approve(shaman.address, 501);
       await expect(
         shamanLootToken.transferFrom(summoner.address, shaman.address, 501)
       ).to.be.revertedWith(revertMessages.lootInsufficientBalance);
