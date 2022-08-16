@@ -39,9 +39,9 @@ interface IBaalToken {
         uint256 votes; /*votes at given unix time*/
     }
 
-    function numCheckpoints(address) external view returns (uint256);
+    function numCheckpoints(address) external view returns (uint32);
 
-    function getCheckpoint(address, uint256)
+    function checkpoints(address, uint32)
         external
         view
         returns (Checkpoint memory);
@@ -960,10 +960,10 @@ contract Baal is CloneFactory, Module {
         view
         returns (uint256 votes)
     {
-        uint256 nCheckpoints = sharesToken.numCheckpoints(account); /*Get most recent checkpoint, or 0 if no checkpoints*/
+        uint32 nCheckpoints = sharesToken.numCheckpoints(account); /*Get most recent checkpoint, or 0 if no checkpoints*/
         unchecked {
             votes = nCheckpoints != 0
-                ? sharesToken.getCheckpoint(account, nCheckpoints - 1).votes
+                ? sharesToken.checkpoints(account, nCheckpoints - 1).votes
                 : 0;
         }
     }
@@ -979,23 +979,23 @@ contract Baal is CloneFactory, Module {
     {
         require(timeStamp < block.timestamp, "!determined"); /* Prior votes must be in the past*/
 
-        uint256 nCheckpoints = sharesToken.numCheckpoints(account);
+        uint32 nCheckpoints = sharesToken.numCheckpoints(account);
         if (nCheckpoints == 0) return 0;
 
         unchecked {
             if (
                 sharesToken
-                    .getCheckpoint(account, nCheckpoints - 1)
+                    .checkpoints(account, nCheckpoints - 1)
                     .fromTimeStamp <= timeStamp
-            ) return sharesToken.getCheckpoint(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
-            if (sharesToken.getCheckpoint(account, 0).fromTimeStamp > timeStamp)
+            ) return sharesToken.checkpoints(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
+            if (sharesToken.checkpoints(account, 0).fromTimeStamp > timeStamp)
                 return 0;
-            uint256 lower = 0;
-            uint256 upper = nCheckpoints - 1;
+            uint32 lower = 0;
+            uint32 upper = nCheckpoints - 1;
             while (upper > lower) {
                 /* Binary search to look for highest timestamp before desired timestamp*/
-                uint256 center = upper - (upper - lower) / 2;
-                IBaalToken.Checkpoint memory cp = sharesToken.getCheckpoint(
+                uint32 center = upper - (upper - lower) / 2;
+                IBaalToken.Checkpoint memory cp = sharesToken.checkpoints(
                     account,
                     center
                 );
@@ -1003,7 +1003,7 @@ contract Baal is CloneFactory, Module {
                 else if (cp.fromTimeStamp < timeStamp) lower = center;
                 else upper = center - 1;
             }
-            votes = sharesToken.getCheckpoint(account, lower).votes;
+            votes = sharesToken.checkpoints(account, lower).votes;
         }
     }
 
