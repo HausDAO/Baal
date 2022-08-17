@@ -4,17 +4,15 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
 /**
- * @dev extention to Openzeplin ERC20Vote
+ * @dev similar to Openzeplin ERC20Votes
  * 
  * uses timestamp instead of block.number and auto self delegates.
  *
  * This extension keeps a history (checkpoints) of each account's vote power. Vote power can be delegated either
  * by calling the {delegate} function directly, or by providing a signature to be used with {delegateBySig}. Voting
- * power can be queried through the public accessors {getVotes} and {getPastVotes}.
+ * power can be queried through the public accessors  {getPriorVotes}.
  *
- * By default, token balance does not account for voting power. This makes transfers cheaper. The downside is that it
- * requires users to delegate to themselves in order to activate checkpoints and have their voting power tracked.
- *
+ * TODO alighn more with OZ ERC20Votes
  */
 abstract contract BaalVotes is ERC20Permit {
     using ECDSA for bytes32;
