@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
 /**
  * @dev similar to Openzeplin ERC20Votes
- * 
+ *
  * uses timestamp instead of block.number and auto self delegates.
  *
  * This extension keeps a history (checkpoints) of each account's vote power. Vote power can be delegated either
@@ -33,7 +33,7 @@ abstract contract BaalVotes is ERC20Permit {
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
     bytes32 constant DOMAIN_TYPEHASH =
         keccak256(
-            "EIP712Domain(string name,uint256 chainId,address verifyingContract)"
+            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
         );
 
     event DelegateChanged(
@@ -83,7 +83,7 @@ abstract contract BaalVotes is ERC20Permit {
             abi.encode(
                 DOMAIN_TYPEHASH,
                 keccak256(bytes(name())),
-                // keccak256(bytes(name)),
+                keccak256(bytes("4")),
                 block.chainid,
                 address(this)
             )

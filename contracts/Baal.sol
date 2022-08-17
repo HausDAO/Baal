@@ -74,7 +74,7 @@ contract Baal is Module {
     // SIGNATURE HELPERS
     bytes32 constant DOMAIN_TYPEHASH =
         keccak256(
-            "EIP712Domain(string name,uint256 chainId,address verifyingContract)"
+            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
         );
     bytes32 constant VOTE_TYPEHASH =
         keccak256("Vote(uint32 proposalId,bool support)");
@@ -431,9 +431,9 @@ contract Baal is Module {
             abi.encode(
                 DOMAIN_TYPEHASH,
                 keccak256(bytes(name)),
+                keccak256(bytes("4")),
                 block.chainid,
                 address(this)
-                // TODO dont we need version in this Domain Seperator?
             )
         ); /*calculate EIP-712 domain hash*/
         bytes32 structHash = keccak256(abi.encode(VOTE_TYPEHASH, id, approved)); /*calculate EIP-712 struct hash*/

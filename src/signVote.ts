@@ -11,6 +11,7 @@ export default async function signVote(
 ) {
   const domain = {
     name,
+    version: '4',
     chainId,
     verifyingContract: contractAddress,
   }
