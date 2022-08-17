@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.13;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
@@ -12,7 +12,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
  * by calling the {delegate} function directly, or by providing a signature to be used with {delegateBySig}. Voting
  * power can be queried through the public accessors  {getPriorVotes}.
  *
- * TODO alighn more with OZ ERC20Votes
  */
 abstract contract BaalVotes is ERC20Permit {
     using ECDSA for bytes32;
@@ -74,7 +73,6 @@ abstract contract BaalVotes is ERC20Permit {
     /// @param nonce The contract state required to match the signature.
     /// @param deadline The time at which to expire the signature.
     /// @param signature The concatenated signature
-    //TODO
     function delegateBySig(
         address delegatee,
         uint256 nonce,

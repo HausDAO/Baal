@@ -95,8 +95,6 @@ contract BaalSummoner is ModuleProxyFactory {
             address _safeAddr /*address of safe*/
         ) = abi.decode(initializationParams, (string, string, address));
 
-        // TODO: allow safe to init baal
-
         bytes memory _anyCall = abi.encodeWithSignature("avatar()"); /*This call can be anything, it just needs to return successfully*/
         Baal _baal = Baal(
             moduleProxyFactory.deployModule(template, _anyCall, _saltNonce)

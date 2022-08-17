@@ -16,37 +16,7 @@ import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
-// import "hardhat/console.sol";
-
-interface IBaalToken {
-    function name() external view returns (string memory);
-
-    function setUp(string memory _name, string memory _symbol) external;
-
-    function mint(address recipient, uint256 amount) external;
-
-    function burn(address account, uint256 amount) external;
-
-    function balanceOf(address account) external view returns (uint256);
-
-    function totalSupply() external view returns (uint256);
-
-    function getPriorVotes(address account, uint256 timeStamp) external view returns (uint256);
-
-    // below is shares token specific
-    struct Checkpoint {
-        /*Baal checkpoint for marking number of delegated votes*/
-        uint32 fromTimeStamp; /*unix time for referencing voting balance*/
-        uint256 votes; /*votes at given unix time*/
-    }
-
-    function numCheckpoints(address) external view returns (uint256);
-
-    function getCheckpoint(address, uint256)
-        external
-        view
-        returns (Checkpoint memory);
-}
+import ".interfaces/IBaalToken.sol";
 
 /// @title Baal ';_;'.
 /// @notice Flexible guild contract inspired by Moloch DAO framework.
