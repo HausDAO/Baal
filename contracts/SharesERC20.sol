@@ -60,7 +60,7 @@ contract Shares is ERC20, ERC20Permit, Initializable {
 
     constructor() ERC20("Template", "T") ERC20Permit("Shares") initializer {} /*Configure template to be unusable*/
 
-    /// @notice Configure loot - called by Baal on summon
+    /// @notice Configure shares - called by Baal on summon
     /// @dev initializer should prevent this from being called again
     /// @param name_ Name for ERC20 token trackers
     /// @param symbol_ Symbol for ERC20 token trackers
@@ -83,28 +83,8 @@ contract Shares is ERC20, ERC20Permit, Initializable {
         return __symbol;
     }
 
-    /// @notice Transfer `amount` tokens from `from` to `to`.
-    /// @param from The address of the source account.
-    /// @param to The address of the destination account.
-    /// @param amount The number of `loot` tokens to transfer.
-    /// @return success Whether or not the transfer succeeded.
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public override(ERC20) returns (bool success) {
-        _transfer(from, to, amount);
-
-        uint256 currentAllowance = allowance(from, msg.sender);
-        if (currentAllowance != type(uint256).max) {
-            _approve(from, msg.sender, currentAllowance - amount);
-        }
-
-        return true;
-    }
-
-    /// @notice Baal-only function to mint loot.
-    /// @param recipient Address to receive loot
+    /// @notice Baal-only function to mint shares.
+    /// @param recipient Address to receive shares
     /// @param amount Amount to mint
     function mint(address recipient, uint256 amount) external baalOnly {
         unchecked {
@@ -114,8 +94,8 @@ contract Shares is ERC20, ERC20Permit, Initializable {
         }
     }
 
-    /// @notice Baal-only function to burn loot.
-    /// @param account Address to lose loot
+    /// @notice Baal-only function to burn shares.
+    /// @param account Address to lose shares
     /// @param amount Amount to burn
     function burn(address account, uint256 amount) external baalOnly {
         _burn(account, amount);
@@ -125,7 +105,7 @@ contract Shares is ERC20, ERC20Permit, Initializable {
     /// @dev Allows transfers if msg.sender is Baal which enables minting and burning
     /// @param from The address of the source account.
     /// @param to The address of the destination account.
-    /// @param amount The number of `loot` tokens to transfer.
+    /// @param amount The number of `shares` tokens to transfer.
     function _beforeTokenTransfer(
         address from,
         address to,
@@ -193,8 +173,6 @@ contract Shares is ERC20, ERC20Permit, Initializable {
     /// @notice Delegates Baal voting weight.
     /// @param delegator The address to delegate 'votes' from.
     /// @param delegatee The address to delegate 'votes' to.
-    // TODO sharestoken
-
     function _delegate(address delegator, address delegatee) private {
         require(balanceOf(delegator) > 0, "!shares");
         address currentDelegate = delegates[delegator];
@@ -213,8 +191,6 @@ contract Shares is ERC20, ERC20Permit, Initializable {
     /// @param srcRep The address to delegate 'votes' from.
     /// @param dstRep The address to delegate 'votes' to.
     /// @param amount The amount of votes to delegate
-    // TODO sharestoken
-
     function _moveDelegates(
         address srcRep,
         address dstRep,
@@ -275,9 +251,48 @@ contract Shares is ERC20, ERC20Permit, Initializable {
         emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
     }
 
+    /// @notice Returns the prior number of `votes` for `account` as of `timeStamp`.
+    /// @param account The user to check `votes` for.
+    /// @param timeStamp The unix time to check `votes` for.
+    /// @return votes Prior `votes` delegated to `account`.
+    function getPriorVotes(address account, uint256 timeStamp)
+        public
+        view
+        returns (uint256 votes)
+    {
+        require(timeStamp < block.timestamp, "!determined"); /* Prior votes must be in the past*/
 
-    function getCheckpoint(address delegatee, uint256 nCheckpoints) public view returns(Checkpoint memory) {
-        return checkpoints[delegatee][nCheckpoints]; 
+        uint256 nCheckpoints = numCheckpoints[account];
+        if (nCheckpoints == 0) return 0;
+
+        unchecked {
+            if (
+                getCheckpoint(account, nCheckpoints - 1).fromTimeStamp <=
+                timeStamp
+            ) return getCheckpoint(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
+            if (getCheckpoint(account, 0).fromTimeStamp > timeStamp) return 0;
+            uint256 lower = 0;
+            uint256 upper = nCheckpoints - 1;
+            while (upper > lower) {
+                /* Binary search to look for highest timestamp before desired timestamp*/
+                uint256 center = upper - (upper - lower) / 2;
+                Checkpoint memory cp = getCheckpoint(
+                    account,
+                    center
+                );
+                if (cp.fromTimeStamp == timeStamp) return cp.votes;
+                else if (cp.fromTimeStamp < timeStamp) lower = center;
+                else upper = center - 1;
+            }
+            votes = getCheckpoint(account, lower).votes;
+        }
+    }
+
+    function getCheckpoint(address delegatee, uint256 nCheckpoints)
+        public
+        view
+        returns (Checkpoint memory)
+    {
+        return checkpoints[delegatee][nCheckpoints];
     }
 }
-
