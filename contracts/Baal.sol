@@ -276,8 +276,6 @@ contract Baal is Module {
 
         multisendLibrary = _multisendLibrary; /*Set address of Gnosis multisend library to use for all execution*/
 
-        status = 1; /*initialize 'reentrancy guard' status*/
-
         // Execute all setups including but not limited to
         // * mint shares
         // * convert shares to loot
@@ -307,6 +305,8 @@ contract Baal is Module {
             totalShares(),
             totalLoot()
         );
+
+        status = 1; /*initialize 'reentrancy guard' status*/
     }
 
     /*****************

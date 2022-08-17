@@ -2088,7 +2088,6 @@ describe("Baal contract", function () {
         ethers.utils.id(proposal.details)
       );
       await moveForwardPeriods(2);
-      // console.log(now > expiration, proposal.baalGas);
 
       // TODO: fix
       await expect(baal.sponsorProposal(1)).to.be.revertedWith(
@@ -2336,6 +2335,7 @@ describe("Baal contract", function () {
         1,
         true
       );
+
       await baal.submitVoteWithSig(1, true, signature);
       const prop = await baal.proposals(1);
       const nCheckpoints = await sharesToken.numCheckpoints(summoner.address);
