@@ -15,7 +15,7 @@ use(solidity)
 
 const revertMessages = {
   lootAlreadyInitialized: 'Initializable: contract is already initialized',
-  permitNotAuthorized: '!authorized',
+  permitNotAuthorized: 'ERC20Permit: invalid signature',
   permitExpired: 'expired',
   lootNotBaal: '!auth',
   notTransferable: '!transferable',
