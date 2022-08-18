@@ -31,10 +31,6 @@ abstract contract BaalVotes is ERC20Permit {
     /*_nonces come from ERC20Permit*/
     bytes32 constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
-    bytes32 constant DOMAIN_TYPEHASH =
-        keccak256(
-            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        );
 
     event DelegateChanged(
         address indexed delegator,
