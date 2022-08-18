@@ -68,42 +68,34 @@ abstract contract BaalVotes is ERC20Permit {
         _delegate(msg.sender, delegatee);
     }
 
-    /// @notice Delegates votes from `signatory` to `delegatee` with EIP-712 signature.
+    /// @notice Delegates votes from `signer` to `delegatee` with EIP-712 signature.
     /// @param delegatee The address to delegate 'votes' to.
     /// @param nonce The contract state required to match the signature.
-    /// @param deadline The time at which to expire the signature.
-    /// @param signature The concatenated signature
+    /// @param expiry The time at which to expire the signature.
+    /// @param v The v signature
+    /// @param r The r signature
+    /// @param s The s signature
     function delegateBySig(
         address delegatee,
         uint256 nonce,
-        uint256 deadline,
-        bytes calldata signature
-    ) public virtual {
-        bytes32 domainSeparator = keccak256(
-            abi.encode(
-                DOMAIN_TYPEHASH,
-                keccak256(bytes(name())),
-                keccak256(bytes("4")),
-                block.chainid,
-                address(this)
-            )
-        ); /*calculate EIP-712 domain hash*/
-        bytes32 structHash = keccak256(
-            abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, deadline)
-        ); /*calculate EIP-712 struct hash*/
-        bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", domainSeparator, structHash)
-        ); /*calculate EIP-712 digest for signature*/
-        address signatory = digest.recover(signature); /*recover signer from hash data*/
-
-        require(signatory != address(0), "!signatory"); /*check signer is not null*/
-        unchecked {
-            require(nonce == _nonces[signatory]++, "!nonce"); /*check given `nonce` is next in `nonces`*/
-        }
-
-        require(deadline == 0 || deadline < block.timestamp, "expired");
-
-        _delegate(signatory, delegatee); /*execute delegation*/
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
+        require(block.timestamp <= expiry, "ERC20Votes: signature expired");
+        address signer = ECDSA.recover(
+            _hashTypedDataV4(
+                keccak256(
+                    abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry)
+                )
+            ),
+            v,
+            r,
+            s
+        );
+        require(nonce == _useNonce(signer), "ERC20Votes: invalid nonce");
+        _delegate(signer, delegatee);
     }
 
     /// @notice Delegates Baal voting weight.

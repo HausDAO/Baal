@@ -11,7 +11,7 @@ export default async function signDelegation(
 ) {
   const domain = {
     name,
-    version: '4',
+    version: '1',
     chainId,
     verifyingContract: contractAddress,
   }

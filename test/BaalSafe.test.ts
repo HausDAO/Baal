@@ -2352,49 +2352,69 @@ describe("Baal contract", function () {
   });
 
   describe("delegateBySig", function () {
-    it("happy case ", async function () {
+    beforeEach(async function () {
       await baal.submitProposal(
         proposal.data,
         proposal.expiration,
         proposal.baalGas,
         ethers.utils.id(proposal.details)
       );
+    });
+    it("happy case ", async function () {
+      const expiry = (await blockTime()) + 10000;
+      const nonce = 0;
       const signature = await signDelegation(
         chainId,
         sharesToken.address,
         summoner,
-        deploymentConfig.TOKEN_NAME,
+        'Shares', // deploymentConfig.TOKEN_NAME
         shaman.address,
-        0,
-        0
+        nonce,
+        expiry
       );
-      // console.log(summoner.address);
-      await shamanSharesToken.delegateBySig(shaman.address, 0, 0, signature);
+
+      const {v, r, s} = await ethers.utils.splitSignature(signature);
+      await shamanSharesToken.delegateBySig(shaman.address, nonce, expiry, v, r, s);
       const summonerDelegate = await sharesToken.delegates(summoner.address);
       expect(summonerDelegate).to.equal(shaman.address);
     });
 
     it("require fail - nonce is re-used", async function () {
-      await baal.submitProposal(
-        proposal.data,
-        proposal.expiration,
-        proposal.baalGas,
-        ethers.utils.id(proposal.details)
-      );
+      const expiry = (await blockTime()) + 10000;
+      const nonce = 0;
       const signature = await signDelegation(
         chainId,
         sharesToken.address,
         summoner,
-        deploymentConfig.TOKEN_NAME,
+        'Shares', // deploymentConfig.TOKEN_NAME
         shaman.address,
-        0,
+        nonce,
+        expiry
+      );
+
+      const {v, r, s} = await ethers.utils.splitSignature(signature);
+      await shamanSharesToken.delegateBySig(shaman.address, nonce, expiry, v, r, s);
+      expect(
+        shamanSharesToken.delegateBySig(shaman.address, nonce, expiry, v, r, s)
+      ).to.be.revertedWith("ERC20Votes: invalid nonce");
+    });
+
+    it("require fail - signature expired", async function () {
+      const nonce = 0;
+      const signature = await signDelegation(
+        chainId,
+        sharesToken.address,
+        summoner,
+        'Shares', // deploymentConfig.TOKEN_NAME
+        shaman.address,
+        nonce,
         0
       );
-      // console.log(summoner.address);
-      await shamanSharesToken.delegateBySig(shaman.address, 0, 0, signature);
+
+      const {v, r, s} = await ethers.utils.splitSignature(signature);
       expect(
-        shamanSharesToken.delegateBySig(shaman.address, 0, 0, signature)
-      ).to.be.revertedWith("!nonce");
+        shamanSharesToken.delegateBySig(shaman.address, nonce, 0, v, r, s)
+      ).to.be.revertedWith("ERC20Votes: signature expired");
     });
   });
 
