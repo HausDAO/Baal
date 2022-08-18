@@ -4,8 +4,7 @@ import { use, expect } from 'chai'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 import { Loot, MockBaal } from '../src/types'
-import { BigNumber, BigNumberish } from '@ethersproject/bignumber'
-import { ContractFactory, utils } from 'ethers'
+import { ContractFactory } from 'ethers'
 import signPermit from '../src/signPermit'
 
 use(solidity)
@@ -168,27 +167,22 @@ describe('Loot ERC20 contract', async function () {
   })
 
   describe('erc20 loot - increase allowance with permit', async function () {
-    it.only('happy case - increase allowance with valid permit', async function () {
+    it('happy case - increase allowance with valid permit', async function () {
       const deadline = (await blockTime()) + 10000
       const nonce = await lootToken.nonces(summoner.address)
-
-      console.log(lootToken.address)
       const permitSignature = await signPermit(
         chainId, // chainId
         lootToken.address, // contractAddress
         summoner, // signer
-        await lootToken.name(), // name
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         summoner.address, // owner
         s1.address, // spender
         500, // value
         nonce, // nonce
         deadline, // deadline
-        'ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80' // pkey summoner for v1 eip712 signature
       )
 
-
       const {v,r,s} = await ethers.utils.splitSignature(permitSignature)
-      console.log(v,r,s)
       await lootToken.permit(summoner.address, s1.address, 500, deadline, v, r, s) //  owner, spender, value, deadline, v, r, s
       const s1Allowance = await lootToken.allowance(summoner.address, s1.address)
       console.log(s1Allowance)
@@ -202,7 +196,7 @@ describe('Loot ERC20 contract', async function () {
         chainId,
         lootToken.address,
         summoner,
-        await lootToken.name(),
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         summoner.address,
         s1.address,
         500,
@@ -221,7 +215,7 @@ describe('Loot ERC20 contract', async function () {
         420,
         lootToken.address,
         summoner,
-        await lootToken.name(),
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         summoner.address,
         s1.address,
         500,
@@ -248,7 +242,7 @@ describe('Loot ERC20 contract', async function () {
         chainId,
         zeroAddress,
         summoner,
-        await lootToken.name(),
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         summoner.address,
         s1.address,
         500,
@@ -267,7 +261,7 @@ describe('Loot ERC20 contract', async function () {
         chainId,
         lootToken.address,
         summoner,
-        await lootToken.name(),
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         s1.address,
         s1.address,
         500,
@@ -286,7 +280,7 @@ describe('Loot ERC20 contract', async function () {
         chainId,
         lootToken.address,
         summoner,
-        await lootToken.name(),
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         summoner.address,
         s2.address,
         500,
@@ -305,7 +299,7 @@ describe('Loot ERC20 contract', async function () {
         chainId,
         lootToken.address,
         summoner,
-        await lootToken.name(),
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         summoner.address,
         s1.address,
         499,
@@ -324,7 +318,7 @@ describe('Loot ERC20 contract', async function () {
         chainId,
         lootToken.address,
         summoner,
-        await lootToken.name(),
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         summoner.address,
         s1.address,
         500,
@@ -343,7 +337,7 @@ describe('Loot ERC20 contract', async function () {
         chainId,
         lootToken.address,
         summoner,
-        await lootToken.name(),
+        'Loot', // name -- replacing await lootToken.name()  with 'Loot' for new signing scope
         summoner.address,
         s1.address,
         500,
