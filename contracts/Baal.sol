@@ -640,7 +640,7 @@ contract Baal is Module {
             _burnShares(msg.sender, sharesToBurn); /*subtract `shares` from user account & Baal totals with erc20 accounting*/
         }
 
-        for (uint256 i; i < tokens.length; i++) {
+        for (uint256 i = 0; i < tokens.length; i++) {
             (, bytes memory balanceData) = tokens[i].staticcall(
                 abi.encodeWithSelector(0x70a08231, address(target))
             ); /*get Baal token balances - 'balanceOf(address)'*/
@@ -991,4 +991,3 @@ contract Baal is Module {
         ); /*checks success & allows non-conforming transfers*/
     }
 }
-

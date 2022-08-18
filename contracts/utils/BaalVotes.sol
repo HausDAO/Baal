@@ -28,7 +28,7 @@ abstract contract BaalVotes is ERC20Permit {
     mapping(address => address) public delegates; /*maps record of each account's `shares` delegate*/
 
     // SIGNATURE HELPERS
-    mapping(address => uint256) public _nonces; /*maps record of states for signing & validating signatures*/
+    /*_nonces come from ERC20Permit*/
     bytes32 constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
     bytes32 constant DOMAIN_TYPEHASH =
@@ -64,7 +64,7 @@ abstract contract BaalVotes is ERC20Permit {
 
     /// @notice Delegate votes from user to `delegatee`.
     /// @param delegatee The address to delegate votes to.
-    function delegate(address delegatee) public virtual {
+    function delegate(address delegatee) external virtual {
         _delegate(msg.sender, delegatee);
     }
 
@@ -184,7 +184,7 @@ abstract contract BaalVotes is ERC20Permit {
     /// @param timeStamp The unix time to check `votes` for.
     /// @return votes Prior `votes` delegated to `account`.
     function getPriorVotes(address account, uint256 timeStamp)
-        public
+        external
         view
         virtual
         returns (uint256 votes)
@@ -218,7 +218,7 @@ abstract contract BaalVotes is ERC20Permit {
     /// @param account The user to check delegated `votes` for.
     /// @return votes Current `votes` delegated to `account`.
     function getCurrentVotes(address account)
-        public
+        external
         view
         virtual
         returns (uint256 votes)
