@@ -2331,12 +2331,13 @@ describe("Baal contract", function () {
         chainId,
         baal.address,
         summoner,
-        deploymentConfig.TOKEN_NAME,
+        "Vote", // deploymentConfig.TOKEN_NAME
         1,
         true
       );
 
-      await baal.submitVoteWithSig(1, true, signature);
+      const {v,r,s} = await ethers.utils.splitSignature(signature);
+      await baal.submitVoteWithSig(summoner.address, 1, true, v, r, s);
       const prop = await baal.proposals(1);
       const nCheckpoints = await sharesToken.numCheckpoints(summoner.address);
       const votes = (
@@ -2348,6 +2349,40 @@ describe("Baal contract", function () {
       );
       expect(priorVotes).to.equal(votes);
       expect(prop.yesVotes).to.equal(votes);
+    });
+
+    it("fail case - fails with different voter", async function () {
+      const signature = await signVote(
+        chainId,
+        baal.address,
+        summoner,
+        "Vote", // deploymentConfig.TOKEN_NAME
+        1,
+        true
+      );
+
+      const {v,r,s} = await ethers.utils.splitSignature(signature);
+      expect(
+        baal.submitVoteWithSig(applicant.address, 1, true, v, r, s)
+      ).to.be.revertedWith("invalid signature");
+    });
+
+    it("fail case - cant vote twice", async function () {
+      const signature = await signVote(
+        chainId,
+        baal.address,
+        summoner,
+        "Vote", // deploymentConfig.TOKEN_NAME
+        1,
+        true
+      );
+
+      const {v,r,s} = await ethers.utils.splitSignature(signature);
+      await baal.submitVoteWithSig(summoner.address, 1, true, v, r, s);
+
+      expect(
+        baal.submitVoteWithSig(summoner.address, 1, true, v, r, s)
+      ).to.be.revertedWith("voted");
     });
   });
 
@@ -3718,11 +3753,7 @@ describe("Baal contract - summon baal with current safe", function () {
         };
 
       expect(expectedAddress).to.equal(addresses.baal);
-
-
       });
     });
-
-
   });
 });

@@ -28,7 +28,6 @@ abstract contract BaalVotes is ERC20Permit {
     mapping(address => address) public delegates; /*maps record of each account's `shares` delegate*/
 
     // SIGNATURE HELPERS
-    /*_nonces come from ERC20Permit*/
     bytes32 constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
