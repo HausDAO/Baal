@@ -2386,7 +2386,7 @@ describe("Baal contract", function () {
     });
   });
 
-  describe("delegateBySig", function () {
+  describe.only("delegateBySig", function () {
     beforeEach(async function () {
       await baal.submitProposal(
         proposal.data,
@@ -2402,7 +2402,7 @@ describe("Baal contract", function () {
         chainId,
         sharesToken.address,
         summoner,
-        'Shares', // deploymentConfig.TOKEN_NAME
+        deploymentConfig.TOKEN_NAME,
         shaman.address,
         nonce,
         expiry
@@ -2421,7 +2421,7 @@ describe("Baal contract", function () {
         chainId,
         sharesToken.address,
         summoner,
-        'Shares', // deploymentConfig.TOKEN_NAME
+        deploymentConfig.TOKEN_NAME,
         shaman.address,
         nonce,
         expiry
@@ -2440,7 +2440,7 @@ describe("Baal contract", function () {
         chainId,
         sharesToken.address,
         summoner,
-        'Shares', // deploymentConfig.TOKEN_NAME
+        deploymentConfig.TOKEN_NAME,
         shaman.address,
         nonce,
         0
