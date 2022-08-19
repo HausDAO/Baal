@@ -2331,7 +2331,7 @@ describe("Baal contract", function () {
         chainId,
         baal.address,
         summoner,
-        "Vote", // deploymentConfig.TOKEN_NAME
+        deploymentConfig.TOKEN_NAME,
         1,
         true
       );
@@ -2356,7 +2356,7 @@ describe("Baal contract", function () {
         chainId,
         baal.address,
         summoner,
-        "Vote", // deploymentConfig.TOKEN_NAME
+        deploymentConfig.TOKEN_NAME,
         1,
         true
       );
@@ -2372,7 +2372,7 @@ describe("Baal contract", function () {
         chainId,
         baal.address,
         summoner,
-        "Vote", // deploymentConfig.TOKEN_NAME
+        deploymentConfig.TOKEN_NAME,
         1,
         true
       );
@@ -2386,7 +2386,7 @@ describe("Baal contract", function () {
     });
   });
 
-  describe.only("delegateBySig", function () {
+  describe("delegateBySig", function () {
     beforeEach(async function () {
       await baal.submitProposal(
         proposal.data,
