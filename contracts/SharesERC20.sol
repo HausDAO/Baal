@@ -32,7 +32,6 @@ contract Shares is BaalVotes {
     {
         baal = IBaal(msg.sender); /*Configure Baal to setup sender*/
         __ERC20_init(name_, symbol_);
-        __ERC20_init("Template", "T");
         __ERC20Permit_init(name_);
     }
 

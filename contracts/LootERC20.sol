@@ -29,7 +29,6 @@ contract Loot is ERC20SnapshotUpgradeable, ERC20PermitUpgradeable {
     function setUp(string memory name_, string memory symbol_) external initializer {
         baal = IBaal(msg.sender); /*Configure Baal to setup sender*/
         __ERC20_init(name_, symbol_);
-        __ERC20_init("Template", "T");
         __ERC20Permit_init(name_);
     }
 
