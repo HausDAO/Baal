@@ -56,6 +56,16 @@ abstract contract BaalVotes is ERC20Permit {
         _moveDelegates(delegates[from], delegates[to], amount);
     }
 
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal virtual override(ERC20) {
+        super._afterTokenTransfer(from, to, amount);
+
+        _moveDelegates(delegates[from], delegates[to], amount);
+    }
+
     /// @notice Delegate votes from user to `delegatee`.
     /// @param delegatee The address to delegate votes to.
     function delegate(address delegatee) external virtual {

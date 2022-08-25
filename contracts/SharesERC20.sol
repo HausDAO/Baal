@@ -3,6 +3,7 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./utils/BaalVotes.sol";
 import "./interfaces/IBaal.sol";
@@ -11,7 +12,7 @@ import "./interfaces/IBaal.sol";
 
 /// @title Shares
 /// @notice Accounting for Baal non voting shares
-contract Shares is ERC20, BaalVotes, Initializable {
+contract Shares is ERC20, BaalVotes, Ownable, Initializable {
     // ERC20 CONFIG
     string private __name; /*Name for ERC20 trackers*/
     string private __symbol; /*Symbol for ERC20 trackers*/
@@ -84,5 +85,13 @@ contract Shares is ERC20, BaalVotes, Initializable {
                 !baal.sharesPaused(),
             "!transferable"
         );
+    }
+
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override(BaalVotes, ERC20) {
+        super._afterTokenTransfer(from, to, amount);
     }
 }

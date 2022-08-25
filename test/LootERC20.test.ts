@@ -34,7 +34,7 @@ async function blockNumber() {
   return block.number
 }
 
-describe('Loot ERC20 contract', async function () {
+describe.only('Loot ERC20 contract', async function () {
   let lootSingleton: Loot
   let LootFactory: ContractFactory
   let MockBaalFactory: ContractFactory
@@ -166,7 +166,7 @@ describe('Loot ERC20 contract', async function () {
 
   })
 
-  describe('erc20 loot - increase allowance with permit', async function () {
+  describe.skip('erc20 loot - increase allowance with permit', async function () {
     it('happy case - increase allowance with valid permit', async function () {
       const deadline = (await blockTime()) + 10000
       const nonce = await lootToken.nonces(summoner.address)
