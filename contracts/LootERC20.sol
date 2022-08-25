@@ -3,7 +3,6 @@ pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20SnapshotUpgradeable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
 import "./interfaces/IBaal.sol";
 
@@ -11,10 +10,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 
 contract Loot is ERC20SnapshotUpgradeable, ERC20PermitUpgradeable {
-    // ERC20 CONFIG
-    string private __name; /*Name for ERC20 trackers*/
-    string private __symbol; /*Symbol for ERC20 trackers*/
-
     // Baal Config
     IBaal public baal;
 
@@ -33,20 +28,9 @@ contract Loot is ERC20SnapshotUpgradeable, ERC20PermitUpgradeable {
     /// @param symbol_ Symbol for ERC20 token trackers
     function setUp(string memory name_, string memory symbol_) external initializer {
         baal = IBaal(msg.sender); /*Configure Baal to setup sender*/
-        __name = name_;
-        __symbol = symbol_;
+        __ERC20_init(name_, symbol_);
         __ERC20_init("Template", "T");
-        __ERC20Permit_init(__name);
-    }
-
-    /// @notice Returns the name of the token.
-    function name() public view override(ERC20Upgradeable) returns (string memory) {
-        return __name;
-    }
-
-    /// @notice Returns the symbol of this token
-    function symbol() public view override(ERC20Upgradeable) returns (string memory) {
-        return __symbol;
+        __ERC20Permit_init(name_);
     }
 
     /// @notice Allows baal to create a snapshot

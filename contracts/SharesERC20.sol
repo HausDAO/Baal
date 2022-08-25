@@ -2,6 +2,7 @@ pragma solidity 0.8.7;
 //SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./utils/BaalVotes.sol";
 import "./interfaces/IBaal.sol";
 
@@ -10,16 +11,15 @@ import "./interfaces/IBaal.sol";
 /// @title Shares
 /// @notice Accounting for Baal non voting shares
 contract Shares is BaalVotes {
-    // ERC20 CONFIG
-    string private __name; /*Name for ERC20 trackers*/
-    string private __symbol; /*Symbol for ERC20 trackers*/
-
     // Baal Config
     IBaal public baal;
 
     modifier baalOnly() {
         require(msg.sender == address(baal), "!auth");
         _;
+    }
+    constructor() {
+        _disableInitializers();
     }
 
     /// @notice Configure shares - called by Baal on summon
@@ -31,20 +31,9 @@ contract Shares is BaalVotes {
         initializer
     {
         baal = IBaal(msg.sender); /*Configure Baal to setup sender*/
-        __name = name_;
-        __symbol = symbol_;
-        __ERC20Permit_init(__name);
+        __ERC20_init(name_, symbol_);
         __ERC20_init("Template", "T");
-    }
-
-    /// @notice Returns the name of the token.
-    function name() public view override(ERC20Upgradeable) returns (string memory) {
-        return __name;
-    }
-
-    /// @notice Returns the symbol of this token
-    function symbol() public view override(ERC20Upgradeable) returns (string memory) {
-        return __symbol;
+        __ERC20Permit_init(name_);
     }
 
     /// @notice Baal-only function to mint shares.
