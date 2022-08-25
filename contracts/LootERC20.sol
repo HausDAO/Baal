@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20SnapshotUpgradeable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
 import "./interfaces/IBaal.sol";
 
-contract Loot is ERC20, ERC20Snapshot, ERC20Permit, Initializable {
+import "@openzeppelin/contracts/utils/Address.sol";
+
+
+contract Loot is ERC20SnapshotUpgradeable, ERC20PermitUpgradeable {
     // ERC20 CONFIG
     string private __name; /*Name for ERC20 trackers*/
     string private __symbol; /*Symbol for ERC20 trackers*/
@@ -21,28 +23,29 @@ contract Loot is ERC20, ERC20Snapshot, ERC20Permit, Initializable {
         _;
     }
 
-    constructor() ERC20("Template", "T") ERC20Permit("Loot") initializer {}
+    constructor() {
+        _disableInitializers();
+    }
 
     /// @notice Configure loot - called by Baal on summon
     /// @dev initializer should prevent this from being called again
     /// @param name_ Name for ERC20 token trackers
     /// @param symbol_ Symbol for ERC20 token trackers
-    function setUp(string memory name_, string memory symbol_)
-        external
-        initializer
-    {
+    function setUp(string memory name_, string memory symbol_) external initializer {
         baal = IBaal(msg.sender); /*Configure Baal to setup sender*/
         __name = name_;
         __symbol = symbol_;
+        __ERC20_init("Template", "T");
+        __ERC20Permit_init(__name);
     }
 
     /// @notice Returns the name of the token.
-    function name() public view override(ERC20) returns (string memory) {
+    function name() public view override(ERC20Upgradeable) returns (string memory) {
         return __name;
     }
 
     /// @notice Returns the symbol of this token
-    function symbol() public view override(ERC20) returns (string memory) {
+    function symbol() public view override(ERC20Upgradeable) returns (string memory) {
         return __symbol;
     }
 
@@ -74,7 +77,7 @@ contract Loot is ERC20, ERC20Snapshot, ERC20Permit, Initializable {
         address from,
         address to,
         uint256 amount
-    ) internal override(ERC20, ERC20Snapshot) {
+    ) internal override(ERC20Upgradeable, ERC20SnapshotUpgradeable) {
         super._beforeTokenTransfer(from, to, amount);
         require(
             from == address(0) || /*Minting allowed*/
