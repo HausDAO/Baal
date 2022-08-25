@@ -1,9 +1,7 @@
 pragma solidity 0.8.13;
 //SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "./utils/BaalVotes.sol";
 import "./interfaces/IBaal.sol";
 
@@ -11,7 +9,7 @@ import "./interfaces/IBaal.sol";
 
 /// @title Shares
 /// @notice Accounting for Baal non voting shares
-contract Shares is ERC20, BaalVotes, Initializable {
+contract Shares is BaalVotes {
     // ERC20 CONFIG
     string private __name; /*Name for ERC20 trackers*/
     string private __symbol; /*Symbol for ERC20 trackers*/
@@ -24,8 +22,6 @@ contract Shares is ERC20, BaalVotes, Initializable {
         _;
     }
 
-    constructor() ERC20("Template", "T") ERC20Permit("Shares") initializer {} /*Configure template to be unusable*/
-
     /// @notice Configure shares - called by Baal on summon
     /// @dev initializer should prevent this from being called again
     /// @param name_ Name for ERC20 token trackers
@@ -37,15 +33,17 @@ contract Shares is ERC20, BaalVotes, Initializable {
         baal = IBaal(msg.sender); /*Configure Baal to setup sender*/
         __name = name_;
         __symbol = symbol_;
+        __ERC20Permit_init(__name);
+        __ERC20_init("Template", "T");
     }
 
     /// @notice Returns the name of the token.
-    function name() public view override(ERC20) returns (string memory) {
+    function name() public view override(ERC20Upgradeable) returns (string memory) {
         return __name;
     }
 
     /// @notice Returns the symbol of this token
-    function symbol() public view override(ERC20) returns (string memory) {
+    function symbol() public view override(ERC20Upgradeable) returns (string memory) {
         return __symbol;
     }
 
@@ -76,7 +74,7 @@ contract Shares is ERC20, BaalVotes, Initializable {
         address from,
         address to,
         uint256 amount
-    ) internal override(BaalVotes, ERC20) {
+    ) internal override(BaalVotes) {
         super._beforeTokenTransfer(from, to, amount);
         require(
             from == address(0) || /*Minting allowed*/
