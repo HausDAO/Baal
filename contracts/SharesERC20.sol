@@ -3,6 +3,9 @@ pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+
 import "./utils/BaalVotes.sol";
 import "./interfaces/IBaal.sol";
 
@@ -10,7 +13,7 @@ import "./interfaces/IBaal.sol";
 
 /// @title Shares
 /// @notice Accounting for Baal non voting shares
-contract Shares is BaalVotes {
+contract Shares is BaalVotes, OwnableUpgradeable, UUPSUpgradeable {
     // Baal Config
     IBaal public baal;
 
@@ -71,4 +74,6 @@ contract Shares is BaalVotes {
             "!transferable"
         );
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
