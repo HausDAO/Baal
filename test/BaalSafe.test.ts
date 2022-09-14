@@ -82,6 +82,7 @@ const revertMessages = {
   permitNotAuthorized: "!authorized",
   permitExpired: "expired",
   notEnoughGas: "not enough gas",
+  OwnableCallerIsNotTheOwner: "Ownable: caller is not the owner",
 };
 
 const STATES = {
@@ -545,6 +546,20 @@ describe("Baal contract", function () {
     // })
   });
   describe("token ownership", function () {
+    it.only("can not transfer ownership when not owner", async function () {
+      expect(await lootToken.owner()).to.equal(baal.address);
+
+      await expect(lootToken.transferOwnership(summoner.address)).to.be.revertedWith(
+        revertMessages.OwnableCallerIsNotTheOwner
+        );
+    });
+    it.only("can not be upgraded when not owner", async function () {
+      expect(await lootToken.owner()).to.equal(baal.address);
+
+      await expect(lootToken.upgradeTo(sharesToken.address)).to.be.revertedWith(
+        revertMessages.OwnableCallerIsNotTheOwner
+        );
+    });
     it.only("can renounce loot token ownership", async function () {
       expect(await lootToken.owner()).to.equal(baal.address);
 
@@ -619,6 +634,46 @@ describe("Baal contract", function () {
         .withArgs(1, true, false);
 
         expect(await lootToken.owner()).to.equal(gnosisSafe.address);
+    });
+    it.skip("can eject and upgrade token", async function () {
+      expect(await lootToken.owner()).to.equal(baal.address);
+      // todo: transfer ownership of shares
+      const transferOwnershipAction = await lootToken.interface.encodeFunctionData(
+        "transferOwnership",
+        [gnosisSafe.address]
+      );
+
+      const transferOwnershipFromBaal = await baal.interface.encodeFunctionData(
+        "executeAsBaal",
+        [lootToken.address, 0, transferOwnershipAction]
+      );
+
+      await expect(submitAndProcessProposal(baal, transferOwnershipFromBaal, 1))
+        .to.emit(baal, "ProcessProposal")
+        .withArgs(1, true, false);
+
+      expect(await lootToken.owner()).to.equal(gnosisSafe.address);
+      // todo: not working
+      const addOwnerToSafe = gnosisSafe.interface.encodeFunctionData(
+        "addOwnerWithThreshold",
+        [summoner.address,1]
+      );
+
+      const addOwnerToSafeAction = encodeMultiAction(
+        multisend,
+        [addOwnerToSafe],
+        [gnosisSafe.address],
+        [BigNumber.from(0)],
+        [0]
+      );
+      await baal.submitProposal(addOwnerToSafeAction, 0, 0, "");
+      const proposalId = await baal.proposalCount();
+      await baal.submitVote(proposalId, true);
+      await moveForwardPeriods(2);
+      await baal.processProposal(proposalId, addOwnerToSafeAction)
+
+      expect(await gnosisSafe.isOwner(summoner.address)).to.equal(true);
+      // todo: upgrade token contracts to remove baal deps
     });
   });
   describe("shaman actions - permission level 7 (full)", function () {
