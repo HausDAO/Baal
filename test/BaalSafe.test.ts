@@ -489,7 +489,7 @@ describe("Baal contract", function () {
   });
 
   describe("constructor", function () {
-    it("verify deployment parameters", async function () {
+    it.only("verify deployment parameters", async function () {
       const now = await blockTime();
 
       // const decimals = await baal.decimals()
@@ -543,6 +543,83 @@ describe("Baal contract", function () {
     //   const decoded = decodeMultiAction(multisend, encoded)
     //   console.log({ decoded })
     // })
+  });
+  describe("token ownership", function () {
+    it.only("can renounce loot token ownership", async function () {
+      expect(await lootToken.owner()).to.equal(baal.address);
+
+
+      const renounceAction = await lootToken.interface.encodeFunctionData(
+        "renounceOwnership"
+      );
+
+      const renounceFromBaal = await baal.interface.encodeFunctionData(
+        "executeAsBaal",
+        [lootToken.address, 0, renounceAction]
+      );
+
+      await expect(submitAndProcessProposal(baal, renounceFromBaal, 1))
+        .to.emit(baal, "ProcessProposal")
+        .withArgs(1, true, false);
+
+        expect(await lootToken.owner()).to.equal(zeroAddress);
+    });
+    it.only("can renounce shares token ownership", async function () {
+      expect(await sharesToken.owner()).to.equal(baal.address);
+
+      const renounceAction = await sharesToken.interface.encodeFunctionData(
+        "renounceOwnership"
+      );
+
+      const renounceFromBaal = await baal.interface.encodeFunctionData(
+        "executeAsBaal",
+        [sharesToken.address, 0, renounceAction]
+      );
+
+      await expect(submitAndProcessProposal(baal, renounceFromBaal, 1))
+        .to.emit(baal, "ProcessProposal")
+        .withArgs(1, true, false);
+
+        expect(await sharesToken.owner()).to.equal(zeroAddress);
+    });
+    it.only("can change shares token ownership to avatar", async function () {
+      expect(await sharesToken.owner()).to.equal(baal.address);
+
+      const transferOwnershipAction = await sharesToken.interface.encodeFunctionData(
+        "transferOwnership",
+        [gnosisSafe.address]
+      );
+
+      const transferOwnershipFromBaal = await baal.interface.encodeFunctionData(
+        "executeAsBaal",
+        [sharesToken.address, 0, transferOwnershipAction]
+      );
+
+      await expect(submitAndProcessProposal(baal, transferOwnershipFromBaal, 1))
+        .to.emit(baal, "ProcessProposal")
+        .withArgs(1, true, false);
+
+        expect(await sharesToken.owner()).to.equal(gnosisSafe.address);
+    });
+    it.only("can change loot token ownership to avatar", async function () {
+      expect(await lootToken.owner()).to.equal(baal.address);
+
+      const transferOwnershipAction = await lootToken.interface.encodeFunctionData(
+        "transferOwnership",
+        [gnosisSafe.address]
+      );
+
+      const transferOwnershipFromBaal = await baal.interface.encodeFunctionData(
+        "executeAsBaal",
+        [lootToken.address, 0, transferOwnershipAction]
+      );
+
+      await expect(submitAndProcessProposal(baal, transferOwnershipFromBaal, 1))
+        .to.emit(baal, "ProcessProposal")
+        .withArgs(1, true, false);
+
+        expect(await lootToken.owner()).to.equal(gnosisSafe.address);
+    });
   });
   describe("shaman actions - permission level 7 (full)", function () {
     it("setAdminConfig", async function () {

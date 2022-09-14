@@ -261,7 +261,7 @@ contract Baal is Module, EIP712, ReentrancyGuard {
                 IBaalToken(_lootSingleton).setUp.selector, 
                 string(abi.encodePacked(_name, " LOOT")), 
                 string(abi.encodePacked(_symbol, "-LOOT")))
-                )));
+        )));
 
         require(_sharesSingleton != address(0), "!sharesSingleton");
 

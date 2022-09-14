@@ -36,6 +36,8 @@ contract Shares is BaalVotes, OwnableUpgradeable, UUPSUpgradeable {
         baal = IBaal(msg.sender); /*Configure Baal to setup sender*/
         __ERC20_init(name_, symbol_);
         __ERC20Permit_init(name_);
+        __Ownable_init();
+
     }
 
     /// @notice Baal-only function to mint shares.

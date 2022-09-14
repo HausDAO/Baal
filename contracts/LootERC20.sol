@@ -39,6 +39,7 @@ contract Loot is
         baal = IBaal(msg.sender); /*Configure Baal to setup sender*/
         __ERC20_init(name_, symbol_);
         __ERC20Permit_init(name_);
+        __Ownable_init();
     }
 
     /// @notice Allows baal to create a snapshot
