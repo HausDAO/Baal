@@ -306,6 +306,7 @@ describe("Baal contract", function () {
   let GnosisSafe: ContractFactory;
   let gnosisSafeSingleton: GnosisSafe;
   let gnosisSafe: GnosisSafe;
+  let gnosisSafe1: GnosisSafe;
 
   let GnosisSafeProxyFactory: ContractFactory;
   let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
@@ -451,6 +452,7 @@ describe("Baal contract", function () {
 
     baal = BaalFactory.attach(addresses.baal) as Baal;
     gnosisSafe = BaalFactory.attach(addresses.safe) as GnosisSafe;
+    gnosisSafe1 = GnosisSafe.attach(addresses.safe) as GnosisSafe;
 
     shamanBaal = baal.connect(shaman); // needed to send txns to baal as the shaman
     applicantBaal = baal.connect(applicant); // needed to send txns to baal as the shaman
@@ -635,7 +637,7 @@ describe("Baal contract", function () {
 
         expect(await lootToken.owner()).to.equal(gnosisSafe.address);
     });
-    it.skip("can eject and upgrade token", async function () {
+    it.only("can eject and upgrade token", async function () {
       expect(await lootToken.owner()).to.equal(baal.address);
       // todo: transfer ownership of shares
       const transferOwnershipAction = await lootToken.interface.encodeFunctionData(
@@ -654,7 +656,7 @@ describe("Baal contract", function () {
 
       expect(await lootToken.owner()).to.equal(gnosisSafe.address);
       // todo: not working
-      const addOwnerToSafe = gnosisSafe.interface.encodeFunctionData(
+      const addOwnerToSafe = gnosisSafe1.interface.encodeFunctionData(
         "addOwnerWithThreshold",
         [summoner.address,1]
       );
@@ -672,8 +674,10 @@ describe("Baal contract", function () {
       await moveForwardPeriods(2);
       await baal.processProposal(proposalId, addOwnerToSafeAction)
 
-      expect(await gnosisSafe.isOwner(summoner.address)).to.equal(true);
+      expect(await gnosisSafe1.isOwner(summoner.address)).to.equal(true);
       // todo: upgrade token contracts to remove baal deps
+      // call from safe
+      // remove baal module 
     });
   });
   describe("shaman actions - permission level 7 (full)", function () {
