@@ -16,26 +16,22 @@ import "../interfaces/IBaal.sol";
 contract BaalLessShares is BaalVotes, OwnableUpgradeable, UUPSUpgradeable {
     // Baal Config
     IBaal public baal;
-    uint256 public version = 2;
+    uint8 public version;
 
     constructor() {
         _disableInitializers();
     }
 
     /// @notice Configure shares - called by Baal on summon
-    /// @dev initializer should prevent this from being called again
-    /// @param name_ Name for ERC20 token trackers
-    /// @param symbol_ Symbol for ERC20 token trackers
-    function setUp(string memory name_, string memory symbol_)
+    /// @param _version new version
+    function setUp(uint8 _version)
         external
-        initializer
+        reinitializer(_version)
     {
         baal = IBaal(address(0)); /*Configure Baal to setup sender*/
-        __ERC20_init(name_, symbol_);
-        __ERC20Permit_init(name_);
-        __Ownable_init();
-
+        version = _version;
     }
+
 
     /// @notice owner-only function to mint shares.
     /// @param recipient Address to receive shares
