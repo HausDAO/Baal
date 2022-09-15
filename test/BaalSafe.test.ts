@@ -656,28 +656,42 @@ describe("Baal contract", function () {
 
       expect(await lootToken.owner()).to.equal(gnosisSafe.address);
       // todo: not working
-      const addOwnerToSafe = gnosisSafe1.interface.encodeFunctionData(
-        "addOwnerWithThreshold",
-        [summoner.address,1]
+      const addModuleToSafe = gnosisSafe1.interface.encodeFunctionData(
+        "enableModule",
+        [summoner.address]
       );
 
-      const addOwnerToSafeAction = encodeMultiAction(
+      const addModuleToSafeAction = encodeMultiAction(
         multisend,
-        [addOwnerToSafe],
+        [addModuleToSafe],
         [gnosisSafe.address],
         [BigNumber.from(0)],
         [0]
       );
-      await baal.submitProposal(addOwnerToSafeAction, 0, 0, "");
+      await baal.submitProposal(addModuleToSafeAction, 0, 0, "");
       const proposalId = await baal.proposalCount();
       await baal.submitVote(proposalId, true);
       await moveForwardPeriods(2);
-      await baal.processProposal(proposalId, addOwnerToSafeAction)
+      await baal.processProposal(proposalId, addModuleToSafeAction)
 
-      expect(await gnosisSafe1.isOwner(summoner.address)).to.equal(true);
+      expect(await gnosisSafe1.isModuleEnabled(summoner.address)).to.equal(true);
       // todo: upgrade token contracts to remove baal deps
       // call from safe
       // remove baal module 
+      const upgradeToken = lootToken.interface.encodeFunctionData(
+        "upgradeTo",
+        [sharesToken.address]
+      );
+      const upgradeAction = encodeMultiAction(
+        multisend,
+        [upgradeToken],
+        [lootToken.address],
+        [BigNumber.from(0)],
+        [0]
+      );
+      const gnosisSafeAsModule = await gnosisSafe1.connect(summoner.address);
+      await gnosisSafeAsModule.execTransactionFromModule(lootToken.address, 0, upgradeToken, 0);
+      
     });
   });
   describe("shaman actions - permission level 7 (full)", function () {
