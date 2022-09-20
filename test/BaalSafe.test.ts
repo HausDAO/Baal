@@ -493,7 +493,7 @@ describe("Baal contract", function () {
   });
 
   describe("constructor", function () {
-    it.only("verify deployment parameters", async function () {
+    it("verify deployment parameters", async function () {
       const now = await blockTime();
 
       // const decimals = await baal.decimals()
@@ -549,21 +549,21 @@ describe("Baal contract", function () {
     // })
   });
   describe("token ownership", function () {
-    it.only("can not transfer ownership when not owner", async function () {
+    it("can not transfer ownership when not owner", async function () {
       expect(await lootToken.owner()).to.equal(baal.address);
 
       await expect(lootToken.transferOwnership(summoner.address)).to.be.revertedWith(
         revertMessages.OwnableCallerIsNotTheOwner
         );
     });
-    it.only("can not be upgraded when not owner", async function () {
+    it("can not be upgraded when not owner", async function () {
       expect(await lootToken.owner()).to.equal(baal.address);
 
       await expect(lootToken.upgradeTo(sharesToken.address)).to.be.revertedWith(
         revertMessages.OwnableCallerIsNotTheOwner
         );
     });
-    it.only("can renounce loot token ownership", async function () {
+    it("can renounce loot token ownership", async function () {
       expect(await lootToken.owner()).to.equal(baal.address);
 
 
@@ -582,7 +582,7 @@ describe("Baal contract", function () {
 
         expect(await lootToken.owner()).to.equal(zeroAddress);
     });
-    it.only("can renounce shares token ownership", async function () {
+    it("can renounce shares token ownership", async function () {
       expect(await sharesToken.owner()).to.equal(baal.address);
 
       const renounceAction = await sharesToken.interface.encodeFunctionData(
@@ -600,7 +600,7 @@ describe("Baal contract", function () {
 
         expect(await sharesToken.owner()).to.equal(zeroAddress);
     });
-    it.only("can change shares token ownership to avatar", async function () {
+    it("can change shares token ownership to avatar", async function () {
       expect(await sharesToken.owner()).to.equal(baal.address);
 
       const transferOwnershipAction = await sharesToken.interface.encodeFunctionData(
@@ -619,7 +619,7 @@ describe("Baal contract", function () {
 
         expect(await sharesToken.owner()).to.equal(gnosisSafe.address);
     });
-    it.only("can change loot token ownership to avatar", async function () {
+    it("can change loot token ownership to avatar", async function () {
       expect(await lootToken.owner()).to.equal(baal.address);
 
       const transferOwnershipAction = await lootToken.interface.encodeFunctionData(
@@ -638,111 +638,8 @@ describe("Baal contract", function () {
 
         expect(await lootToken.owner()).to.equal(gnosisSafe.address);
     });
-    it.skip("can eject and upgrade token with safe", async function () {
-      // TODO: not working
-      // upgrade token contracts to remove baal deps
-      // call from safe
-      // remove baal module 
 
-      // owner should be baal
-      expect(await sharesToken.owner()).to.equal(baal.address);
-      
-      const transferOwnershipAction = await sharesToken.interface.encodeFunctionData(
-        "transferOwnership",
-        [gnosisSafe.address]
-      );
-
-      const transferOwnershipFromBaal = await baal.interface.encodeFunctionData(
-        "executeAsBaal",
-        [sharesToken.address, 0, transferOwnershipAction]
-      );
-
-      // make a proposal to transfer ownership to the safe
-      await expect(submitAndProcessProposal(baal, transferOwnershipFromBaal, 1))
-        .to.emit(baal, "ProcessProposal")
-        .withArgs(1, true, false);
-
-      expect(await sharesToken.owner()).to.equal(gnosisSafe.address);
-      const tokenAsNoneOwner = await sharesToken.connect(summoner.address);
-      // expect(await tokenAsNoneOwner.mint(summoner.address, 100)).to.be.reverted;
-      
-      const addModuleToSafe = gnosisSafe1.interface.encodeFunctionData(
-        "enableModule",
-        [summoner.address]
-      );
-
-      const addModuleToSafeAction = encodeMultiAction(
-        multisend,
-        [addModuleToSafe],
-        [gnosisSafe.address],
-        [BigNumber.from(0)],
-        [0]
-      );
-      // make a proposal to add a eoa as a module (summoner)
-      await baal.submitProposal(addModuleToSafeAction, 0, 0, "");
-      const proposalId = await baal.proposalCount();
-      await baal.submitVote(proposalId, true);
-      await moveForwardPeriods(2);
-      await baal.processProposal(proposalId, addModuleToSafeAction)
-
-      // should have new eoa module
-      expect(await gnosisSafe1.isModuleEnabled(summoner.address)).to.equal(true);
-
-      let BaalLessSharesFactory: ContractFactory;
-
-      BaalLessSharesFactory = await ethers.getContractFactory("BaalLessShares");
-      const baalLessSharesSingleton = (await BaalLessSharesFactory.deploy()) as BaalLessShares;
-
-
-      const upgradeToken = sharesToken.interface.encodeFunctionData(
-        "upgradeToAndCall",
-        [baalLessSharesSingleton.address,
-         baalLessSharesSingleton.interface.encodeFunctionData("setUp", [
-            2
-        ])]
-      );
-
-      const eoaAsModule = await gnosisSafe1.connect(summoner);
-      console.log("run execute");
-      
-      // upgrade token from eoa module (safe is owner)
-      await eoaAsModule.callStatic.execTransactionFromModule(
-        sharesToken.address, 
-        0, 
-        upgradeToken,
-        0);
-      
-      console.log("executed");
-      
-      const newTokenInterface = baalLessSharesSingleton.attach(sharesToken.address);
-      expect(await newTokenInterface.baal()).to.equal(zeroAddress);
-      
-      // disable old baal module
-      // const dissableModule = gnosisSafe1.interface.encodeFunctionData(
-      //   "disableModule",
-      //   [summoner.address, baal.address]
-      // );
-      // await eoaAsModule.callStatic.execTransactionFromModule(gnosisSafe1.address, 0, dissableModule, 0);
-      // expect(await gnosisSafe1.isModuleEnabled(baal.address)).to.equal(false);
-
-      // after upgrade token should have same balances
-      // after upgrade token should have a version
-      expect(await sharesToken.balanceOf(summoner.address)).to.equal(100);
-      expect(await newTokenInterface.version()).to.equal(2);
-      expect(await newTokenInterface.baal()).to.equal(zeroAddress);
-
-      const tokenAsNewOwner = await sharesToken.connect(summoner.address);
-
-      // new owner should be able to mint
-      // should this be the safe actually
-      await tokenAsNewOwner.mint(summoner.address, 100);
-
-      expect(await sharesToken.balanceOf(summoner.address)).to.equal(200);
-
-      
-    });
-
-    it.only("can eject and upgrade token with eoa", async function () {
+    it("can eject and upgrade token with eoa", async function () {
       // upgrade token contracts to remove baal deps
       // call from safe
       // remove baal module 
