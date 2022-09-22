@@ -31,12 +31,6 @@ contract Baal is Module, EIP712, ReentrancyGuard {
 
     address private constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE; /*ETH reference for redemptions*/
 
-    // ADMIN PARAMETERS
-    bool public lootPaused; /*tracks transferability of `loot` economic weight - amendable through 'period'[2] proposal*/
-    bool public sharesPaused; /*tracks transferability of erc20 `shares` - amendable through 'period'[2] proposal*/
-
-    // MANAGER PARAMS
-
     // GOVERNANCE PARAMS
     uint32 public votingPeriod; /* voting period in seconds - amendable through 'period'[2] proposal*/
     uint32 public gracePeriod; /*time delay after proposal voting period for processing*/
@@ -272,8 +266,8 @@ contract Baal is Module, EIP712, ReentrancyGuard {
         );
 
         emit SetupComplete(
-            lootPaused,
-            sharesPaused,
+            lootToken.paused(),
+            sharesToken.paused(),
             gracePeriod,
             votingPeriod,
             proposalOffering,
@@ -713,20 +707,14 @@ contract Baal is Module, EIP712, ReentrancyGuard {
         baalOrAdminOnly
     {
 
-        sharesPaused = pauseShares; /*set pause `shares`*/
-        lootPaused = pauseLoot; /*set pause `loot`*/
-
-        // TODO: only call these if needed
         if(pauseShares && !sharesToken.paused()){
             sharesToken.pause();
-        } 
-        if(!pauseShares && sharesToken.paused()){
+        } else if(!pauseShares && sharesToken.paused()){
             sharesToken.unpause();
         }
         if(pauseLoot && !lootToken.paused()){
             lootToken.pause();
-        } 
-        if(!pauseLoot && lootToken.paused()){
+        } else if(!pauseLoot && lootToken.paused()){
             lootToken.unpause();
         }
 
