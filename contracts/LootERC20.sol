@@ -82,5 +82,11 @@ contract Loot is
         );
     }
 
+    /// @notice disable renounce ownership
+    /// @dev If ownership is renounced by the DAO all onlyOwner functions are disabled
+    function renounceOwnership() public override view onlyOwner {
+        revert("always needs an owner");
+    }
+
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
