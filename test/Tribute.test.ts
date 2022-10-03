@@ -89,7 +89,7 @@ const getNewBaalAddresses = async (
 const deploymentConfig = {
   GRACE_PERIOD_IN_SECONDS: 43200,
   VOTING_PERIOD_IN_SECONDS: 432000,
-  PROPOSAL_OFFERING: 0,
+  PROPOSAL_OFFERING: 69,
   SPONSOR_THRESHOLD: 1,
   MIN_RETENTION_PERCENT: 0,
   MIN_STAKING_PERCENT: 0,
@@ -183,7 +183,7 @@ const getBaalParams = async function (
   };
 };
 
-describe.only("Tribute proposal type", function () {
+describe("Tribute proposal type", function () {
   let baal: Baal;
   let lootSingleton: Loot;
   let LootFactory: ContractFactory;
@@ -379,7 +379,8 @@ describe.only("Tribute proposal type", function () {
         encodedProposal,
         proposal.expiration,
         0,
-        ethers.utils.id(proposal.details)
+        ethers.utils.id(proposal.details),
+        {value: deploymentConfig.PROPOSAL_OFFERING}
       );
       await baal.submitVote(1, yes);
       await moveForwardPeriods(2);
@@ -422,13 +423,15 @@ describe.only("Tribute proposal type", function () {
         encodedProposal,
         proposal.expiration,
         0,
-        ethers.utils.id(proposal.details)
+        ethers.utils.id(proposal.details),
+        {value: deploymentConfig.PROPOSAL_OFFERING}
       );
       await baal.submitProposal(
         maliciousProposal,
         proposal.expiration,
         0,
-        ethers.utils.id(proposal.details)
+        ethers.utils.id(proposal.details),
+        {value: deploymentConfig.PROPOSAL_OFFERING}
       );
       await baal.submitVote(1, no);
       await baal.submitVote(2, yes);
@@ -466,7 +469,8 @@ describe.only("Tribute proposal type", function () {
         1007,
         proposal.expiration,
         proposal.baalGas,
-        "tribute"
+        "tribute",
+        {value: deploymentConfig.PROPOSAL_OFFERING}
       );
       await baal.sponsorProposal(1);
       await baal.submitVote(1, yes);
@@ -498,5 +502,28 @@ describe.only("Tribute proposal type", function () {
       );
       expect(await applicantWeth.balanceOf(gnosisSafe.address)).to.equal(100);
     });
+    it("fails to tribute without offering", async function () {
+      const applicantTributeMinion = tributeMinion.connect(applicant);
+
+      expect(await applicantWeth.balanceOf(gnosisSafe.address)).to.equal(0);
+      expect(await applicantWeth.balanceOf(applicant.address)).to.equal(1000);
+
+      const cuurentShares = await sharesToken.balanceOf(applicant.address);
+
+      await applicantWeth.approve(tributeMinion.address, 10000);
+
+      await expect(applicantTributeMinion.submitTributeProposal(
+        baal.address,
+        applicantWeth.address,
+        100,
+        1234,
+        1007,
+        proposal.expiration,
+        proposal.baalGas,
+        "tribute"
+      )).to.be.revertedWith("Baal requires an offering");
+      
+    });
   });
+  
 });
