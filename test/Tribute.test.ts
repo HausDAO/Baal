@@ -183,7 +183,7 @@ const getBaalParams = async function (
   };
 };
 
-describe("Tribute proposal type", function () {
+describe.only("Tribute proposal type", function () {
   let baal: Baal;
   let lootSingleton: Loot;
   let LootFactory: ContractFactory;
@@ -347,6 +347,7 @@ describe("Tribute proposal type", function () {
       data: selfTransferAction,
       details: "all hail baal",
       expiration: 0,
+      baalGas: 0,
     };
   });
 
@@ -464,6 +465,7 @@ describe("Tribute proposal type", function () {
         1234,
         1007,
         proposal.expiration,
+        proposal.baalGas,
         "tribute"
       );
       await baal.sponsorProposal(1);
