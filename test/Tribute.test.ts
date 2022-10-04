@@ -90,7 +90,7 @@ const deploymentConfig = {
   GRACE_PERIOD_IN_SECONDS: 43200,
   VOTING_PERIOD_IN_SECONDS: 432000,
   PROPOSAL_OFFERING: 69,
-  SPONSOR_THRESHOLD: 1,
+  SPONSOR_THRESHOLD: 101,
   MIN_RETENTION_PERCENT: 0,
   MIN_STAKING_PERCENT: 0,
   QUORUM_PERCENT: 0,
@@ -298,7 +298,7 @@ describe("Tribute proposal type", function () {
       [[shaman.address], [7]],
       [
         [summoner.address, applicant.address],
-        [shares, shares],
+        [shares + 1, shares],
       ],
       [
         [summoner.address, applicant.address],
@@ -502,13 +502,60 @@ describe("Tribute proposal type", function () {
       );
       expect(await applicantWeth.balanceOf(gnosisSafe.address)).to.equal(100);
     });
+    it("should not fail to tribute without offering", async function () {
+      const currentShares = await sharesToken.balanceOf(summoner.address);
+      // CONDITION: Member should be able to self-sponsor if shares >= SPONSOR_THRESHOLD
+      expect(currentShares.gte(BigNumber.from(deploymentConfig.SPONSOR_THRESHOLD)));
+
+      const summonerTributeMinion = tributeMinion.connect(summoner);
+      const requestedShares = 1234;
+      const tribute = 1000;
+      const tributeToken = weth.connect(summoner);
+
+      expect(await tributeToken.balanceOf(gnosisSafe.address)).to.equal(0);
+      expect(await tributeToken.balanceOf(summoner.address)).to.gte(tribute);
+
+      await tributeToken.approve(tributeMinion.address, tribute);
+
+      await summonerTributeMinion.submitTributeProposal(
+        baal.address,
+        tributeToken.address,
+        tribute,
+        requestedShares,
+        0,
+        proposal.expiration,
+        proposal.baalGas,
+        "tribute"
+      );
+
+      await baal.submitVote(1, yes);
+      await moveForwardPeriods(2);
+
+      const encodedProposal = await tributeMinion.encodeTributeProposal(
+        baal.address,
+        requestedShares,
+        0,
+        summoner.address,
+        1,
+        tributeMinion.address
+      );
+
+      await baal.processProposal(1, encodedProposal);
+
+      expect(await sharesToken.balanceOf(summoner.address))
+        .to.eq(
+          currentShares.add(BigNumber.from(requestedShares)),
+        );
+    });
     it("fails to tribute without offering", async function () {
+      const currentShares = await sharesToken.balanceOf(applicant.address);
+      // CONDITION: Member should send tribute if shares < SPONSOR_THRESHOLD
+      expect(currentShares.lt(BigNumber.from(deploymentConfig.SPONSOR_THRESHOLD)));
+
       const applicantTributeMinion = tributeMinion.connect(applicant);
 
       expect(await applicantWeth.balanceOf(gnosisSafe.address)).to.equal(0);
       expect(await applicantWeth.balanceOf(applicant.address)).to.equal(1000);
-
-      const cuurentShares = await sharesToken.balanceOf(applicant.address);
 
       await applicantWeth.approve(tributeMinion.address, 10000);
 
