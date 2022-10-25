@@ -1,6 +1,8 @@
 [
   {
     version: "1.0.0",
+    networks: ["mainnet", "gnosischain", "goerli"],
+    deployer: "0xef76a8298Bad65436c7D848aB76FF987Aeebe145",
     addresses: {
       lootSingleton: "0xacD725Cf8906dAD85Fda40a0D621DCE2C1F99563",
       sharesSingleton: "0xADC05EFd6fC78028901deF7C2AC6f61AF0E4C8fb",
