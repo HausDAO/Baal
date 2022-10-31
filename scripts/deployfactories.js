@@ -1,10 +1,4 @@
-const { ethers } = require('hardhat');
-
-// Test Deploy Values 
-
-// deploy templates
-// deploy dao factory
-// deploy higher order factory 
+const { ethers, upgrades } = require('hardhat');
 
 const _shamans = {
     4: [''],
@@ -17,14 +11,15 @@ const _shamans = {
 // same default for all networks, but different sometimes
 // https://github.com/gnosis/zodiac/blob/master/src/factory/constants.ts#L20
 // https://github.com/safe-global/safe-deployments/tree/main/src/assets
-// moduleProxyFactory default 0x00000000062c52e29e8029dc2413172f6d619d85 goerli, optimism and arbitrum at 0x270c012B6C2A61153e8A6d82F2Cb4F88ddB7fD5E
+// moduleProxyFactory https://github.com/gnosis/zodiac/blob/master/src/factory/constants.ts#L21
 const _addresses = {
 	gnosisSingleton: "0xd9db270c1b5e3bd161e8c8503c55ceabee709552",
 	gnosisFallbackLibrary: "0xf48f2b2d2a534e402487b3ee7c18c33aec0fe5e4",
 	gnosisMultisendLibrary: "0xa238cbeb142c10ef7ad8442c6d1f9e89e07e7761",
 	poster: "0x000000000000cd17345801aa8147b8D3950260FF",
 	gnosisSafeProxyFactory: "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
-	moduleProxyFactory: "0x00000000062c52e29e8029dc2413172f6d619d85",
+	moduleProxyFactory: "0x00000000000DC7F163742Eb4aBEf650037b1f588",
+	DAO: "0x0000000000000000000000000000000000000000" // Daohaus protocol zodiac baal avatar
 	}
 
 
@@ -67,9 +62,6 @@ async function main() {
 		ethers.utils.formatEther(await deployer.provider.getBalance(address)),
 		networkCurrency[chainId]
 	);
-
-	// const network = await ethers.provider.getNetwork()
-    // chainId = network.chainId
 	
 	console.log('start deploy');
 
@@ -94,7 +86,11 @@ async function main() {
 	const BaalSummoner = await ethers.getContractFactory('BaalSummoner')
 	
 
-    const baalSummoner = (await BaalSummoner.deploy(
+	// deploy proxy upgrades
+	baalSummoner = await upgrades.deployProxy(BaalSummoner);
+	await baalSummoner.deployed();
+	// set addresses of templates and libraries
+	await baalSummoner.setAddr(
 		baalSingleton.address, 
 		_addresses.gnosisSingleton, 
 		_addresses.gnosisFallbackLibrary, 
@@ -102,9 +98,16 @@ async function main() {
 		_addresses.gnosisSafeProxyFactory,
 		_addresses.moduleProxyFactory,
 		lootSingleton.address,
-		sharesSingleton.address))
-    
-	await baalSummoner.deployed();
+		sharesSingleton.address
+	);
+
+	// transfer ownership to DAO
+	if(_addresses.DAO=="0x0000000000000000000000000000000000000000"){
+		console.log("You need to transferownership");
+	} else {
+		console.log("transffering ownership too: ", _addresses.DAO);
+		await baalSummoner.transderOwnership(_addresses.DAO);
+	}
 
 	const txHash = baalSummoner.deployTransaction.hash;
 	const receipt = await deployer.provider.getTransactionReceipt(txHash);

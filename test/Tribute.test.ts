@@ -1,4 +1,4 @@
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { solidity } from "ethereum-waffle";
 import { use, expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
@@ -311,7 +311,11 @@ describe("Tribute proposal type", function () {
     const proxy = await GnosisSafeProxyFactory.deploy();
     const moduleProxyFactory = await ModuleProxyFactory.deploy();
 
-    baalSummoner = (await BaalSummoner.deploy(
+    // deploy proxy upgrades
+    baalSummoner = await upgrades.deployProxy(BaalSummoner) as BaalSummoner;
+    await baalSummoner.deployed();
+    // set addresses of templates and libraries
+    await baalSummoner.setAddrs(
       baalSingleton.address,
       gnosisSafeSingleton.address,
       handler.address,
@@ -320,7 +324,7 @@ describe("Tribute proposal type", function () {
       moduleProxyFactory.address,
       lootSingleton.address,
       sharesSingleton.address,
-    )) as BaalSummoner;
+    );
 
     const addresses = await setupBaal(
       baalSingleton,

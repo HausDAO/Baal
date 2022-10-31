@@ -1,4 +1,4 @@
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { solidity } from "ethereum-waffle";
 import { use, expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
@@ -428,7 +428,11 @@ describe("Baal contract", function () {
     moduleProxyFactory =
       (await ModuleProxyFactory.deploy()) as ModuleProxyFactory;
 
-    baalSummoner = (await BaalSummoner.deploy(
+    // deploy proxy upgrades
+    baalSummoner = await upgrades.deployProxy(BaalSummoner) as BaalSummoner;
+    await baalSummoner.deployed();
+    // set addresses of templates and libraries
+    await baalSummoner.setAddrs(
       baalSingleton.address,
       gnosisSafeSingleton.address,
       handler.address,
@@ -437,7 +441,7 @@ describe("Baal contract", function () {
       moduleProxyFactory.address,
       lootSingleton.address,
       sharesSingleton.address,
-    )) as BaalSummoner;
+    );
 
     encodedInitParams = await getBaalParams(
       baalSingleton,
@@ -3588,7 +3592,11 @@ describe("Baal contract - offering required", function () {
     moduleProxyFactory =
       (await ModuleProxyFactory.deploy()) as ModuleProxyFactory;
 
-    baalSummoner = (await BaalSummoner.deploy(
+    // deploy proxy upgrades
+    baalSummoner = await upgrades.deployProxy(BaalSummoner) as BaalSummoner;
+    await baalSummoner.deployed();
+    // set addresses of templates and libraries
+    await baalSummoner.setAddrs(
       baalSingleton.address,
       gnosisSafeSingleton.address,
       handler.address,
@@ -3597,7 +3605,7 @@ describe("Baal contract - offering required", function () {
       moduleProxyFactory.address,
       lootSingleton.address,
       sharesSingleton.address,
-    )) as BaalSummoner;
+    );
 
     const encodedInitParams = await getBaalParams(
       baalSingleton,
@@ -3906,8 +3914,11 @@ describe("Baal contract - summon baal with current safe", function () {
 
         const moduleFactory = await ModuleProxyFactory.deploy();
 
-
-        baalSummoner = (await BaalSummoner.deploy(
+        // deploy proxy upgrades
+        baalSummoner = await upgrades.deployProxy(BaalSummoner) as BaalSummoner;
+        await baalSummoner.deployed();
+        // set addresses of templates and libraries
+        await baalSummoner.setAddrs(
           baalSingleton.address,
           gnosisSafeSingleton.address,
           handler.address,
@@ -3916,7 +3927,7 @@ describe("Baal contract - summon baal with current safe", function () {
           moduleProxyFactory.address,
           lootSingleton.address,
           sharesSingleton.address,
-        )) as BaalSummoner;
+        );
 
         const encodedInitParams = await getBaalParamsWithAvatar(
           baalSingleton,

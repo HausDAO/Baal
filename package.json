@@ -53,6 +53,7 @@
   "dependencies": {
     "@gnosis.pm/zodiac": "^1.0.3",
     "@opengsn/contracts": "2.2.5",
+    "@openzeppelin/hardhat-upgrades": "^1.21.0",
     "hardhat-contract-sizer": "^2.4.0"
   }
 }

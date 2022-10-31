@@ -4,28 +4,29 @@ pragma solidity 0.8.7;
 import "@gnosis.pm/zodiac/contracts/factory/ModuleProxyFactory.sol";
 import "@gnosis.pm/safe-contracts/contracts/proxies/GnosisSafeProxyFactory.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./Baal.sol";
 
-contract BaalSummoner is ModuleProxyFactory {
-    address payable public immutable template; // fixed template for baal using eip-1167 proxy pattern
+contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    address payable public template; // fixed template for baal using eip-1167 proxy pattern
 
     // Template contract to use for new Gnosis safe proxies
-    address public immutable gnosisSingleton;
+    address public gnosisSingleton;
 
     // Library to use for EIP1271 compatability
-    address public immutable gnosisFallbackLibrary;
+    address public gnosisFallbackLibrary;
 
     // Library to use for all safe transaction executions
-    address public immutable gnosisMultisendLibrary;
+    address public gnosisMultisendLibrary;
 
     // template contract to clone for loot ERC20 token
-    address public immutable lootSingleton;
+    address public lootSingleton;
 
     // template contract to clone for shares ERC20 token
-    address public immutable sharesSingleton;
+    address public sharesSingleton;
 
     // Proxy summoners
     //
@@ -46,7 +47,12 @@ contract BaalSummoner is ModuleProxyFactory {
         address daoAddress
     );
 
-    constructor(
+    function initialize() initializer public {
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+    }
+
+    function setAddrs(
         address payable _template,
         address _gnosisSingleton,
         address _gnosisFallbackLibrary,
@@ -55,7 +61,7 @@ contract BaalSummoner is ModuleProxyFactory {
         address _moduleProxyFactory,
         address _lootSingleton,
         address _sharesSingleton
-    ) {
+    ) public onlyOwner {
         require(_lootSingleton != address(0), "!lootSingleton");
         require(_sharesSingleton != address(0), "!sharesSingleton");
         require(_gnosisSingleton != address(0), "!gnosisSingleton");
@@ -259,4 +265,10 @@ contract BaalSummoner is ModuleProxyFactory {
 
         return (address(_baal));
     }
+
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        onlyOwner
+        override
+    {}
 }
