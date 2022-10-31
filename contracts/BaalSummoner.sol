@@ -154,7 +154,7 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
     }
 
     function deployAndSetupSafe(address _moduleAddr, uint256 _saltNonce)
-        internal
+        public
         returns (address)
     {
         // Deploy new safe but do not set it up yet
