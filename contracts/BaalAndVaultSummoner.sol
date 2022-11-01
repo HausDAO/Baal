@@ -9,11 +9,7 @@ interface IBAALSUMMONER {
     function deployAndSetupSafe(address _moduleAddr, uint256 _saltNonce)
         external
         returns (address);
-    function summonBaal(
-        bytes calldata initializationParams,
-        bytes[] calldata initializationActions,
-        uint256 _saltNonce
-    ) external returns (address);
+
     function summonBaalFromReferrer(
         bytes calldata initializationParams,
         bytes[] calldata initializationActions,
@@ -30,7 +26,6 @@ Acts as a register and the owner of the contract or DAO can deactivate
 Owner of the contract can add new vaults, and set current vaults
 Contract is upgradable and should be owned by a DAO
 todo: should an existing Vault be able to be added to a dao (would require enableModule on Safe)
-todo: should there be more roles, like a delegated maintainer role, maybe a referrer address has admin 
 */
 contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
@@ -40,14 +35,19 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
     struct Vault{
         uint256 id;
         bool active;
-        bytes32 referrer;
         address daoAddress;
         address vaultAddress;
     }
     mapping(uint256 => Vault) public vaults;
+    mapping(address => address) public delegates;
 
     event SetVault(
         Vault vault
+    );
+
+    event SetDelegate(
+        address daoAddress,
+        address delegate
     );
 
     function initialize() initializer public {
@@ -55,7 +55,7 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
         __UUPSUpgradeable_init();
     }
 
-    function setAddrs(
+    function setSummonerAddr(
         address baalSummoner
     ) public onlyOwner {
         require(baalSummoner != address(0), "zero address");
@@ -79,21 +79,21 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
             _daoAddress, 
             saltNonce + block.timestamp // todo better way to get new salt?
         );
-        _setNewVault(referrer, _daoAddress, _vaultAddress);
+        _setNewVault( _daoAddress, _vaultAddress);
 
     }
 
-    /** Add a Vault to an existing DAO */
+    /** create and add a Vault(safe) to an existing DAO */
+    // TODO: should this be a permissioned function: owner, dao members?
     function summonVault(
         address daoAddress,
-        uint256 saltNonce,
-        bytes32 referrer
+        uint256 saltNonce
     ) external returns (address _vaultAddress) {
         _vaultAddress = _baalSummoner.deployAndSetupSafe(
             daoAddress, 
             saltNonce + block.timestamp
         );
-        _setNewVault(referrer, daoAddress, _vaultAddress);
+        _setNewVault(daoAddress, _vaultAddress);
     }
 
     /** set a Vault as active or not on existing dao (owner only) */
@@ -107,12 +107,11 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
 
     /** set a new Vault as active on existing dao (owner only) */
     function setNewVault(
-        bytes32 referrer, 
         address daoAddress, 
         address vaultAddress
     ) public onlyOwner
     {
-        _setNewVault(referrer, daoAddress, vaultAddress);
+        _setNewVault(daoAddress, vaultAddress);
     }
 
     /** 
@@ -125,10 +124,22 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
         address daoAddress
     ) external
     {
-        require(msg.sender == daoAddress, "!DAO");
+        require(msg.sender == daoAddress || msg.sender == delegates[daoAddress], "not DAO or delegate");
         require(vaults[id].daoAddress == daoAddress,"!DAO vault");
         _setVault(id, false);
     }
+
+    /** Allow a Dao to set a delegate that can manage vault enteries */
+    function setDelegate(
+        address daoAddress,
+        address delegate
+    ) external
+    {
+        require(msg.sender == daoAddress, "!DAO");
+        delegates[daoAddress] = delegate;
+        emit SetDelegate(daoAddress, delegate);
+    }
+
 
     function _setVault(
         uint256 id, 
@@ -140,13 +151,12 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
     }
 
     function _setNewVault(
-        bytes32 referrer, 
         address daoAddress, 
         address vaultAddress
     ) internal 
     {
         vaultIdx += 1;
-        vaults[vaultIdx] = Vault(vaultIdx, true, referrer, daoAddress, vaultAddress);
+        vaults[vaultIdx] = Vault(vaultIdx, true, daoAddress, vaultAddress);
         emit SetVault(vaults[vaultIdx]);
     }
 
