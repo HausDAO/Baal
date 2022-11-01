@@ -119,13 +119,13 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
     Not allowing DAOs to add existing vaults because they could add bad data
     todo: let daos add existing vaults
     */
-    function disableVaultAsDao(
+    function deactivateVaultAsDao(
         uint256 id,
         address daoAddress
     ) external
     {
         require(msg.sender == daoAddress || msg.sender == delegates[daoAddress], "not DAO or delegate");
-        require(vaults[id].daoAddress == daoAddress,"!DAO vault");
+        require(vaults[id].daoAddress == daoAddress && vaults[id].active,"!not active DAO vault");
         _setVault(id, false);
     }
 
