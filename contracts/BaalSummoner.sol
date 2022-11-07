@@ -28,10 +28,16 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
     // template contract to clone for shares ERC20 token
     address public sharesSingleton;
 
+    uint256 addrVersion;
+
     // Proxy summoners
     //
     GnosisSafeProxyFactory gnosisSafeProxyFactory;
     ModuleProxyFactory moduleProxyFactory;
+
+    event SetAddrsVersion(
+        uint256 version
+    );
 
     event SummonBaal(
         address indexed baal,
@@ -78,6 +84,11 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
         moduleProxyFactory = ModuleProxyFactory(_moduleProxyFactory);
         lootSingleton = _lootSingleton;
         sharesSingleton = _sharesSingleton;
+
+        emit SetAddrsVersion(
+        addrVersion++
+        );
+        
     }
 
     function encodeMultisend(bytes[] memory _calls, address _target)
@@ -116,6 +127,7 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
             );
     }
 
+    // todo: maybe get rid of this and have refferer in all
     function summonBaalFromReferrer(
         bytes calldata initializationParams,
         bytes[] calldata initializationActions,
@@ -134,7 +146,11 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
         return daoAddress;
     }
 
-    function deployTokens(string memory _name, string memory _symbol) internal returns (address lootToken, address sharesToken) {
+    // deploy new share and loot contracts
+    function deployTokens(string memory _name, string memory _symbol) 
+        public 
+        returns (address lootToken, address sharesToken) 
+    {
         lootToken = address(new ERC1967Proxy(
             lootSingleton,
             abi.encodeWithSelector(
@@ -208,25 +224,31 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
         bytes[] calldata initializationActions,
         uint256 _saltNonce
     ) internal returns (address) {
+        require(addrVersion > 0, "!initialized");
         uint256 existingAddrs; // 1 tokens, 2 safe, 3 both
         (
-            string memory _name, /*_name Name for erc20 `shares` accounting*/
-            string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting*/
-            address _safeAddr, /*address of safe*/
+            string memory _name, /*_name Name for erc20 `shares` accounting, empty if token */
+            string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting, empty if token*/
+            address _safeAddr, /*address of safe, 0 addr if new*/
             address _forwarder, /*Trusted forwarder address for meta-transactions (EIP 2771)*/
-            address _lootToken, /*predeployed loot token*/
-            address _sharesToken /*predeployed shares token*/
+            address _lootToken, /*predeployed loot token, 0 addr if new*/
+            address _sharesToken /*predeployed shares token, 0 addr if new*/
         ) = abi.decode(initializationParams, (string, string, address, address, address, address));
 
         Baal _baal = Baal(
             moduleProxyFactory.deployModule(template, abi.encodeWithSignature("avatar()"), _saltNonce)
         );
 
+        // if loot or shares are zero address new tokens are deployed
+        // tokens need to be baalTokens
         if(_lootToken == address(0) || _sharesToken == address(0)){
             (_lootToken, _sharesToken) = deployTokens(_name, _symbol);
         } else {
             existingAddrs += 1;
         }
+
+        // if zero address deploy a new safe
+        // Needs to be a valid zodiac treasury
         if(_safeAddr == address(0)){
             _safeAddr = deployAndSetupSafe(address(_baal), _saltNonce);
         } else {

@@ -19,7 +19,7 @@ const _addresses = {
 	poster: "0x000000000000cd17345801aa8147b8D3950260FF",
 	gnosisSafeProxyFactory: "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
 	moduleProxyFactory: "0x00000000000DC7F163742Eb4aBEf650037b1f588",
-	DAO: "0x0000000000000000000000000000000000000000" // Daohaus protocol zodiac baal avatar
+	DAO: "0x0000000000000000000000000000000000000000" // Change to Daohaus protocol zodiac baal avatar
 	}
 
 
