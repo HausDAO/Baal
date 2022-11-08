@@ -1,0 +1,761 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0xdc694D5D7Dc0B7BB057C5e87CA2EF5908bB12CE0",
+      "txHash": "0xfd8615740285abb5b6c7e93524dff1f303dbdb26901016a0f215e79aba54df38",
+      "kind": "uups"
+    },
+    {
+      "address": "0xbf097Bf332E37D6055f42Db878e6c409031c84c9",
+      "txHash": "0x898ca0c798b439904e571f97a48ea31c901db0b95aa8da11f67cadc95342a1d6",
+      "kind": "uups"
+    },
+    {
+      "address": "0x09e49Cb6f5ed8DAAf17Cf3059171974c94a7393f",
+      "txHash": "0xae26628027f0326a911e0357fc40c0a0d717ad7ead4a811650562e66ee1733de",
+      "kind": "uups"
+    },
+    {
+      "address": "0x144222d2C98D7C68dDF8D609D273D28B6d79f502",
+      "txHash": "0xc72b296e3f86138d3342317c414b27d1911ff217f622eba300b25768d3042381",
+      "kind": "uups"
+    },
+    {
+      "address": "0x804D4a01523C4f4e83b5352A630542Ae6eC99323",
+      "txHash": "0x8a7f83e3e2f41156c9a08eba14d04798b04eb3833ebcecab12f6d32565f5d795",
+      "kind": "uups"
+    },
+    {
+      "address": "0xCeEB238A0413850E3867cb9dCE394CD57Db8D451",
+      "txHash": "0x5b2c4f1b3cd3317351e8a09bd59630612ce7bbac0a312af0f3399129fd6b0297",
+      "kind": "uups"
+    },
+    {
+      "address": "0x0De84DCAc3B2d52581120059ee9723FDDecCB044",
+      "txHash": "0x7e834b1d61af5530ff79861ae91c368ffe222a6261928d4c1d2aaf03933ca903",
+      "kind": "uups"
+    },
+    {
+      "address": "0x0C5fd8AAdF995e11E5Ac1CD72139Ee4fd72cDeFC",
+      "txHash": "0x60a645fc4242ec3090733d70b2786268d55174d05dbb0149e4f38558fbd9c32d",
+      "kind": "uups"
+    },
+    {
+      "address": "0x69fF4b0281802473E1b515c5123a0855Ea38c1FE",
+      "txHash": "0x6632217172a49f3b7919f556887b2da93c749e3d3be4ea1f19dce8dabdb73485",
+      "kind": "uups"
+    },
+    {
+      "address": "0x34f1F0585A4a8ca62e9573940f77aD25FbdED860",
+      "txHash": "0xcd9cb152a713d14fd088a70afae189d2a32322c7228a849cc6507cc0b466874b",
+      "kind": "uups"
+    }
+  ],
+  "impls": {
+    "095448ae5eb9b46e563c4598e05ed668ee42f98c0ec7d073104f4465648f2050": {
+      "address": "0xB21a21c457073074C28d004a4800E1cf3438fD13",
+      "txHash": "0x69f61eb8dec749c4cb079ca15d2ca05bd448821a457ede65016ce313a88ec3b8",
+      "layout": {
+        "solcVersion": "0.8.7",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "label": "template",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_address_payable",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:14"
+          },
+          {
+            "label": "gnosisSingleton",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:17"
+          },
+          {
+            "label": "gnosisFallbackLibrary",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:20"
+          },
+          {
+            "label": "gnosisMultisendLibrary",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:23"
+          },
+          {
+            "label": "lootSingleton",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:26"
+          },
+          {
+            "label": "sharesSingleton",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:29"
+          },
+          {
+            "label": "addrVersion",
+            "offset": 0,
+            "slot": "207",
+            "type": "t_uint256",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:31"
+          },
+          {
+            "label": "gnosisSafeProxyFactory",
+            "offset": 0,
+            "slot": "208",
+            "type": "t_contract(GnosisSafeProxyFactory)3163",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:35"
+          },
+          {
+            "label": "moduleProxyFactory",
+            "offset": 0,
+            "slot": "209",
+            "type": "t_contract(ModuleProxyFactory)3550",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:36"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(GnosisSafeProxyFactory)3163": {
+            "label": "contract GnosisSafeProxyFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ModuleProxyFactory)3550": {
+            "label": "contract ModuleProxyFactory",
+            "numberOfBytes": "20"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "90fc869298afd36643d7a944efb9693ce8373d6d8540f70cc7c3f17635279072": {
+      "address": "0xF79e91fe9C068C1331Ef72C2baC28A0711B54AB1",
+      "txHash": "0x92c6dd98da1c7b81141d34b4d7e99b6e250cba3636c8f7c232ba74fc9be736d7",
+      "layout": {
+        "solcVersion": "0.8.7",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "label": "template",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_address_payable",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:14"
+          },
+          {
+            "label": "gnosisSingleton",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:17"
+          },
+          {
+            "label": "gnosisFallbackLibrary",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:20"
+          },
+          {
+            "label": "gnosisMultisendLibrary",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:23"
+          },
+          {
+            "label": "lootSingleton",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:26"
+          },
+          {
+            "label": "sharesSingleton",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:29"
+          },
+          {
+            "label": "addrVersion",
+            "offset": 0,
+            "slot": "207",
+            "type": "t_uint256",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:31"
+          },
+          {
+            "label": "gnosisSafeProxyFactory",
+            "offset": 0,
+            "slot": "208",
+            "type": "t_contract(GnosisSafeProxyFactory)3163",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:35"
+          },
+          {
+            "label": "moduleProxyFactory",
+            "offset": 0,
+            "slot": "209",
+            "type": "t_contract(ModuleProxyFactory)3550",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:36"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(GnosisSafeProxyFactory)3163": {
+            "label": "contract GnosisSafeProxyFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ModuleProxyFactory)3550": {
+            "label": "contract ModuleProxyFactory",
+            "numberOfBytes": "20"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "219e9a7c316c15058d3767bb00e46abbd06f239bb647e8c936e2c81681592093": {
+      "address": "0xD38C630e73b7326c07C914De8C42cC4Ad1c0B662",
+      "txHash": "0xb81d89bbbc182f29136b2b1223cd869dc598d25ff2fea7c435a08dd086c59b58",
+      "layout": {
+        "solcVersion": "0.8.7",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "label": "template",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_address_payable",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:14"
+          },
+          {
+            "label": "gnosisSingleton",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:17"
+          },
+          {
+            "label": "gnosisFallbackLibrary",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:20"
+          },
+          {
+            "label": "gnosisMultisendLibrary",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:23"
+          },
+          {
+            "label": "lootSingleton",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:26"
+          },
+          {
+            "label": "sharesSingleton",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_address",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:29"
+          },
+          {
+            "label": "addrsVersion",
+            "offset": 0,
+            "slot": "207",
+            "type": "t_uint256",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:31"
+          },
+          {
+            "label": "gnosisSafeProxyFactory",
+            "offset": 0,
+            "slot": "208",
+            "type": "t_contract(GnosisSafeProxyFactory)3163",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:35"
+          },
+          {
+            "label": "moduleProxyFactory",
+            "offset": 0,
+            "slot": "209",
+            "type": "t_contract(ModuleProxyFactory)3550",
+            "contract": "BaalSummoner",
+            "src": "contracts/BaalSummoner.sol:36"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(GnosisSafeProxyFactory)3163": {
+            "label": "contract GnosisSafeProxyFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ModuleProxyFactory)3550": {
+            "label": "contract ModuleProxyFactory",
+            "numberOfBytes": "20"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "16a1f5f0bc491b222a7a2cc425a91a4bcc8101fe700d2d8ed5940b363d4395b7": {
+      "address": "0xe79D3F4DDc5A1E72A812eC1Bf51780a26797C4C9",
+      "txHash": "0x9935ddd43d57ae85a2e572588d5b9ffa81668240497570e8c30906cd086929fe",
+      "layout": {
+        "solcVersion": "0.8.7",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:211"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "label": "_baalSummoner",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_contract(IBAALSUMMONER)12884",
+            "contract": "BaalAndVaultSummoner",
+            "src": "contracts/BaalAndVaultSummoner.sol:32"
+          },
+          {
+            "label": "vaultIdx",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_uint256",
+            "contract": "BaalAndVaultSummoner",
+            "src": "contracts/BaalAndVaultSummoner.sol:33"
+          },
+          {
+            "label": "vaults",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_mapping(t_uint256,t_struct(Vault)12906_storage)",
+            "contract": "BaalAndVaultSummoner",
+            "src": "contracts/BaalAndVaultSummoner.sol:42"
+          },
+          {
+            "label": "delegates",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "BaalAndVaultSummoner",
+            "src": "contracts/BaalAndVaultSummoner.sol:43"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IBAALSUMMONER)12884": {
+            "label": "contract IBAALSUMMONER",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Vault)12906_storage)": {
+            "label": "mapping(uint256 => struct BaalAndVaultSummoner.Vault)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Vault)12906_storage": {
+            "label": "struct BaalAndVaultSummoner.Vault",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "active",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "daoAddress",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "1"
+              },
+              {
+                "label": "vaultAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}

@@ -10,7 +10,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./Baal.sol";
 
-contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract BaalSummoner Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    // when some of the init addresses are updated
+    uint256 public addrsVersion;
+
     address payable public template; // fixed template for baal using eip-1167 proxy pattern
 
     // Template contract to use for new Gnosis safe proxies
@@ -27,8 +30,6 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
 
     // template contract to clone for shares ERC20 token
     address public sharesSingleton;
-
-    uint256 addrVersion;
 
     // Proxy summoners
     //
@@ -58,6 +59,7 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
         __UUPSUpgradeable_init();
     }
 
+    // must be called after deploy to set libraries
     function setAddrs(
         address payable _template,
         address _gnosisSingleton,
@@ -86,7 +88,7 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
         sharesSingleton = _sharesSingleton;
 
         emit SetAddrsVersion(
-        addrVersion++
+        addrsVersion++
         );
         
     }
@@ -127,7 +129,7 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
             );
     }
 
-    // todo: maybe get rid of this and have refferer in all
+    // Add a referrer to help keep track of where deploies are coming from
     function summonBaalFromReferrer(
         bytes calldata initializationParams,
         bytes[] calldata initializationActions,
@@ -169,6 +171,7 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
 
     }
 
+    // deploy a safe with module and single module signer setup
     function deployAndSetupSafe(address _moduleAddr, uint256 _saltNonce)
         public
         returns (address)
@@ -219,30 +222,45 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
         return address(_safe);
     }
 
+    // advanced summon baal with different configurations
+    // name and symbol can be blank if bringing own baal tokens
+    // zero address for either loot or shares token will summon new ones
+    // if bringing own tokens the ownership must be transfered to the new DAO
+    // zero address for Safe with summon and setup a new Safe
+    // if bringing existing safe the new dao must be enabled as a module
+    // todo: add a simple summon that just creates a dao with a single summoner
     function _summonBaal(
         bytes calldata initializationParams,
         bytes[] calldata initializationActions,
         uint256 _saltNonce
     ) internal returns (address) {
-        require(addrVersion > 0, "!initialized");
         uint256 existingAddrs; // 1 tokens, 2 safe, 3 both
         (
             string memory _name, /*_name Name for erc20 `shares` accounting, empty if token */
             string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting, empty if token*/
             address _safeAddr, /*address of safe, 0 addr if new*/
-            address _forwarder, /*Trusted forwarder address for meta-transactions (EIP 2771)*/
+            address _forwarder, /*Trusted forwarder address for meta-transactions (EIP 2771), 0 addr if initially disabled*/
             address _lootToken, /*predeployed loot token, 0 addr if new*/
             address _sharesToken /*predeployed shares token, 0 addr if new*/
         ) = abi.decode(initializationParams, (string, string, address, address, address, address));
 
         Baal _baal = Baal(
-            moduleProxyFactory.deployModule(template, abi.encodeWithSignature("avatar()"), _saltNonce)
+            moduleProxyFactory.deployModule(
+                template, 
+                abi.encodeWithSignature("avatar()"), 
+                _saltNonce
+            )
         );
 
         // if loot or shares are zero address new tokens are deployed
         // tokens need to be baalTokens
         if(_lootToken == address(0) || _sharesToken == address(0)){
             (_lootToken, _sharesToken) = deployTokens(_name, _symbol);
+            // pause tokens by default and transfer to the DAO
+            IBaalToken(_lootToken).pause();
+            IBaalToken(_sharesToken).pause();
+            IBaalToken(_lootToken).transferOwnership(address(_baal));
+            IBaalToken(_sharesToken).transferOwnership(address(_baal));
         } else {
             existingAddrs += 1;
         }
@@ -254,12 +272,6 @@ contract BaalSummoner is ModuleProxyFactory, Initializable, OwnableUpgradeable, 
         } else {
             existingAddrs += 2;
         }
-
-        IBaalToken(_lootToken).pause();
-        IBaalToken(_sharesToken).pause();
-
-        IBaalToken(_lootToken).transferOwnership(address(_baal));
-        IBaalToken(_sharesToken).transferOwnership(address(_baal));
 
         bytes memory _initializationMultisendData = encodeMultisend(
             initializationActions,

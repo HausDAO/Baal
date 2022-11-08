@@ -19,7 +19,7 @@ const _addresses = {
 	poster: "0x000000000000cd17345801aa8147b8D3950260FF",
 	gnosisSafeProxyFactory: "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
 	moduleProxyFactory: "0x00000000000DC7F163742Eb4aBEf650037b1f588",
-	DAO: "0x0000000000000000000000000000000000000000" // Change to Daohaus protocol zodiac baal avatar
+	DAO: "0xCED608Aa29bB92185D9b6340Adcbfa263DAe075b" // Change to Daohaus protocol zodiac baal avatar
 	}
 
 
@@ -67,6 +67,7 @@ async function main() {
 
 	const LootFactory = await ethers.getContractFactory('Loot')
     const lootSingleton = (await LootFactory.deploy())
+	console.log('loot waiting');
 	await lootSingleton.deployed();
 	console.log('loot deploy');
 	console.log('lootSingleton',lootSingleton.address)
@@ -80,17 +81,20 @@ async function main() {
     const baalSingleton = (await BaalFactory.deploy())
 	await baalSingleton.deployed();
 
-	console.log('baal deploy');
 	console.log('baalSingleton',baalSingleton.address)
+	console.log('baal deploy');
 
 	const BaalSummoner = await ethers.getContractFactory('BaalSummoner')
+	const BaalAndVaultSummoner = await ethers.getContractFactory('BaalAndVaultSummoner')
 	
 
 	// deploy proxy upgrades
 	baalSummoner = await upgrades.deployProxy(BaalSummoner);
 	await baalSummoner.deployed();
+	console.log('Factory Contract Address:', baalSummoner.address);
+	console.log('imp:', await upgrades.erc1967.getImplementationAddress(baalSummoner.address));
 	// set addresses of templates and libraries
-	await baalSummoner.setAddr(
+	await baalSummoner.setAddrs(
 		baalSingleton.address, 
 		_addresses.gnosisSingleton, 
 		_addresses.gnosisFallbackLibrary, 
@@ -106,23 +110,30 @@ async function main() {
 		console.log("You need to transferownership");
 	} else {
 		console.log("transffering ownership too: ", _addresses.DAO);
-		await baalSummoner.transderOwnership(_addresses.DAO);
+		await baalSummoner.transferOwnership(_addresses.DAO);
 	}
 
 	const txHash = baalSummoner.deployTransaction.hash;
 	const receipt = await deployer.provider.getTransactionReceipt(txHash);
+
+	// deploy vault factory proxy upgrades
+	baalAndVaultSummoner = await upgrades.deployProxy(BaalAndVaultSummoner);
+	await baalAndVaultSummoner.deployed();
+	console.log('Vault Factory Contract Address:', baalAndVaultSummoner.address);
+	console.log('Vault imp:', await upgrades.erc1967.getImplementationAddress(baalAndVaultSummoner.address));
+	
 	console.log('Transaction Hash:', txHash);
 	console.log('Factory Contract Address:', baalSummoner.address);
 	console.log('Block Number:', receipt.blockNumber);
-	console.log('full verify params:', baalSummoner.address, 
-	baalSingleton.address, 
-	_addresses.gnosisSingleton, 
-	_addresses.gnosisFallbackLibrary, 
-	_addresses.gnosisMultisendLibrary,
-	_addresses.gnosisSafeProxyFactory,
-	_addresses.moduleProxyFactory,
-	lootSingleton.address,
-	sharesSingleton.address);
+	// console.log('full verify params:', baalSummoner.address, 
+	// baalSingleton.address, 
+	// _addresses.gnosisSingleton, 
+	// _addresses.gnosisFallbackLibrary, 
+	// _addresses.gnosisMultisendLibrary,
+	// _addresses.gnosisSafeProxyFactory,
+	// _addresses.moduleProxyFactory,
+	// lootSingleton.address,
+	// sharesSingleton.address);
 	}
 
 

@@ -14,7 +14,7 @@ const _addresses = {
   posterKovan: "0x37A2080f275E26fFEfB6E68F3005826368156C5C",
 };
 
-const DEBUG = false;
+const DEBUG = true;
 
 task(
   "generate",

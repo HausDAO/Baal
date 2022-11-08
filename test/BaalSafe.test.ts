@@ -218,7 +218,7 @@ const getBaalParams = async function (
       [
         config.TOKEN_NAME,
         config.TOKEN_SYMBOL,
-        zeroAddress,
+        zeroAddress, // safe addr
         trustedForwarder,
         lootAddr,
         sharesAddr
