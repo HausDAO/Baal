@@ -56,7 +56,11 @@ contract Loot is
     /// @param recipient Address to receive loot
     /// @param amount Amount to mint
     function mint(address recipient, uint256 amount) external onlyOwner {
-        _mint(recipient, amount);
+        unchecked {
+            if (totalSupply() + amount <= type(uint256).max / 2) {
+                _mint(recipient, amount);
+            }
+        }
     }
 
     /// @notice Baal-only function to burn loot.
