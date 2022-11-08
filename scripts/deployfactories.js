@@ -104,7 +104,7 @@ async function main() {
 		lootSingleton.address,
 		sharesSingleton.address
 	);
-
+  
 	// transfer ownership to DAO
 	if(_addresses.DAO=="0x0000000000000000000000000000000000000000"){
 		console.log("You need to transferownership");
@@ -112,6 +112,7 @@ async function main() {
 		console.log("transffering ownership too: ", _addresses.DAO);
 		await baalSummoner.transferOwnership(_addresses.DAO);
 	}
+
 
 	const txHash = baalSummoner.deployTransaction.hash;
 	const receipt = await deployer.provider.getTransactionReceipt(txHash);
@@ -125,6 +126,7 @@ async function main() {
 	console.log('Transaction Hash:', txHash);
 	console.log('Factory Contract Address:', baalSummoner.address);
 	console.log('Block Number:', receipt.blockNumber);
+
 	// console.log('full verify params:', baalSummoner.address, 
 	// baalSingleton.address, 
 	// _addresses.gnosisSingleton, 
@@ -134,6 +136,7 @@ async function main() {
 	// _addresses.moduleProxyFactory,
 	// lootSingleton.address,
 	// sharesSingleton.address);
+
 	}
 
 

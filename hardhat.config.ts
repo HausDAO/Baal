@@ -110,6 +110,14 @@ const config: HardhatUserConfig = {
         mnemonic: mnemonic(),
       },
     },
+    gnosis: {
+      url: "https://rpc.gnosischain.com/",
+      gas: 5000000,
+      gasPrice: 8000000000,
+      accounts: {
+        mnemonic: mnemonic(),
+      },
+    },
     matic: {
       // url: 'https://rpc-mainnet.maticvigil.com/v1/036f1ba8516f0eee2204a574a960b68437ac8661',
       url: "https://polygon-mainnet.infura.io/v3/cc7ca25d68f246f393d7630842360c47",
@@ -163,7 +171,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 100,
+            runs: 200,
           },
         },
       }
