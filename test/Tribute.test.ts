@@ -90,7 +90,7 @@ const getNewBaalAddresses = async (
 const defaultDAOSettings = {
   GRACE_PERIOD_IN_SECONDS: 43200,
   VOTING_PERIOD_IN_SECONDS: 432000,
-  PROPOSAL_OFFERING: 69,
+  PROPOSAL_OFFERING: 0,
   SPONSOR_THRESHOLD: 1,
   MIN_RETENTION_PERCENT: 0,
   MIN_STAKING_PERCENT: 0,
@@ -499,6 +499,7 @@ describe("Tribute proposal type", function () {
     proposalId: number = 1,
     proposalOffering: number = 0,
   ) => {
+    
     await tributeMinion.submitTributeProposal(
       baal.address,
       tributeToken,
@@ -529,7 +530,6 @@ describe("Tribute proposal type", function () {
 
     const state = await baal.state(proposalId);
     const propStatus = await baal.getProposalStatus(proposalId);
-    console.log({ state, propStatus });
   };
 
   describe("Baal with NO proposal offering - Safe Tribute Proposal", function () {
@@ -568,7 +568,7 @@ describe("Tribute proposal type", function () {
         tribute,
         requestedShares,
         requestedLoot,
-        false,
+        true,
       );
 
       expect(await sharesToken.balanceOf(applicant.address)).to.equal(
@@ -598,7 +598,7 @@ describe("Tribute proposal type", function () {
         tribute,
         requestedShares,
         requestedLoot,
-        false,
+        true,
       );
       expect(await sharesToken.balanceOf(applicant.address)).to.equal(
         requestedShares + parseInt(currentShares.toString())
@@ -657,37 +657,38 @@ describe("Tribute proposal type", function () {
       expect(await applicantWeth.balanceOf(gnosisSafe.address)).to.equal(tribute);
     });
 
-    it("should not fail to tribute without offering", async function () {
-      const currentShares = await sharesToken.balanceOf(summoner.address);
-      // CONDITION: Member should be able to self-sponsor if shares >= SPONSOR_THRESHOLD
-      expect(currentShares.gte(BigNumber.from(daoConfig.SPONSOR_THRESHOLD)));
+    // tribute proposal can not self sponsor because of potential tx.origin issues
+    // it("should not fail to tribute without offering", async function () {
+    //   const currentShares = await sharesToken.balanceOf(summoner.address);
+    //   // CONDITION: Member should be able to self-sponsor if shares >= SPONSOR_THRESHOLD
+    //   expect(currentShares.gte(BigNumber.from(daoConfig.SPONSOR_THRESHOLD)));
 
-      const summonerTributeMinion = tributeMinion.connect(summoner);
-      const requestedShares = 1234;
-      const tribute = 1000;
-      const tributeToken = weth.connect(summoner);
+    //   const summonerTributeMinion = tributeMinion.connect(summoner);
+    //   const requestedShares = 1234;
+    //   const tribute = 1000;
+    //   const tributeToken = weth.connect(summoner);
 
-      expect(await tributeToken.balanceOf(gnosisSafe.address)).to.equal(0);
-      expect(await tributeToken.balanceOf(summoner.address)).to.gte(tribute);
+    //   expect(await tributeToken.balanceOf(gnosisSafe.address)).to.equal(0);
+    //   expect(await tributeToken.balanceOf(summoner.address)).to.gte(tribute);
 
-      await tributeToken.approve(tributeMinion.address, tribute);
+    //   await tributeToken.approve(tributeMinion.address, tribute);
 
-      await submitAndProcessTributeProposal(
-        summonerTributeMinion,
-        baal,
-        summoner.address,
-        tributeToken.address,
-        tribute,
-        requestedShares,
-        0,
-        false,
-      );
+    //   await submitAndProcessTributeProposal(
+    //     summonerTributeMinion,
+    //     baal,
+    //     summoner.address,
+    //     tributeToken.address,
+    //     tribute,
+    //     requestedShares,
+    //     0,
+    //     true,
+    //   );
 
-      expect(await sharesToken.balanceOf(summoner.address))
-        .to.eq(
-          currentShares.add(BigNumber.from(requestedShares)),
-        );
-    });
+    //   expect(await sharesToken.balanceOf(summoner.address))
+    //     .to.eq(
+    //       currentShares.add(BigNumber.from(requestedShares)),
+    //     );
+    // });
 
     it("fails to tribute without offering", async function () {
       const currentShares = await sharesToken.balanceOf(applicant.address);
