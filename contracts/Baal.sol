@@ -322,9 +322,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         );
 
         bool selfSponsor = false; /*plant sponsor flag*/
-        if (sharesToken.getCurrentVotes(_msgSender()) >= sponsorThreshold ||
-            sharesToken.getCurrentVotes(tx.origin) >= sponsorThreshold /*if called by a middleware contract (e.g. minion) & above sponsor threshold*/
-        ) {
+        if (sharesToken.getCurrentVotes(_msgSender()) >= sponsorThreshold ) {
             selfSponsor = true; /*if above sponsor threshold, self-sponsor*/
         } else {
             require(msg.value == proposalOffering, "Baal requires an offering"); /*Optional anti-spam gas token tribute*/
@@ -469,20 +467,21 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         require(balance > 0, "!member"); /* check that user has shares*/
         require(!memberVoted[voter][id], "voted"); /*check vote not already cast*/
 
+        memberVoted[voter][id] = true; /*record voting action to `members` struct per user account*/
+
         unchecked {
             if (approved) {
                 /*if `approved`, cast delegated balance `yesVotes` to proposal*/
                 prop.yesVotes += balance;
-                if (totalSupply() > prop.maxTotalSharesAndLootAtYesVote) {
-                    prop.maxTotalSharesAndLootAtYesVote = totalSupply();
+                uint256 _totalSupply = totalSupply();
+                if (_totalSupply > prop.maxTotalSharesAndLootAtYesVote) {
+                    prop.maxTotalSharesAndLootAtYesVote = _totalSupply;
                 }
             } else {
                 /*otherwise, cast delegated balance `noVotes` to proposal*/
                 prop.noVotes += balance;
             }
         }
-
-        memberVoted[voter][id] = true; /*record voting action to `members` struct per user account*/
 
         emit SubmitVote(voter, balance, id, approved); /*emit event reflecting vote*/
     }
@@ -614,10 +613,8 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         uint256 lootToBurn,
         address[] calldata tokens
     ) external nonReentrant {
-        for (uint256 i = 0; i < tokens.length; i++) {
-            if (i > 0) {
+        for (uint256 i = 1; i < tokens.length; i++) {
                 require(tokens[i] > tokens[i - 1], "!order");
-            }
         }
 
         _ragequit(to, sharesToBurn, lootToBurn, tokens);
@@ -647,12 +644,15 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         }
 
         for (uint256 i = 0; i < tokens.length; i++) {
-            (, bytes memory balanceData) = tokens[i].staticcall(
-                abi.encodeWithSelector(0x70a08231, address(target))
-            ); /*get Baal token balances - 'balanceOf(address)'*/
-            uint256 balance = tokens[i] == ETH
-                ? address(target).balance
-                : abi.decode(balanceData, (uint256)); /*decode Baal token balances for calculation*/
+            uint256 balance;
+            if(tokens[i] == ETH) {
+                balance = address(target).balance;
+            } else {
+                (, bytes memory balanceData) = tokens[i].staticcall(
+                    abi.encodeWithSelector(0x70a08231, address(target))
+                ); /*get Baal token balances - 'balanceOf(address)'*/
+                balance = abi.decode(balanceData, (uint256));
+            }
 
             uint256 amountToRagequit = ((lootToBurn + sharesToBurn) * balance) /
                 _totalSupply; /*calculate 'fair shair' claims*/

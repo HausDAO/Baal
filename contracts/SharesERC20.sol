@@ -28,8 +28,8 @@ contract Shares is BaalVotes, OwnableUpgradeable, PausableUpgradeable, UUPSUpgra
         external
         initializer
     {
-        require(bytes(name_).length != 0, "Sname empty");
-        require(bytes(symbol_).length != 0, "Ssymbol empty");
+        require(bytes(name_).length != 0, "shares: name empty");
+        require(bytes(symbol_).length != 0, "shares: symbol empty");
 
         __ERC20_init(name_, symbol_);
         __ERC20Permit_init(name_);
@@ -52,11 +52,9 @@ contract Shares is BaalVotes, OwnableUpgradeable, PausableUpgradeable, UUPSUpgra
     /// @param recipient Address to receive shares
     /// @param amount Amount to mint
     function mint(address recipient, uint256 amount) external onlyOwner {
-        unchecked {
-            if (totalSupply() + amount <= type(uint256).max / 2) {
-                _mint(recipient, amount);
-            }
-        }
+        // can not be more than half the max because of totalsupply of loot and shares
+        require(totalSupply() + amount <= type(uint256).max / 2, "shares: cap exceeded");
+        _mint(recipient, amount);
     }
 
     /// @notice Baal-only function to burn shares.
@@ -81,7 +79,7 @@ contract Shares is BaalVotes, OwnableUpgradeable, PausableUpgradeable, UUPSUpgra
             from == address(0) || /*Minting allowed*/
                 (msg.sender == owner() && to == address(0)) || /*Burning by Baal allowed*/
                 !paused(),
-            "!transferable"
+            "shares: !transferable"
         );
     }
 
