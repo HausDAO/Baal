@@ -79,6 +79,7 @@ const revertMessages = {
   permitNotAuthorized: "!authorized",
   permitExpired: "expired",
   notEnoughGas: "not enough gas",
+  baalGasToHigh: "baalGas to high",
   OwnableCallerIsNotTheOwner: "Ownable: caller is not the owner",
 };
 
@@ -2707,6 +2708,19 @@ describe("Baal contract", function () {
 
       const state = await baal.state(1);
       expect(state).to.equal(STATES.READY);
+    });
+
+    it("require fail - baalGas to high", async function () {
+      const proposalCount = await baal.proposalCount();
+
+      const baalGas = ethers.utils.parseUnits('30000001', 'gwei');
+      await expect(baal.submitProposal(
+        proposal.data,
+        proposal.expiration,
+        baalGas,
+        ethers.utils.id(proposal.details)
+      )).to.be.revertedWith(revertMessages.baalGasToHigh);
+
     });
 
     it("has enough baalGas", async function () {
