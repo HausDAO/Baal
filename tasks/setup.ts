@@ -383,7 +383,13 @@ task("memberprop", "Submits a new member proposal")
     console.log("tx:", submit.hash);
   });
 
-
+/* example:
+npx hardhat summon --factory 0xe2F42d9fd5C1a590F6c3d6b2A27802C0da93FEb7 
+--summoners [\"0xadc...\"] 
+--shares [\"10000000000000000000\"] --loot [\"10000000000000000000\"] 
+--sharespaused false --lootpaused false 
+--shaman 0xadc... --name gB447  --network goerli
+*/
 task("summon", "Summons a new DAO")
   .addParam("factory", "Dao factory address")
   .addParam(

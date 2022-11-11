@@ -80,7 +80,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         uint256 baalGas; /* gas needed to process proposal */
         uint256 yesVotes; /*counter for `members` `approved` 'votes' to calculate approval on processing*/
         uint256 noVotes; /*counter for `members` 'dis-approved' 'votes' to calculate approval on processing*/
-        uint256 maxTotalSharesAndLootAtYesVote; /* highest share+loot count during any individual yes vote*/
+        uint256 maxTotalSharesAndLootAtVote; /* highest share+loot count during any individual yes vote*/
         bool[4] status; /* [cancelled, processed, passed, actionFailed] */
         address sponsor; /* address of the sponsor - set at sponsor proposal - relevant for cancellation */
         bytes32 proposalDataHash; /*hash of raw data associated with state updates*/
@@ -345,7 +345,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
             baalGas,
             0, /* yes votes */
             0, /* no votes */
-            0, /* highestMaxSharesAndLootAtYesVote */
+            0,
             [false, false, false, false], /* [cancelled, processed, passed, actionFailed] */
             selfSponsor ? _msgSender() : address(0),
             proposalDataHash
@@ -469,14 +469,15 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
 
         memberVoted[voter][id] = true; /*record voting action to `members` struct per user account*/
 
+        // get high water mark on all votes
+        uint256 _totalSupply = totalSupply();
+        if (_totalSupply > prop.maxTotalSharesAndLootAtVote) {
+            prop.maxTotalSharesAndLootAtVote = totalSupply();
+        }
         unchecked {
             if (approved) {
                 /*if `approved`, cast delegated balance `yesVotes` to proposal*/
-                prop.yesVotes += balance;
-                uint256 _totalSupply = totalSupply();
-                if (_totalSupply > prop.maxTotalSharesAndLootAtYesVote) {
-                    prop.maxTotalSharesAndLootAtYesVote = _totalSupply;
-                }
+                prop.yesVotes += balance;    
             } else {
                 /*otherwise, cast delegated balance `noVotes` to proposal*/
                 prop.noVotes += balance;
@@ -527,14 +528,14 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
             okToExecute = false;
 
         // Make proposal fail if it didn't pass quorum
-        if (okToExecute && prop.yesVotes * 100 < quorumPercent * totalShares())
+        if (okToExecute && prop.yesVotes * 100 < quorumPercent * prop.maxTotalSharesAndLootAtVote)
             okToExecute = false;
 
         // Make proposal fail if the minRetentionPercent is exceeded
         if (
             okToExecute &&
             (totalSupply()) <
-            (prop.maxTotalSharesAndLootAtYesVote * minRetentionPercent) / 100 /*Check for dilution since high water mark during voting*/
+            (prop.maxTotalSharesAndLootAtVote * minRetentionPercent) / 100 /*Check for dilution since high water mark during voting*/
         ) {
             okToExecute = false;
         }

@@ -683,7 +683,6 @@ describe("Baal contract", function () {
 
       const sharesTokenAsOwnerEoa = await sharesToken.connect(summoner);
       expect(await baalLessSharesSingleton.version()).to.equal(0);
-      console.log('upgrade');
 
       await sharesTokenAsOwnerEoa.upgradeToAndCall(
         baalLessSharesSingleton.address,
@@ -2390,7 +2389,7 @@ describe("Baal contract", function () {
       );
       expect(priorVotes).to.equal(votes);
       expect(prop.yesVotes).to.equal(votes);
-      expect(prop.maxTotalSharesAndLootAtYesVote).to.equal(shares + loot);
+      expect(prop.maxTotalSharesAndLootAtVote).to.equal(shares + loot);
     });
 
     it("happy case - no vote", async function () {
@@ -2475,14 +2474,14 @@ describe("Baal contract", function () {
       );
       await baal.submitVote(1, yes);
       const prop1 = await baal.proposals(1);
-      expect(prop1.maxTotalSharesAndLootAtYesVote).to.equal(
+      expect(prop1.maxTotalSharesAndLootAtVote).to.equal(
         shares + loot + 100
       );
       await shamanBaal.mintShares([shaman.address], [100]); // add another 100 shares for shaman
       await shamanBaal.submitVote(1, yes);
       const prop = await baal.proposals(1);
       expect(prop.yesVotes).to.equal(200); // 100 summoner and 1st 100 from shaman are counted
-      expect(prop.maxTotalSharesAndLootAtYesVote).to.equal(shares + loot + 200);
+      expect(prop.maxTotalSharesAndLootAtVote).to.equal(shares + loot + 200);
     });
 
     it("scenario - decrease shares during voting", async function () {
@@ -2495,14 +2494,14 @@ describe("Baal contract", function () {
       );
       await baal.submitVote(1, yes);
       const prop1 = await baal.proposals(1);
-      expect(prop1.maxTotalSharesAndLootAtYesVote).to.equal(
+      expect(prop1.maxTotalSharesAndLootAtVote).to.equal(
         shares + loot + 100
       );
       await shamanBaal.ragequit(shaman.address, 50, 0, [weth.address]);
       await shamanBaal.submitVote(1, yes);
       const prop = await baal.proposals(1);
       expect(prop.yesVotes).to.equal(200); // 100 summoner and 1st 100 from shaman are counted (not affected by rq)
-      expect(prop.maxTotalSharesAndLootAtYesVote).to.equal(shares + loot + 100); // unchanged
+      expect(prop.maxTotalSharesAndLootAtVote).to.equal(shares + loot + 100); // unchanged
     });
   });
 
@@ -2906,8 +2905,10 @@ describe("Baal contract", function () {
         ]
       );
 
-      await shamanBaal.mintShares([shaman.address], [900]); // mint 900 shares so summoner has exectly 10% w/ 100 shares
-
+      await shamanBaal.mintShares([shaman.address], [400]); // mint 400 shares to make total supply 1000 so summoner has exectly 10% w/ 100 shares
+      console.log("total supply", (await shamanBaal.totalSupply()).toString());
+      const totalSupply = await shamanBaal.totalSupply();
+      expect(totalSupply).to.equal(1000);
       await baal.submitProposal(
         proposal.data,
         proposal.expiration,
@@ -2922,10 +2923,14 @@ describe("Baal contract", function () {
       const beforeProcessed = await baal.proposals(1);
       await baal.processProposal(1, proposal.data);
       const afterProcessed = await baal.proposals(1);
+      console.log('afterProcessed', afterProcessed.yesVotes.toString());
+      console.log('afterProcessed', afterProcessed.maxTotalSharesAndLootAtVote.toString());
+      
       verifyProposal(afterProcessed, beforeProcessed);
       const state2 = await baal.state(1);
       expect(state2).to.equal(STATES.PROCESSED);
       const propStatus = await baal.getProposalStatus(1);
+      console.log('[false, true, true, false]', propStatus);
       expect(propStatus).to.eql([false, true, true, false]); // passed [3] is true
     });
 

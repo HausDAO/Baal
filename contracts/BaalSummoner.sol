@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./Baal.sol";
 
-contract BaalSummoner Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract BaalSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // when some of the init addresses are updated
     uint256 public addrsVersion;
 
@@ -169,6 +169,8 @@ contract BaalSummoner Initializable, OwnableUpgradeable, UUPSUpgradeable {
                 _symbol)
         ));
 
+        // todo: add event
+
     }
 
     // deploy a safe with module and single module signer setup
@@ -218,6 +220,8 @@ contract BaalSummoner Initializable, OwnableUpgradeable, UUPSUpgradeable {
             0,
             payable(address(0))
         );
+
+        // todo: events
 
         return address(_safe);
     }

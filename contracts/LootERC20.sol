@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20SnapshotUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
 contract Loot is
@@ -34,12 +34,19 @@ contract Loot is
         __ERC20_init(name_, symbol_);
         __ERC20Permit_init(name_);
         __Pausable_init();
+        __ERC20Snapshot_init();
         __Ownable_init();
+        __UUPSUpgradeable_init();
     }
 
     /// @notice Allows baal to create a snapshot
-    function snapshot() external onlyOwner {
-        _snapshot();
+    function snapshot() external onlyOwner returns(uint256) {
+        return _snapshot();
+    }
+
+    /// @notice get current SnapshotId
+    function getCurrentSnapshotId() external view returns (uint256) {
+        return _getCurrentSnapshotId();
     }
 
     /// @notice Baal-only function to pause shares.
