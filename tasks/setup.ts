@@ -409,6 +409,7 @@ task("summon", "Summons a new DAO")
   .addParam("shaman", "any initial shamans")
   .addParam("name", "share token symbol")
   .addOptionalParam("meta", "updated meta data")
+  .addOptionalParam("withsidecar", "add a vault (factory address)")
   .setAction(async (taskArgs, hre) => {
     const zeroAddress = "0x0000000000000000000000000000000000000000";
     const network = await hre.ethers.provider.getNetwork();
@@ -587,12 +588,29 @@ task("summon", "Summons a new DAO")
     );
 
     const randomSeed = Math.floor(Math.random() * 10000000);
+    let tx;
+    if(taskArgs.withsidecar){
+      const baalVaultSummoner = await hre.ethers.getContractFactory("BaalAndVaultSummoner");
+      const contractVault = await baalVaultSummoner.attach(taskArgs.withsidecar);
+      console.log("summon ball and vault from tasks");
 
-    const tx = await contract.summonBaal(
-      encodedInitParams.initParams,
-      encodedInitParams.initalizationActions,
-      randomSeed
-    );
+      tx = await contractVault.summonBaalAndVault(
+        encodedInitParams.initParams,
+        encodedInitParams.initalizationActions,
+        randomSeed,
+        hre.ethers.utils.formatBytes32String("daohausCLI"),
+        "test cli vault"
+      );
+    } else {
+      console.log("summon ball from tasks");
+      
+      tx = await contract.summonBaalFromReferrer(
+        encodedInitParams.initParams,
+        encodedInitParams.initalizationActions,
+        randomSeed,
+        hre.ethers.utils.formatBytes32String("daohausCLI")
+      );
+    }
 
     console.log(taskArgs);
     console.log("tx:", tx.hash);
