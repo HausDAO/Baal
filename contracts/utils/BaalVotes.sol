@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.7;
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
+import "./DelegationEIP712Upgradeable.sol";
 
 /**
  * @dev similar to Openzeplin ERC20Votes
@@ -13,8 +14,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
  * power can be queried through the public accessors  {getPriorVotes}.
  *
  */
-abstract contract BaalVotes is ERC20PermitUpgradeable {
-    using ECDSA for bytes32;
+abstract contract BaalVotes is ERC20PermitUpgradeable, DelegationEIP712Upgradeable {
+    using ECDSAUpgradeable for bytes32;
 
     struct Checkpoint {
         /*Baal checkpoint for marking number of delegated votes*/
@@ -26,6 +27,7 @@ abstract contract BaalVotes is ERC20PermitUpgradeable {
     mapping(address => mapping(uint256 => Checkpoint)) public checkpoints; /*maps record of vote `checkpoints` for each account by index*/
     mapping(address => uint256) public numCheckpoints; /*maps number of `checkpoints` for each account*/
     mapping(address => address) public delegates; /*maps record of each account's `shares` delegate*/
+    mapping(address => uint256) public delegationNonces; /*nonces for delegating by signature*/
 
     // SIGNATURE HELPERS
     bytes32 constant DELEGATION_TYPEHASH = keccak256("Delegation(string name,address delegatee,uint256 nonce,uint256 expiry)");
@@ -78,8 +80,8 @@ abstract contract BaalVotes is ERC20PermitUpgradeable {
         bytes32 s
     ) public {
         require(block.timestamp <= expiry, "ERC20Votes: signature expired");
-        address signer = ECDSA.recover(
-            _hashTypedDataV4(
+        address signer = ECDSAUpgradeable.recover(
+            _hashTypedDataV4Delegation(
                 keccak256(
                     abi.encode(
                         DELEGATION_TYPEHASH,
@@ -95,7 +97,9 @@ abstract contract BaalVotes is ERC20PermitUpgradeable {
             s
         );
         require(signer != address(0), "ERC20Votes: invalid signer (0x0)");
-        require(nonce == _useNonce(signer), "ERC20Votes: invalid nonce");
+        require(nonce == delegationNonces[signer], "ERC20Votes: invalid nonce");
+
+        delegationNonces[signer]++;
         _delegate(signer, delegatee);
     }
 

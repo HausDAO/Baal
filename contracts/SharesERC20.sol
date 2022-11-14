@@ -35,6 +35,7 @@ contract Shares is BaalVotes, OwnableUpgradeable, PausableUpgradeable, UUPSUpgra
         __ERC20Permit_init(name_);
         __Pausable_init();
         __Ownable_init();
+        __EIP712_init_delegation("delegation", "4");
 
     }
 
