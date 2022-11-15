@@ -54,6 +54,16 @@ contract BaalSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address daoAddress
     );
 
+    event DeployBaalTokens(
+        address lootToken, 
+        address sharesToken
+    );
+
+    event DeployBaalSafe(
+        address baalSafe,
+        address moduleAddr
+    );
+
     function initialize() initializer public {
         __Ownable_init();
         __UUPSUpgradeable_init();
@@ -169,7 +179,7 @@ contract BaalSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
                 _symbol)
         ));
 
-        // todo: add event
+        emit DeployBaalTokens(lootToken, sharesToken);
 
     }
 
@@ -221,7 +231,7 @@ contract BaalSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             payable(address(0))
         );
 
-        // todo: events
+        emit DeployBaalSafe(address(_safe), address(_moduleAddr));
 
         return address(_safe);
     }
