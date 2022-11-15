@@ -38,6 +38,8 @@ contract Shares is BaalVotes, ERC20SnapshotUpgradeable, OwnableUpgradeable, Paus
         __ERC20Snapshot_init();
         __Ownable_init();
         __UUPSUpgradeable_init();
+        __EIP712_init_delegation("delegation", "4");
+
 
     }
 
