@@ -320,7 +320,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
                 expiration > block.timestamp + votingPeriod + gracePeriod,
             "expired"
         );
-        require(baalGas < 30000000 gwei, "baalGas to high"); /* eth block limit */
+        require(baalGas <= 20000000, "baalGas to high"); /* gwei 2/3 eth block limit */
 
         bool selfSponsor = false; /*plant sponsor flag*/
         if (sharesToken.getCurrentVotes(_msgSender()) >= sponsorThreshold ) {

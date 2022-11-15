@@ -2710,10 +2710,10 @@ describe("Baal contract", function () {
       expect(state).to.equal(STATES.READY);
     });
 
-    it("require fail - baalGas to high", async function () {
+    it.only("require fail - baalGas to high", async function () {
       const proposalCount = await baal.proposalCount();
 
-      const baalGas = ethers.utils.parseUnits('30000001', 'gwei');
+      const baalGas = 30000001;
       await expect(baal.submitProposal(
         proposal.data,
         proposal.expiration,
