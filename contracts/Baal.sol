@@ -323,7 +323,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         require(baalGas < 30000000 gwei, "baalGas to high"); /* eth block limit */
 
         bool selfSponsor = false; /*plant sponsor flag*/
-        if (sharesToken.getCurrentVotes(_msgSender()) >= sponsorThreshold ) {
+        if (sharesToken.getVotes(_msgSender()) >= sponsorThreshold ) {
             selfSponsor = true; /*if above sponsor threshold, self-sponsor*/
         } else {
             require(msg.value == proposalOffering, "Baal requires an offering"); /*Optional anti-spam gas token tribute*/
@@ -376,7 +376,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
     function sponsorProposal(uint32 id) external nonReentrant {
         Proposal storage prop = proposals[id]; /*alias proposal storage pointers*/
 
-        require(sharesToken.getCurrentVotes(_msgSender()) >= sponsorThreshold, "!sponsor"); /*check 'votes > threshold - required to sponsor proposal*/
+        require(sharesToken.getVotes(_msgSender()) >= sponsorThreshold, "!sponsor"); /*check 'votes > threshold - required to sponsor proposal*/
         require(state(id) == ProposalState.Submitted, "!submitted");
         require(
             prop.expiration == 0 ||
@@ -463,7 +463,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         Proposal storage prop = proposals[id]; /*alias proposal storage pointers*/
         require(state(id) == ProposalState.Voting, "!voting");
 
-        uint256 balance = sharesToken.getPriorVotes(voter, prop.votingStarts); /*fetch & gas-optimize voting weight at proposal creation time*/
+        uint256 balance = sharesToken.getPastVotes(voter, prop.votingStarts); /*fetch & gas-optimize voting weight at proposal creation time*/
 
         require(balance > 0, "!member"); /* check that user has shares*/
         require(!memberVoted[voter][id], "voted"); /*check vote not already cast*/
@@ -576,7 +576,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         require(state(id) == ProposalState.Voting, "!voting");
         require(
             _msgSender() == prop.sponsor ||
-                sharesToken.getPriorVotes(prop.sponsor, block.timestamp - 1) <
+                sharesToken.getPastVotes(prop.sponsor, block.timestamp - 1) <
                 sponsorThreshold ||
                 isGovernor(_msgSender()),
             "!cancellable"

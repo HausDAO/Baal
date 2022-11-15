@@ -19,7 +19,7 @@ abstract contract BaalVotes is ERC20PermitUpgradeable, DelegationEIP712Upgradeab
 
     struct Checkpoint {
         /*Baal checkpoint for marking number of delegated votes*/
-        uint32 fromTimeStamp; /*unix time for referencing voting balance*/
+        uint32 fromTimePoint; /*unix time for referencing voting balance*/
         uint256 votes; /*votes at given unix time*/
     }
 
@@ -79,7 +79,7 @@ abstract contract BaalVotes is ERC20PermitUpgradeable, DelegationEIP712Upgradeab
         bytes32 r,
         bytes32 s
     ) public {
-        require(block.timestamp <= expiry, "ERC20Votes: signature expired");
+        require(now() <= expiry, "ERC20Votes: signature expired");
         address signer = ECDSAUpgradeable.recover(
             _hashTypedDataV4Delegation(
                 keccak256(
@@ -163,17 +163,17 @@ abstract contract BaalVotes is ERC20PermitUpgradeable, DelegationEIP712Upgradeab
         uint256 oldVotes,
         uint256 newVotes
     ) private {
-        uint32 timeStamp = uint32(block.timestamp);
+        uint32 timePoint = uint32(now());
 
         unchecked {
             if (
                 nCheckpoints != 0 &&
-                checkpoints[delegatee][nCheckpoints - 1].fromTimeStamp == timeStamp
+                checkpoints[delegatee][nCheckpoints - 1].fromTimePoint == timePoint
             ) {
                 checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
             } else {
                 checkpoints[delegatee][nCheckpoints] = Checkpoint(
-                    timeStamp,
+                    timePoint,
                     newVotes
                 );
                 numCheckpoints[delegatee] = nCheckpoints + 1;
@@ -183,35 +183,41 @@ abstract contract BaalVotes is ERC20PermitUpgradeable, DelegationEIP712Upgradeab
         emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
     }
 
-    /// @notice Returns the prior number of `votes` for `account` as of `timeStamp`.
+    // @notice Returns the current timepoint.
+    /// @return timePoint returns unix epoch timestamp
+    function now() public view returns (uint256 timepoint) {
+        return block.timestamp;
+    }
+
+    /// @notice Returns the prior number of `votes` for `account` as of `timePoint`.
     /// @param account The user to check `votes` for.
-    /// @param timeStamp The unix time to check `votes` for.
-    /// @return votes Prior `votes` delegated to `account`.
-    function getPriorVotes(address account, uint256 timeStamp)
+    /// @param timePoint The unix time to check `votes` for.
+    /// @return votes Past `votes` delegated to `account`.
+    function getPastVotes(address account, uint256 timePoint)
         external
         view
         virtual
         returns (uint256 votes)
     {
-        require(timeStamp < block.timestamp, "!determined"); /* Prior votes must be in the past*/
+        require(timePoint < now(), "!determined"); /* Prior votes must be in the past*/
 
         uint256 nCheckpoints = numCheckpoints[account];
         if (nCheckpoints == 0) return 0;
 
         unchecked {
             if (
-                getCheckpoint(account, nCheckpoints - 1).fromTimeStamp <=
-                timeStamp
-            ) return getCheckpoint(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timestamp, return*/
-            if (getCheckpoint(account, 0).fromTimeStamp > timeStamp) return 0;
+                getCheckpoint(account, nCheckpoints - 1).fromTimePoint <=
+                timePoint
+            ) return getCheckpoint(account, nCheckpoints - 1).votes; /* If most recent checkpoint is at or after desired timepoint, return*/
+            if (getCheckpoint(account, 0).fromTimePoint > timePoint) return 0;
             uint256 lower = 0;
             uint256 upper = nCheckpoints - 1;
             while (upper > lower) {
-                /* Binary search to look for highest timestamp before desired timestamp*/
+                /* Binary search to look for highest timePoint before desired timePoint*/
                 uint256 center = upper - (upper - lower) / 2;
                 Checkpoint memory cp = getCheckpoint(account, center);
-                if (cp.fromTimeStamp == timeStamp) return cp.votes;
-                else if (cp.fromTimeStamp < timeStamp) lower = center;
+                if (cp.fromTimePoint == timePoint) return cp.votes;
+                else if (cp.fromTimePoint < timePoint) lower = center;
                 else upper = center - 1;
             }
             votes = getCheckpoint(account, lower).votes;
@@ -221,7 +227,7 @@ abstract contract BaalVotes is ERC20PermitUpgradeable, DelegationEIP712Upgradeab
     /// @notice Returns the current delegated `vote` balance for `account`.
     /// @param account The user to check delegated `votes` for.
     /// @return votes Current `votes` delegated to `account`.
-    function getCurrentVotes(address account)
+    function getVotes(address account)
         external
         view
         virtual
