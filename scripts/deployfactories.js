@@ -19,7 +19,7 @@ const _addresses = {
 	poster: "0x000000000000cd17345801aa8147b8D3950260FF",
 	gnosisSafeProxyFactory: "0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2",
 	moduleProxyFactory: "0x00000000000DC7F163742Eb4aBEf650037b1f588",
-	DAO: "0xCED608Aa29bB92185D9b6340Adcbfa263DAe075b" // Change to Daohaus protocol zodiac baal avatar
+	DAO: "0x0000000000000000000000000000000000000000" // Change to Daohaus protocol zodiac baal avatar
 	}
 
 
@@ -107,7 +107,7 @@ async function main() {
   
 	// transfer ownership to DAO
 	if(_addresses.DAO=="0x0000000000000000000000000000000000000000"){
-		console.log("You need to transferownership");
+		console.log("You need to transfer ownership of summoner");
 	} else {
 		console.log("transffering ownership too: ", _addresses.DAO);
 		await baalSummoner.transferOwnership(_addresses.DAO);
@@ -124,7 +124,11 @@ async function main() {
 	console.log('Vault imp:', await upgrades.erc1967.getImplementationAddress(baalAndVaultSummoner.address));
 	
 	await baalAndVaultSummoner.setSummonerAddr(baalSummoner.address);
-	await baalAndVaultSummoner.transferOwnership(_addresses.DAO);
+	if(_addresses.DAO=="0x0000000000000000000000000000000000000000"){
+		console.log("You need to transfer ownership of vault registery");
+	} else {
+		await baalAndVaultSummoner.transferOwnership(_addresses.DAO);
+	}
 	
 	console.log('Transaction Hash:', txHash);
 	console.log('Factory Contract Address:', baalSummoner.address);
