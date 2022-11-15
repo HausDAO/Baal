@@ -346,7 +346,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
             baalGas,
             0, /* yes votes */
             0, /* no votes */
-            0,
+            0, /* maxTotalSharesAndLootAtVote */
             [false, false, false, false], /* [cancelled, processed, passed, actionFailed] */
             selfSponsor ? _msgSender() : address(0),
             proposalDataHash
@@ -473,7 +473,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         // get high water mark on all votes
         uint256 _totalSupply = totalSupply();
         if (_totalSupply > prop.maxTotalSharesAndLootAtVote) {
-            prop.maxTotalSharesAndLootAtVote = totalSupply();
+            prop.maxTotalSharesAndLootAtVote = _totalSupply;
         }
         unchecked {
             if (approved) {
