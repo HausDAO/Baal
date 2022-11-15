@@ -542,7 +542,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         }
 
         /*check if `proposal` approved by simple majority of members*/
-        if (prop.yesVotes > prop.noVotes && okToExecute) {
+        if (okToExecute) {
             prop.status[2] = true; /*flag that proposal passed - allows baal-like extensions*/
             bool success = processActionProposal(proposalData); /*execute 'action'*/
             if (!success) {
