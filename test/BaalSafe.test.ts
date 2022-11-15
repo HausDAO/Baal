@@ -1,4 +1,4 @@
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { solidity } from "ethereum-waffle";
 import { use, expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
@@ -79,6 +79,7 @@ const revertMessages = {
   permitNotAuthorized: "!authorized",
   permitExpired: "expired",
   notEnoughGas: "not enough gas",
+  baalGasToHigh: "baalGas to high",
   OwnableCallerIsNotTheOwner: "Ownable: caller is not the owner",
 };
 
@@ -153,6 +154,8 @@ const getBaalParams = async function (
   shares: [string[], number[]],
   loots: [string[], number[]],
   trustedForwarder: string,
+  lootAddr: string,
+  sharesAddr: string,
 ) {
   const governanceConfig = abiCoder.encode(
     ["uint32", "uint32", "uint256", "uint256", "uint256", "uint256"],
@@ -212,11 +215,14 @@ const getBaalParams = async function (
   // )
   return {
     initParams: abiCoder.encode(
-      ["string", "string", "address"],
+      ["string", "string", "address", "address", "address", "address"],
       [
         config.TOKEN_NAME,
         config.TOKEN_SYMBOL,
-        trustedForwarder
+        zeroAddress, // safe addr
+        trustedForwarder,
+        lootAddr,
+        sharesAddr
       ]
     ),
     initalizationActions,
@@ -228,7 +234,7 @@ const getNewBaalAddresses = async (
 ): Promise<{ baal: string; loot: string; shares: string; safe: string }> => {
   const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
   let baalSummonAbi = [
-    "event SummonBaal(address indexed baal, address indexed loot, address indexed shares, address safe, bool existingSafe)",
+    "event SummonBaal(address indexed baal, address indexed loot, address indexed shares, address safe, address forwarder, uint256 existingAddrs)",
   ];
   let iface = new ethers.utils.Interface(baalSummonAbi);
   let log = iface.parseLog(receipt.logs[receipt.logs.length - 1]);
@@ -301,6 +307,8 @@ describe("Baal contract", function () {
   let applicantWeth: TestERC20;
   let multisend: MultiSend;
   let forwarder: string;
+  let lootAddr: string;
+  let sharesAddr: string;
 
   let GnosisSafe: ContractFactory;
   let gnosisSafeSingleton: GnosisSafe;
@@ -384,6 +392,8 @@ describe("Baal contract", function () {
     const network = await ethers.provider.getNetwork();
     chainId = network.chainId;
     forwarder = "0x0000000000000000000000000000000000000420";
+    lootAddr = "0x000000000000000000000000000000000000069";
+    sharesAddr = "0x000000000000000000000000000000000000033";
   });
 
   beforeEach(async function () {
@@ -419,7 +429,11 @@ describe("Baal contract", function () {
     moduleProxyFactory =
       (await ModuleProxyFactory.deploy()) as ModuleProxyFactory;
 
-    baalSummoner = (await BaalSummoner.deploy(
+    // deploy proxy upgrades
+    baalSummoner = await upgrades.deployProxy(BaalSummoner) as BaalSummoner;
+    await baalSummoner.deployed();
+    // set addresses of templates and libraries
+    await baalSummoner.setAddrs(
       baalSingleton.address,
       gnosisSafeSingleton.address,
       handler.address,
@@ -428,7 +442,7 @@ describe("Baal contract", function () {
       moduleProxyFactory.address,
       lootSingleton.address,
       sharesSingleton.address,
-    )) as BaalSummoner;
+    );
 
     encodedInitParams = await getBaalParams(
       baalSingleton,
@@ -440,9 +454,11 @@ describe("Baal contract", function () {
       [[summoner.address], [shares]],
       [[summoner.address], [loot]],
       forwarder,
+      zeroAddress, 
+      zeroAddress
     );
 
-    const tx = await baalSummoner.summonBaalAndSafe(
+    const tx = await baalSummoner.summonBaal(
       encodedInitParams.initParams,
       encodedInitParams.initalizationActions,
       101
@@ -668,7 +684,6 @@ describe("Baal contract", function () {
 
       const sharesTokenAsOwnerEoa = await sharesToken.connect(summoner);
       expect(await baalLessSharesSingleton.version()).to.equal(0);
-      console.log('upgrade');
 
       await sharesTokenAsOwnerEoa.upgradeToAndCall(
         baalLessSharesSingleton.address,
@@ -2375,7 +2390,7 @@ describe("Baal contract", function () {
       );
       expect(priorVotes).to.equal(votes);
       expect(prop.yesVotes).to.equal(votes);
-      expect(prop.maxTotalSharesAndLootAtYesVote).to.equal(shares + loot);
+      expect(prop.maxTotalSharesAndLootAtVote).to.equal(shares + loot);
     });
 
     it("happy case - no vote", async function () {
@@ -2460,14 +2475,14 @@ describe("Baal contract", function () {
       );
       await baal.submitVote(1, yes);
       const prop1 = await baal.proposals(1);
-      expect(prop1.maxTotalSharesAndLootAtYesVote).to.equal(
+      expect(prop1.maxTotalSharesAndLootAtVote).to.equal(
         shares + loot + 100
       );
       await shamanBaal.mintShares([shaman.address], [100]); // add another 100 shares for shaman
       await shamanBaal.submitVote(1, yes);
       const prop = await baal.proposals(1);
       expect(prop.yesVotes).to.equal(200); // 100 summoner and 1st 100 from shaman are counted
-      expect(prop.maxTotalSharesAndLootAtYesVote).to.equal(shares + loot + 200);
+      expect(prop.maxTotalSharesAndLootAtVote).to.equal(shares + loot + 200);
     });
 
     it("scenario - decrease shares during voting", async function () {
@@ -2480,14 +2495,14 @@ describe("Baal contract", function () {
       );
       await baal.submitVote(1, yes);
       const prop1 = await baal.proposals(1);
-      expect(prop1.maxTotalSharesAndLootAtYesVote).to.equal(
+      expect(prop1.maxTotalSharesAndLootAtVote).to.equal(
         shares + loot + 100
       );
       await shamanBaal.ragequit(shaman.address, 50, 0, [weth.address]);
       await shamanBaal.submitVote(1, yes);
       const prop = await baal.proposals(1);
       expect(prop.yesVotes).to.equal(200); // 100 summoner and 1st 100 from shaman are counted (not affected by rq)
-      expect(prop.maxTotalSharesAndLootAtYesVote).to.equal(shares + loot + 100); // unchanged
+      expect(prop.maxTotalSharesAndLootAtVote).to.equal(shares + loot + 100); // unchanged
     });
   });
 
@@ -2695,6 +2710,19 @@ describe("Baal contract", function () {
       expect(state).to.equal(STATES.READY);
     });
 
+    it("require fail - baalGas to high", async function () {
+      const proposalCount = await baal.proposalCount();
+
+      const baalGas = ethers.utils.parseUnits('30000001', 'gwei');
+      await expect(baal.submitProposal(
+        proposal.data,
+        proposal.expiration,
+        baalGas,
+        ethers.utils.id(proposal.details)
+      )).to.be.revertedWith(revertMessages.baalGasToHigh);
+
+    });
+
     it("has enough baalGas", async function () {
       const baalGas = 1000000;
       await baal.submitProposal(
@@ -2891,8 +2919,10 @@ describe("Baal contract", function () {
         ]
       );
 
-      await shamanBaal.mintShares([shaman.address], [900]); // mint 900 shares so summoner has exectly 10% w/ 100 shares
-
+      await shamanBaal.mintShares([shaman.address], [400]); // mint 400 shares to make total supply 1000 so summoner has exectly 10% w/ 100 shares
+      console.log("total supply", (await shamanBaal.totalSupply()).toString());
+      const totalSupply = await shamanBaal.totalSupply();
+      expect(totalSupply).to.equal(1000);
       await baal.submitProposal(
         proposal.data,
         proposal.expiration,
@@ -2907,10 +2937,14 @@ describe("Baal contract", function () {
       const beforeProcessed = await baal.proposals(1);
       await baal.processProposal(1, proposal.data);
       const afterProcessed = await baal.proposals(1);
+      console.log('afterProcessed', afterProcessed.yesVotes.toString());
+      console.log('afterProcessed', afterProcessed.maxTotalSharesAndLootAtVote.toString());
+      
       verifyProposal(afterProcessed, beforeProcessed);
       const state2 = await baal.state(1);
       expect(state2).to.equal(STATES.PROCESSED);
       const propStatus = await baal.getProposalStatus(1);
+      console.log('[false, true, true, false]', propStatus);
       expect(propStatus).to.eql([false, true, true, false]); // passed [3] is true
     });
 
@@ -3577,7 +3611,11 @@ describe("Baal contract - offering required", function () {
     moduleProxyFactory =
       (await ModuleProxyFactory.deploy()) as ModuleProxyFactory;
 
-    baalSummoner = (await BaalSummoner.deploy(
+    // deploy proxy upgrades
+    baalSummoner = await upgrades.deployProxy(BaalSummoner) as BaalSummoner;
+    await baalSummoner.deployed();
+    // set addresses of templates and libraries
+    await baalSummoner.setAddrs(
       baalSingleton.address,
       gnosisSafeSingleton.address,
       handler.address,
@@ -3586,7 +3624,7 @@ describe("Baal contract - offering required", function () {
       moduleProxyFactory.address,
       lootSingleton.address,
       sharesSingleton.address,
-    )) as BaalSummoner;
+    );
 
     const encodedInitParams = await getBaalParams(
       baalSingleton,
@@ -3598,9 +3636,11 @@ describe("Baal contract - offering required", function () {
       [[summoner.address], [shares]],
       [[summoner.address], [loot]],
       zeroAddress,
+      zeroAddress,
+      zeroAddress
     );
 
-    const tx = await baalSummoner.summonBaalAndSafe(
+    const tx = await baalSummoner.summonBaal(
       encodedInitParams.initParams,
       encodedInitParams.initalizationActions,
       101 // nonce
@@ -3785,11 +3825,14 @@ const getBaalParamsWithAvatar = async function (
   // )
   return {
     initParams: abiCoder.encode(
-      ["string", "string", "address"],
+      ["string", "string", "address", "address", "address", "address"],
       [
         config.TOKEN_NAME,
         config.TOKEN_SYMBOL,
         safeAddr,
+        zeroAddress,
+        zeroAddress,
+        zeroAddress
       ]
     ),
     initalizationActions,
@@ -3890,8 +3933,11 @@ describe("Baal contract - summon baal with current safe", function () {
 
         const moduleFactory = await ModuleProxyFactory.deploy();
 
-
-        baalSummoner = (await BaalSummoner.deploy(
+        // deploy proxy upgrades
+        baalSummoner = await upgrades.deployProxy(BaalSummoner) as BaalSummoner;
+        await baalSummoner.deployed();
+        // set addresses of templates and libraries
+        await baalSummoner.setAddrs(
           baalSingleton.address,
           gnosisSafeSingleton.address,
           handler.address,
@@ -3900,7 +3946,7 @@ describe("Baal contract - summon baal with current safe", function () {
           moduleProxyFactory.address,
           lootSingleton.address,
           sharesSingleton.address,
-        )) as BaalSummoner;
+        );
 
         const encodedInitParams = await getBaalParamsWithAvatar(
           baalSingleton,
@@ -3911,7 +3957,7 @@ describe("Baal contract - summon baal with current safe", function () {
           [[shaman.address], [7]],
           [[summoner.address], [shares]],
           [[summoner.address], [loot]],
-          avatar.address,
+          avatar.address
         );
 
         // view function used as placeholder in deployment

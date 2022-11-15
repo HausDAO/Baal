@@ -80,7 +80,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         uint256 baalGas; /* gas needed to process proposal */
         uint256 yesVotes; /*counter for `members` `approved` 'votes' to calculate approval on processing*/
         uint256 noVotes; /*counter for `members` 'dis-approved' 'votes' to calculate approval on processing*/
-        uint256 maxTotalSharesAndLootAtYesVote; /* highest share+loot count during any individual yes vote*/
+        uint256 maxTotalSharesAndLootAtVote; /* highest share+loot count during any individual yes vote*/
         bool[4] status; /* [cancelled, processed, passed, actionFailed] */
         address sponsor; /* address of the sponsor - set at sponsor proposal - relevant for cancellation */
         bytes32 proposalDataHash; /*hash of raw data associated with state updates*/
@@ -245,8 +245,6 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
             );
 
         require(
-            _lootToken != address(0) &&
-                _sharesToken != address(0) &&
                 _multisendLibrary != address(0) &&
                 _avatar != address(0),
             "0 addr used"
@@ -322,11 +320,10 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
                 expiration > block.timestamp + votingPeriod + gracePeriod,
             "expired"
         );
+        require(baalGas < 30000000 gwei, "baalGas to high"); /* eth block limit */
 
         bool selfSponsor = false; /*plant sponsor flag*/
-        if (sharesToken.getCurrentVotes(_msgSender()) >= sponsorThreshold ||
-            sharesToken.getCurrentVotes(tx.origin) >= sponsorThreshold /*if called by a middleware contract (e.g. minion) & above sponsor threshold*/
-        ) {
+        if (sharesToken.getCurrentVotes(_msgSender()) >= sponsorThreshold ) {
             selfSponsor = true; /*if above sponsor threshold, self-sponsor*/
         } else {
             require(msg.value == proposalOffering, "Baal requires an offering"); /*Optional anti-spam gas token tribute*/
@@ -349,7 +346,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
             baalGas,
             0, /* yes votes */
             0, /* no votes */
-            0, /* highestMaxSharesAndLootAtYesVote */
+            0, /* maxTotalSharesAndLootAtVote */
             [false, false, false, false], /* [cancelled, processed, passed, actionFailed] */
             selfSponsor ? _msgSender() : address(0),
             proposalDataHash
@@ -471,20 +468,22 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         require(balance > 0, "!member"); /* check that user has shares*/
         require(!memberVoted[voter][id], "voted"); /*check vote not already cast*/
 
+        memberVoted[voter][id] = true; /*record voting action to `members` struct per user account*/
+
+        // get high water mark on all votes
+        uint256 _totalSupply = totalSupply();
+        if (_totalSupply > prop.maxTotalSharesAndLootAtVote) {
+            prop.maxTotalSharesAndLootAtVote = _totalSupply;
+        }
         unchecked {
             if (approved) {
                 /*if `approved`, cast delegated balance `yesVotes` to proposal*/
-                prop.yesVotes += balance;
-                if (totalSupply() > prop.maxTotalSharesAndLootAtYesVote) {
-                    prop.maxTotalSharesAndLootAtYesVote = totalSupply();
-                }
+                prop.yesVotes += balance;    
             } else {
                 /*otherwise, cast delegated balance `noVotes` to proposal*/
                 prop.noVotes += balance;
             }
         }
-
-        memberVoted[voter][id] = true; /*record voting action to `members` struct per user account*/
 
         emit SubmitVote(voter, balance, id, approved); /*emit event reflecting vote*/
     }
@@ -530,14 +529,14 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
             okToExecute = false;
 
         // Make proposal fail if it didn't pass quorum
-        if (okToExecute && prop.yesVotes * 100 < quorumPercent * totalShares())
+        if (okToExecute && prop.yesVotes * 100 < quorumPercent * prop.maxTotalSharesAndLootAtVote)
             okToExecute = false;
 
         // Make proposal fail if the minRetentionPercent is exceeded
         if (
             okToExecute &&
             (totalSupply()) <
-            (prop.maxTotalSharesAndLootAtYesVote * minRetentionPercent) / 100 /*Check for dilution since high water mark during voting*/
+            (prop.maxTotalSharesAndLootAtVote * minRetentionPercent) / 100 /*Check for dilution since high water mark during voting*/
         ) {
             okToExecute = false;
         }
@@ -616,10 +615,8 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         uint256 lootToBurn,
         address[] calldata tokens
     ) external nonReentrant {
-        for (uint256 i = 0; i < tokens.length; i++) {
-            if (i > 0) {
+        for (uint256 i = 1; i < tokens.length; i++) {
                 require(tokens[i] > tokens[i - 1], "!order");
-            }
         }
 
         _ragequit(to, sharesToBurn, lootToBurn, tokens);
@@ -649,12 +646,15 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         }
 
         for (uint256 i = 0; i < tokens.length; i++) {
-            (, bytes memory balanceData) = tokens[i].staticcall(
-                abi.encodeWithSelector(0x70a08231, address(target))
-            ); /*get Baal token balances - 'balanceOf(address)'*/
-            uint256 balance = tokens[i] == ETH
-                ? address(target).balance
-                : abi.decode(balanceData, (uint256)); /*decode Baal token balances for calculation*/
+            uint256 balance;
+            if(tokens[i] == ETH) {
+                balance = address(target).balance;
+            } else {
+                (, bytes memory balanceData) = tokens[i].staticcall(
+                    abi.encodeWithSelector(0x70a08231, address(target))
+                ); /*get Baal token balances - 'balanceOf(address)'*/
+                balance = abi.decode(balanceData, (uint256));
+            }
 
             uint256 amountToRagequit = ((lootToBurn + sharesToBurn) * balance) /
                 _totalSupply; /*calculate 'fair shair' claims*/
