@@ -185,7 +185,7 @@ abstract contract BaalVotes is ERC20PermitUpgradeable, DelegationEIP712Upgradeab
 
     // @notice Returns the current timepoint.
     /// @return timePoint returns unix epoch timestamp
-    function now() public view returns (uint256 timepoint) {
+    function now() public view returns (uint256 timePoint) {
         return block.timestamp;
     }
 
