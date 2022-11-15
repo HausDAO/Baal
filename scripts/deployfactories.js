@@ -123,6 +123,9 @@ async function main() {
 	console.log('Vault Factory Contract Address:', baalAndVaultSummoner.address);
 	console.log('Vault imp:', await upgrades.erc1967.getImplementationAddress(baalAndVaultSummoner.address));
 	
+	await baalAndVaultSummoner.setSummonerAddr(baalSummoner.address);
+	await baalAndVaultSummoner.transferOwnership(_addresses.DAO);
+	
 	console.log('Transaction Hash:', txHash);
 	console.log('Factory Contract Address:', baalSummoner.address);
 	console.log('Block Number:', receipt.blockNumber);

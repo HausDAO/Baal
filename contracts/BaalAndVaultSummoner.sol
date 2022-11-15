@@ -29,8 +29,8 @@ Contract is upgradable and should be owned by a DAO
 */
 contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
-    IBAALSUMMONER _baalSummoner;
-    uint256 vaultIdx;
+    IBAALSUMMONER public _baalSummoner;
+    uint256 public vaultIdx;
 
     struct Vault{
         uint256 id;
@@ -51,6 +51,10 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
         address delegate
     );
 
+    event setSummoner(
+        address summoner
+    );
+
     function initialize() initializer public {
         __Ownable_init();
         __UUPSUpgradeable_init();
@@ -62,6 +66,7 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
     ) public onlyOwner {
         require(baalSummoner != address(0), "zero address");
         _baalSummoner = IBAALSUMMONER(baalSummoner);
+        emit setSummoner(baalSummoner);
     }
 
     /** Summon a new baal and add a Vault */
