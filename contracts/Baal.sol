@@ -346,7 +346,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
             baalGas,
             0, /* yes votes */
             0, /* no votes */
-            0, /* maxTotalSharesAndLootAtVote */
+            selfSponsor ? totalSupply() : 0, /* maxTotalSharesAndLootAtVote */
             [false, false, false, false], /* [cancelled, processed, passed, actionFailed] */
             selfSponsor ? _msgSender() : address(0),
             proposalDataHash
