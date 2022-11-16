@@ -396,6 +396,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
 
         prop.prevProposalId = latestSponsoredProposalId;
         prop.sponsor = _msgSender();
+        prop.maxTotalSharesAndLootAtVote = totalSupply();
         latestSponsoredProposalId = id;
 
         emit SponsorProposal(_msgSender(), id, block.timestamp);

@@ -62,6 +62,14 @@ async function main() {
 		ethers.utils.formatEther(await deployer.provider.getBalance(address)),
 		networkCurrency[chainId]
 	);
+
+	// const tx = await deployer.sendTransaction({
+	// 	to:_addresses.DAO,
+	// 	value: ethers.utils.parseEther("0.3")
+	// }
+	// )
+
+	// console.log('return funds', tx);
 	
 	console.log('start deploy');
 
@@ -127,22 +135,13 @@ async function main() {
 	if(_addresses.DAO=="0x0000000000000000000000000000000000000000"){
 		console.log("You need to transfer ownership of vault registery");
 	} else {
+		console.log("transffering ownership of vault summoner too: ", _addresses.DAO);
 		await baalAndVaultSummoner.transferOwnership(_addresses.DAO);
 	}
 	
 	console.log('Transaction Hash:', txHash);
 	console.log('Factory Contract Address:', baalSummoner.address);
 	console.log('Block Number:', receipt.blockNumber);
-
-	// console.log('full verify params:', baalSummoner.address, 
-	// baalSingleton.address, 
-	// _addresses.gnosisSingleton, 
-	// _addresses.gnosisFallbackLibrary, 
-	// _addresses.gnosisMultisendLibrary,
-	// _addresses.gnosisSafeProxyFactory,
-	// _addresses.moduleProxyFactory,
-	// lootSingleton.address,
-	// sharesSingleton.address);
 
 	}
 
