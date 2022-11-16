@@ -2690,7 +2690,7 @@ describe("Baal contract", function () {
     it("require fail - not enough gas", async function () {
       const proposalCount = await baal.proposalCount();
 
-      const baalGas = 100000000;
+      const baalGas = 10000000;
       await baal.submitProposal(
         proposal.data,
         proposal.expiration,
@@ -2701,8 +2701,8 @@ describe("Baal contract", function () {
       await baal.submitVote(1, yes);
       await moveForwardPeriods(3);
 
-      const procprop = baal.processProposal(1, proposal.data);
-      // const procprop =  baal.processProposal(1, proposal.data, {gasPrice: ethers.utils.parseUnits('1', 'gwei'), gasLimit: 10000000})
+      // const procprop = baal.processProposal(1, proposal.data);
+      const procprop =  baal.processProposal(1, proposal.data, {gasPrice: ethers.utils.parseUnits('1', 'gwei'), gasLimit: 10000000})
 
       expect(procprop).to.be.revertedWith(revertMessages.notEnoughGas);
 
@@ -2710,10 +2710,10 @@ describe("Baal contract", function () {
       expect(state).to.equal(STATES.READY);
     });
 
-    it.only("require fail - baalGas to high", async function () {
+    it("require fail - baalGas to high", async function () {
       const proposalCount = await baal.proposalCount();
 
-      const baalGas = 30000001;
+      const baalGas = 20000001;
       await expect(baal.submitProposal(
         proposal.data,
         proposal.expiration,

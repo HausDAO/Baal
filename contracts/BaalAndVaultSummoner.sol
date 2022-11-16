@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 interface IBAALSUMMONER {
-    function deployAndSetupSafe(address _moduleAddr, uint256 _saltNonce)
+    function deployAndSetupSafe(address _moduleAddr)
         external
         returns (address);
 
@@ -83,23 +83,16 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
             saltNonce,
             referrer
         );
-        _vaultAddress = _baalSummoner.deployAndSetupSafe(
-            _daoAddress, 
-            saltNonce + block.timestamp
-        );
-        _setNewVault(name, _daoAddress, _vaultAddress);
-
+        _vaultAddress = summonVault(_daoAddress, name);
     }
 
     /** create and add a Vault(Safe) to an existing DAO */
     function summonVault(
         address daoAddress,
-        uint256 saltNonce,
         string memory name
-    ) external returns (address _vaultAddress) {
+    ) public returns (address _vaultAddress) {
         _vaultAddress = _baalSummoner.deployAndSetupSafe(
-            daoAddress, 
-            saltNonce
+            daoAddress
         );
         _setNewVault(name, daoAddress, _vaultAddress);
     }
