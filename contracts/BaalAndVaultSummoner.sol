@@ -5,18 +5,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-interface IBAALSUMMONER {
-    function deployAndSetupSafe(address _moduleAddr)
-        external
-        returns (address);
-
-    function summonBaalFromReferrer(
-        bytes calldata initializationParams,
-        bytes[] calldata initializationActions,
-        uint256 _saltNonce,
-        bytes32 referrer
-    ) external payable returns (address);
-}
+import "./interfaces/IBaalSummoner.sol";
 
 /*
 Summon new 'non-ragequitable' treasury Safe (Vaults). (sidecar?)
@@ -29,7 +18,7 @@ Contract is upgradable and should be owned by a DAO
 */
 contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
-    IBAALSUMMONER public _baalSummoner;
+    IBaalSummoner public _baalSummoner;
     uint256 public vaultIdx;
 
     struct Vault{
@@ -65,7 +54,7 @@ contract BaalAndVaultSummoner is Initializable, OwnableUpgradeable, UUPSUpgradea
         address baalSummoner
     ) public onlyOwner {
         require(baalSummoner != address(0), "zero address");
-        _baalSummoner = IBAALSUMMONER(baalSummoner);
+        _baalSummoner = IBaalSummoner(baalSummoner);
         emit setSummoner(baalSummoner);
     }
 

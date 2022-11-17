@@ -2920,7 +2920,6 @@ describe("Baal contract", function () {
       );
 
       await shamanBaal.mintShares([shaman.address], [400]); // mint 400 shares to make total supply 1000 so summoner has exectly 10% w/ 100 shares
-      console.log("total supply", (await shamanBaal.totalSupply()).toString());
       const totalSupply = await shamanBaal.totalSupply();
       expect(totalSupply).to.equal(1000);
       await baal.submitProposal(
@@ -2937,8 +2936,6 @@ describe("Baal contract", function () {
       const beforeProcessed = await baal.proposals(1);
       await baal.processProposal(1, proposal.data);
       const afterProcessed = await baal.proposals(1);
-      console.log('afterProcessed', afterProcessed.yesVotes.toString());
-      console.log('afterProcessed', afterProcessed.maxTotalSharesAndLootAtVote.toString());
       
       verifyProposal(afterProcessed, beforeProcessed);
       const state2 = await baal.state(1);

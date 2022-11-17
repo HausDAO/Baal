@@ -184,6 +184,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
     ); /*emits when Baal `shares` are approved for pulls with erc20 accounting*/
 
     event ShamanSet(address indexed shaman, uint256 permission); /*emits when a shaman permission changes*/
+    event SetTrustedForwarder(address indexed forwarder); /*emits when a trusted forwarder changes*/
     event GovernanceConfigSet(
         uint32 voting,
         uint32 grace,
@@ -892,6 +893,7 @@ contract Baal is Module, EIP712Upgradeable, ReentrancyGuardUpgradeable, BaseRela
         baalOrGovernorOnly
     {
         _setTrustedForwarder(_trustedForwarderAddress);
+        emit SetTrustedForwarder(_trustedForwarderAddress);
     }
 
     /***************
