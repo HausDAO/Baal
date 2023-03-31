@@ -90,7 +90,7 @@ It can also add a external safe to an existing DAO as owner
 
 ### **Higher Order BaalAdvTokenSummoner (contracts/higherOrderFactories/BaalAdvTokenSummoner.sol)**
 Factory to summon new dao contracts with custom loot token name and symbol 
-
+Minting and pausing of token happen upfront before Baal is setup
 ----
 
 ## Folder Structure
