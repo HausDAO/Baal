@@ -8,10 +8,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "./Baal.sol";
-import "./interfaces/IBaalSummoner.sol";
-
-// todo: does this need to be upgradable, prob not because it does not need subgraph
+import "../Baal.sol";
+import "../interfaces/IBaalSummoner.sol";
 
 contract BaalAdvTokenSummoner is
     Initializable,
@@ -29,12 +27,25 @@ contract BaalAdvTokenSummoner is
         __UUPSUpgradeable_init();
     }
 
+    /**
+     * @dev Sets the address of the BaalSummoner contract
+     * @param baalSummoner The address of the BaalSummoner contract
+     */
     function setSummonerAddr(address baalSummoner) public onlyOwner {
         require(baalSummoner != address(0), "zero address");
         _baalSummoner = IBaalSummoner(baalSummoner);
         emit setSummoner(baalSummoner);
     }
 
+    /**
+     * @dev Summon a new Baal contract with a new set of tokens
+     * @param _safeAddr The address of the Gnosis Safe to be used as the treausry, 0x0 if new Safe
+     * @param _forwarderAddr The address of the forwarder to be used, 0x0 if not set
+     * @param _saltNonce The salt nonce to be used for the Safe contract
+     * @param initializationMintParams The parameters for minting the tokens
+     * @param initializationTokenParams The parameters for deploying the tokens
+     * @param postInitializationActions The actions to be performed after the initialization
+     */
     function summonBaalFromReferrer(
         address _safeAddr,
         address _forwarderAddr,
@@ -48,13 +59,13 @@ contract BaalAdvTokenSummoner is
             initializationTokenParams
         );
 
-        // mint tokens
+        // mint shares loot tokens
         mintTokens(initializationMintParams, _lootToken, _sharesToken);
 
         // summon baal with new tokens
         address _baal = _baalSummoner.summonBaalFromReferrer(
             abi.encode(
-                IBaalToken(_sharesToken).name(),
+                IBaalToken(_sharesToken).name(), 
                 IBaalToken(_sharesToken).symbol(),
                 _safeAddr,
                 _forwarderAddr,
@@ -63,7 +74,7 @@ contract BaalAdvTokenSummoner is
             ),
             postInitializationActions,
             _saltNonce,
-            bytes32(bytes("DHAdvTokenSummoner"))
+            bytes32(bytes("DHAdvTokenSummoner")) // referrer
         );
 
         // change token ownership to baal
@@ -71,15 +82,21 @@ contract BaalAdvTokenSummoner is
         IBaalToken(_sharesToken).transferOwnership(address(_baal));
     }
 
+    /**
+     * @dev mintTokens
+     * @param initializationTokens The parameters for minting the tokens
+     * @param _lootToken The loot token address
+     * @param _sharesToken The shares token address
+     */
     function mintTokens(
         bytes calldata initializationTokens,
         address _lootToken,
         address _sharesToken
-    ) public {
+    ) internal {
         (
-            address[] memory summoners,
-            uint256[] memory summonerShares,
-            uint256[] memory summonerLoot
+            address[] memory summoners, // The address to mint initial tokens to
+            uint256[] memory summonerShares, // The amount of shares to mint
+            uint256[] memory summonerLoot // The amount of loot to mint
         ) = abi.decode(initializationTokens, (address[], uint256[], uint256[]));
 
         require(
@@ -89,29 +106,44 @@ contract BaalAdvTokenSummoner is
         ); /*check array lengths match*/
 
         for (uint256 i = 0; i < summoners.length; i++) {
-            IBaalToken(_sharesToken).mint(
-                summoners[i],
-                summonerShares[i]
-            ); /*grant `to` `amount` `shares`*/
-            IBaalToken(_lootToken).mint(
-                summoners[i],
-                summonerShares[i]
-            ); /*grant `to` `amount` `shares`*/
+            if (summonerLoot[i] > 0) {
+                IBaalToken(_lootToken).mint(
+                    summoners[i],
+                    summonerShares[i]
+                ); /*grant `to` `amount` `loot`*/
+            }
+            if (summonerShares[i] > 0) {
+                IBaalToken(_sharesToken).mint(
+                    summoners[i],
+                    summonerShares[i]
+                ); /*grant `to` `amount` `shares`*/
+            }
         }
     }
 
-    // deploy new share and loot contracts
+    /**
+     * @dev deployTokens
+     * @param initializationParams The parameters for deploying the tokens
+     */
     function deployTokens(
         bytes calldata initializationParams
-    ) public returns (address lootToken, address sharesToken) {
+    ) internal returns (address lootToken, address sharesToken) {
         (
-            string memory _name, /*_name Name for erc20 `shares` accounting, empty if token */
-            string memory _symbol, /*_symbol Symbol for erc20 `shares` accounting, empty if token*/
-            string memory _lootName, /* name for erc20 `loot` accounting, empty if token */
-            string memory _lootSymbol, /* symbol for erc20 `loot` accounting, empty if token*/
-            bool _transferableShares, /* if shares is transferable */
+            string
+                memory _name /*_name Name for erc20 `shares` accounting, empty if token */,
+            string
+                memory _symbol /*_symbol Symbol for erc20 `shares` accounting, empty if token*/,
+            string
+                memory _lootName /* name for erc20 `loot` accounting, empty if token */,
+            string
+                memory _lootSymbol /* symbol for erc20 `loot` accounting, empty if token*/,
+            bool _transferableShares /* if shares is transferable */,
             bool _transferableLoot /* if loot is transferable */
-        ) = abi.decode(initializationParams, (string, string, string, string, bool, bool));
+        ) = abi.decode(
+                initializationParams,
+                (string, string, string, string, bool, bool)
+            );
+
         address lootSingleton = _baalSummoner.lootSingleton();
         address sharesSingleton = _baalSummoner.sharesSingleton();
 
