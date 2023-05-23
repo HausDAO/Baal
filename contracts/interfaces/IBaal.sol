@@ -53,14 +53,14 @@ interface Interface {
 
     function adminLock() external view returns (bool);
     function avatar() external view returns (address);
-    function burnLoot(address[] memory from, uint256[] memory amount) external;
-    function burnShares(address[] memory from, uint256[] memory amount) external;
+    function burnLoot(address[] calldata from, uint256[] calldata amount) external;
+    function burnShares(address[] calldata from, uint256[] calldata amount) external;
     function cancelProposal(uint32 id) external;
     function encodeMultisend(bytes[] memory _calls, address _target)
         external
         pure
         returns (bytes memory encodedMultisend);
-    function executeAsBaal(address _to, uint256 _value, bytes memory _data) external;
+    function executeAsBaal(address _to, uint256 _value, bytes calldata _data) external;
     function getGuard() external view returns (address _guard);
     function getProposalStatus(uint32 id) external view returns (bool[4] memory);
     function governorLock() external view returns (bool);
@@ -79,11 +79,11 @@ interface Interface {
     function managerLock() external view returns (bool);
     function memberVoted(address, uint32) external view returns (bool);
     function minRetentionPercent() external view returns (uint256);
-    function mintLoot(address[] memory to, uint256[] memory amount) external;
-    function mintShares(address[] memory to, uint256[] memory amount) external;
+    function mintLoot(address[] calldata to, uint256[] calldata amount) external;
+    function mintShares(address[] calldata to, uint256[] calldata amount) external;
     function multisendLibrary() external view returns (address);
     function owner() external view returns (address);
-    function processProposal(uint32 id, bytes memory proposalData) external;
+    function processProposal(uint32 id, bytes calldata proposalData) external;
     function proposalCount() external view returns (uint32);
     function proposalOffering() external view returns (uint256);
     function proposals(uint256)
@@ -105,13 +105,13 @@ interface Interface {
             bytes32 proposalDataHash
         );
     function quorumPercent() external view returns (uint256);
-    function ragequit(address to, uint256 sharesToBurn, uint256 lootToBurn, address[] memory tokens) external;
+    function ragequit(address to, uint256 sharesToBurn, uint256 lootToBurn, address[] calldata tokens) external;
     function renounceOwnership() external;
     function setAdminConfig(bool pauseShares, bool pauseLoot) external;
     function setAvatar(address _avatar) external;
-    function setGovernanceConfig(bytes memory _governanceConfig) external;
+    function setGovernanceConfig(bytes calldata _governanceConfig) external;
     function setGuard(address _guard) external;
-    function setShamans(address[] memory _shamans, uint256[] memory _permissions) external;
+    function setShamans(address[] calldata _shamans, uint256[] calldata _permissions) external;
     function setTarget(address _target) external;
     function setTrustedForwarder(address _trustedForwarderAddress) external;
     function setUp(bytes memory _initializationParams) external;
@@ -120,7 +120,7 @@ interface Interface {
     function sponsorProposal(uint32 id) external;
     function sponsorThreshold() external view returns (uint256);
     function state(uint32 id) external view returns (uint8);
-    function submitProposal(bytes memory proposalData, uint32 expiration, uint256 baalGas, string memory details)
+    function submitProposal(bytes calldata proposalData, uint32 expiration, uint256 baalGas, string calldata details)
         external
         payable
         returns (uint256);
