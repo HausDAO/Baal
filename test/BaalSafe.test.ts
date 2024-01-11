@@ -17,20 +17,22 @@ import {
 } from './utils/baal';
 import { blockTime, moveForwardPeriods } from './utils/evm';
 import { baalSetup, mockBaalLessSharesSetup, ProposalHelpers, Signer } from './utils/fixtures';
+import { calculateSafeProxyAddress, getSaltNonce } from './utils/safe';
 import signDelegation from "../src/signDelegation";
 import signVote from "../src/signVote";
 import { sharesRevertMessages } from './utils/token';
 import {
-  Shares,
   Baal,
   BaalSummoner,
-  Poster,
   GnosisSafe,
-  TestERC20,
+  GnosisSafeProxyFactory,
   Loot,
-  MultiSend,
   ModuleProxyFactory,
+  MultiSend,
+  Poster,
+  Shares,
   TestAvatar,
+  TestERC20,
 } from '../src/types';
 import { encodeMultiAction, hashOperation } from '../src/util';
 
@@ -3536,12 +3538,13 @@ describe("Baal contract - offering required", function () {
   });
 });
 
-describe("Baal contract - summon baal with current safe", function () {
+describe("BaalSummoner contract", function () {
   let avatar: TestAvatar;
   let baalSingleton: Baal;
   let baalSummoner: BaalSummoner;
   let expectedAddress: string;
   let moduleProxyFactory: ModuleProxyFactory;
+  let gnosisSafeProxyFactory: GnosisSafeProxyFactory;
   let poster: Poster;
 
   beforeEach(async function () {
@@ -3552,6 +3555,7 @@ describe("Baal contract - summon baal with current safe", function () {
     baalSingleton = (await ethers.getContract('Baal', deployer)) as Baal;
     baalSummoner = (await ethers.getContract('BaalSummoner', deployer)) as BaalSummoner;
     moduleProxyFactory = (await ethers.getContract('ModuleProxyFactory', deployer)) as ModuleProxyFactory;
+    gnosisSafeProxyFactory = (await ethers.getContract('GnosisSafeProxyFactory', deployer)) as GnosisSafeProxyFactory;
     poster = (await ethers.getContract('Poster', deployer)) as Poster
 
     const deployedAvatar = await deployments.deploy('TestAvatar', {
@@ -3562,13 +3566,12 @@ describe("Baal contract - summon baal with current safe", function () {
     avatar = (await ethers.getContractAt('TestAvatar', deployedAvatar.address, deployer)) as TestAvatar;
   });
 
-
   describe("Baal summoned after safe", function () {
     it("should have the expected address of the module the same as the deployed", async () => {
       const [summoner, applicant, shaman] = await getUnnamedAccounts();
 
       const initData = baalSingleton.interface.encodeFunctionData("avatar");
-      const saltNonce = '101';
+      const saltNonce = getSaltNonce();
 
       expectedAddress = calculateProxyAddress(
         moduleProxyFactory,
@@ -3609,6 +3612,60 @@ describe("Baal contract - summon baal with current safe", function () {
       });
 
       expect(expectedAddress).to.equal(addresses.baal);
+    });
+  });
+
+  describe("Baal summoner with fresh treasury vault", function () {
+    it("should have the expected address for both the module and safe", async () => {
+      const [summoner, applicant, shaman] = await getUnnamedAccounts();
+
+      const initData = baalSingleton.interface.encodeFunctionData("avatar");
+      const saltNonce = getSaltNonce();
+
+      expectedAddress = calculateProxyAddress(
+        moduleProxyFactory,
+        baalSingleton.address,
+        initData,
+        saltNonce
+      );
+      const masterCopyAddress = await baalSummoner.gnosisSingleton();
+
+      const expectedSafeAddress = await calculateSafeProxyAddress({
+        gnosisSafeProxyFactory,
+        masterCopyAddress,
+        saltNonce,
+      });
+
+      const loot = defaultSummonSetup.loot;
+      const lootPaused = defaultSummonSetup.lootPaused;
+      const shares = defaultSummonSetup.shares;
+      const sharesPaused = defaultSummonSetup.sharesPaused;
+
+      const shamanPermissions = defaultSummonSetup.shamanPermissions;
+
+      const addresses = await setupBaal({
+          baalSummoner,
+          baalSingleton,
+          poster,
+          config: defaultDAOSettings,
+          adminConfig: [sharesPaused, lootPaused],
+          shamans: [[shaman], [shamanPermissions]],
+          shares: [
+              [summoner, applicant],
+              [shares, shares]
+          ],
+          loots: [
+              [summoner, applicant],
+              [loot, loot]
+          ],
+          forwarderAddress: ethers.constants.AddressZero,
+          lootAddress: ethers.constants.AddressZero,
+          sharesAddress: ethers.constants.AddressZero as `0x${string}`,
+          saltNonceOverride: saltNonce
+      });
+
+      expect(expectedAddress).to.equal(addresses.baal);
+      expect(expectedSafeAddress).to.equal(addresses.safe);
     });
   });
 });
