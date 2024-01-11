@@ -10,7 +10,9 @@
   },
   "typesVersions": {
     "*": {
-      "hardhat": ["./dist/src/hardhat/index.d.ts"]
+      "hardhat": [
+        "./dist/src/hardhat/index.d.ts"
+      ]
     }
   },
   "lockfileVersion": 2,
@@ -56,7 +58,7 @@
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
-    "@openzeppelin/hardhat-upgrades": "^1.21.0",
+    "@openzeppelin/hardhat-upgrades": "^3.0.2",
     "@typechain/ethers-v5": "^10.2.0",
     "@typechain/hardhat": "^6.1.5",
     "@types/chai": "^4.2.18",
