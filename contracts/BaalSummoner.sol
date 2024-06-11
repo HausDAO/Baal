@@ -183,20 +183,7 @@ contract BaalSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     }
 
-    // deploy a safe with module and single module signer setup
-    function deployAndSetupSafe(address _moduleAddr)
-        public
-        returns (address)
-    {
-        // Deploy new safe but do not set it up yet
-        GnosisSafe _safe = GnosisSafe(
-            payable(
-                gnosisSafeProxyFactory.createProxy(
-                    gnosisSingleton,
-                    bytes("")
-                )
-            )
-        );
+    function configureSafe(address _moduleAddr, GnosisSafe _safe) internal {
         // Generate delegate calls so the safe calls enableModule on itself during setup
         bytes memory _enableBaal = abi.encodeWithSignature(
             "enableModule(address)",
@@ -230,6 +217,48 @@ contract BaalSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             0,
             payable(address(0))
         );
+    }
+
+
+    // deploy a safe with module and single module signer setup
+    // with nounce
+    function deployAndSetupSafe(address _moduleAddr, uint256 _saltNonce)
+        public
+        returns (address)
+    {
+        GnosisSafe _safe = GnosisSafe(
+            payable(
+                gnosisSafeProxyFactory.createProxyWithNonce(
+                    gnosisSingleton,
+                    bytes(""),
+                    _saltNonce
+                )
+            )
+        );
+        
+        configureSafe(_moduleAddr, _safe);
+
+        emit DeployBaalSafe(address(_safe), address(_moduleAddr));
+
+        return address(_safe);
+    }
+
+
+    // deploy a safe with module and single module signer setup
+    function deployAndSetupSafe(address _moduleAddr)
+        public
+        returns (address)
+    {
+        GnosisSafe _safe = GnosisSafe(
+            payable(
+        gnosisSafeProxyFactory.createProxy(
+                    gnosisSingleton,
+                    bytes("")
+                )
+                )
+        );
+
+        configureSafe(_moduleAddr, _safe);
 
         emit DeployBaalSafe(address(_safe), address(_moduleAddr));
 
@@ -282,7 +311,7 @@ contract BaalSummoner is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // if zero address deploy a new safe
         // Needs to be a valid zodiac treasury
         if(_safeAddr == address(0)){
-            _safeAddr = deployAndSetupSafe(address(_baal));
+            _safeAddr = deployAndSetupSafe(address(_baal), _saltNonce);
         } else {
             existingAddrs += 2;
         }

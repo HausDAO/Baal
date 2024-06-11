@@ -5,6 +5,7 @@ import { ethers } from 'hardhat';
 import { Baal, BaalSummoner, MultiSend, Poster } from '../../src/types';
 import { encodeMultiAction } from '../../src/util';
 import { moveForwardPeriods } from './evm';
+import { getSaltNonce } from './safe';
 
 export type DAOSettings = {
     PROPOSAL_OFFERING: any;
@@ -279,7 +280,7 @@ export const setupBaal = async ({
     sharesAddress,
     saltNonceOverride
 }: NewBaalParams) => {
-    const saltNonce = saltNonceOverride || (Math.random() * 1000).toFixed(0);
+    const saltNonce = saltNonceOverride || getSaltNonce();
     const encodedInitParams = await getBaalParams(
         baalSingleton,
         poster,
