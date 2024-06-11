@@ -43,7 +43,6 @@ export const calculateSafeProxyAddress = async ({
     );
   } catch (e: unknown) {
     expectedSafeAddress = getSafeAddressFromRevertMessage(e);
-    // console.log('expectedSafeAddress', expectedSafeAddress);
   } finally {
     return expectedSafeAddress;
   }
