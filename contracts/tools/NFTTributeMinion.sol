@@ -2,12 +2,14 @@
 pragma solidity 0.8.7;
 import "../Baal.sol";
 
-interface ERC20 {
+interface IERC721 {
     function transferFrom(
         address from,
         address to,
         uint256 tokenId
-    ) external returns (bool);
+    ) external;
+
+    function ownerOf(uint256 tokenId) external view returns (address);
 }
 
 contract NFTTributeMinion {
@@ -65,7 +67,6 @@ contract NFTTributeMinion {
             // Workaround for solidity dynamic memory array
             uint256[] memory _shares = new uint256[](1);
             _shares[0] = shares;
-
             bytes memory _issueShares = abi.encodeWithSignature(
                 "mintShares(address[],uint256[])",
                 _recipients,
@@ -168,8 +169,9 @@ contract NFTTributeMinion {
             escrow.tokenId
         );
 
+        token.transferFrom(escrow.applicant, escrow.safe, escrow.tokenId);
         require(
-            token.transferFrom(escrow.applicant, escrow.safe, escrow.tokenId),
+            token.ownerOf(escrow.tokenId) == escrow.safe,
             "Transfer failed"
         );
     }
