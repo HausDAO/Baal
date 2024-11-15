@@ -1,10 +1,12 @@
 import { deployments } from 'hardhat';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
-import { Baal, BaalLessShares, BaalSummoner, GnosisSafe, Loot, MockBaal, MultiSend, Poster, Shares, TestERC20, TributeMinion } from '../../src/types';
+import { Baal, BaalLessShares, BaalSummoner, GnosisSafe, Loot, MockBaal, MultiSend, Poster, Shares, TestERC20, TributeMinion, NFTTributeMinion, TestNFT } from '../../src/types';
 import { DAOSettings, NewBaalAddresses, NewBaalParams, ProposalParams, ProposalType, SummonSetup, defaultDAOSettings, defaultSummonSetup, setShamanProposal, setupBaal, submitAndProcessProposal } from './baal';
 import { BigNumberish, ContractTransaction } from 'ethers';
 import { TributeProposalParams, TributeProposalStatus, submitAndProcessTributeProposal } from './tribute';
+import { NFTTributeProposalParams, NFTTributeProposalStatus, submitAndProcessNFTTributeProposal } from './nftTribute';
+
 
 export type Signer = {
     address: string;
@@ -14,13 +16,16 @@ export type Signer = {
     loot?: Loot;
     shares?: Shares;
     tributeMinion?: TributeMinion;
+    nftTributeMinion?: NFTTributeMinion;    
     weth?: TestERC20;
     dai?: TestERC20;
+    testNft?: TestNFT;
   };
 
 export type ProposalHelpers = {
     submitAndProcessProposal: (params: Omit<ProposalParams, "daoSettings">) => Promise<ContractTransaction>,
     submitAndProcessTributeProposal: (params: Omit<TributeProposalParams, "daoSettings">) => Promise<TributeProposalStatus>,
+    submitAndProcessNFTTributeProposal: (params: Omit<NFTTributeProposalParams, "daoSettings">) => Promise<NFTTributeProposalStatus>,
     setShamanProposal: (baal: Baal, multisend: MultiSend, shamanAddress: string, permission: BigNumberish) => Promise<number>,
 };
 
@@ -33,8 +38,10 @@ export type BaalSetupType = {
     MultiSend: MultiSend;
     Poster?: Poster;
     TributeMinion: TributeMinion;
+    NFTTributeMinion: NFTTributeMinion;
     WETH: TestERC20;
     DAI: TestERC20;
+    TestNFT: TestNFT;
     signers: {
         [key: string]: Signer;
     };
@@ -64,6 +71,7 @@ export type SetupUsersParams = {
 export type UsersSetup = {
     dai: TestERC20;
     weth: TestERC20;
+    testNft: TestNFT;
     signers: { [key: string]: Signer };
 }
 
@@ -89,6 +97,7 @@ export const setupUsersDefault = async ({
     const [summoner, applicant, shaman, s1, s2, s3, s4, s5, s6] = await getUnnamedAccounts();
 
     const tributeMinion = (await ethers.getContract('TributeMinion', deployer)) as TributeMinion;
+    const nftTributeMinion = (await ethers.getContract('NFTTributeMinion', deployer)) as NFTTributeMinion;
 
     const lootTokenAddress = await baal.lootToken();
     const lootToken = (await ethers.getContractAt('Loot', lootTokenAddress)) as Loot;
@@ -106,6 +115,12 @@ export const setupUsersDefault = async ({
         args: ['DAI', 'DAI', ethers.utils.parseUnits('10000000', 'ether')]
     });
 
+    const testNftDeployed = await deployments.deploy('TestNFT', {
+        from: deployer,
+        args: []
+    });
+
+
     const weth = (await ethers.getContractAt('TestERC20', wethDeployed.address, deployer)) as TestERC20;
     await weth.transfer(summoner, 1000);
     await weth.transfer(applicant, 1000);
@@ -116,9 +131,12 @@ export const setupUsersDefault = async ({
     await dai.transfer(s1, ethers.utils.parseUnits('10', 'ether'));
     await dai.transfer(s2, ethers.utils.parseUnits('10', 'ether'));
 
+    const testNft = (await ethers.getContractAt('TestNFT', testNftDeployed.address, deployer)) as TestNFT;
+    await testNft.mint(applicant, 1);
     return {
         weth,
         dai,
+        testNft,
         signers: {
             summoner: {
                 address: summoner,
@@ -128,6 +146,7 @@ export const setupUsersDefault = async ({
                 shares: (await ethers.getContractAt('Shares', sharesTokenAddress, summoner)) as Shares,
                 sharesInitial: (await sharesToken.balanceOf(summoner)).toNumber(),
                 tributeMinion: (await ethers.getContractAt('TributeMinion', tributeMinion.address, summoner)) as TributeMinion,
+                nftTributeMinion: (await ethers.getContractAt('NFTTributeMinion', nftTributeMinion.address, summoner)) as NFTTributeMinion,
                 weth: (await ethers.getContractAt('TestERC20', weth.address, summoner)) as TestERC20,
                 dai: (await ethers.getContractAt('TestERC20', dai.address, summoner)) as TestERC20,
             },
@@ -139,8 +158,10 @@ export const setupUsersDefault = async ({
                 shares: (await ethers.getContractAt('Shares', sharesToken.address, applicant)) as Shares,
                 sharesInitial: (await sharesToken.balanceOf(applicant)).toNumber(),
                 tributeMinion: (await ethers.getContractAt('TributeMinion', tributeMinion.address, applicant)) as TributeMinion,
+                nftTributeMinion: (await ethers.getContractAt('NFTTributeMinion', nftTributeMinion.address, applicant)) as NFTTributeMinion,
                 weth: (await ethers.getContractAt('TestERC20', weth.address, applicant)) as TestERC20,
                 dai: (await ethers.getContractAt('TestERC20', dai.address, applicant)) as TestERC20,
+                testNft: (await ethers.getContractAt('TestNFT', testNft.address, applicant)) as TestNFT,
             },
             shaman: {
                 address: shaman,
@@ -157,6 +178,7 @@ export const setupUsersDefault = async ({
                 sharesInitial: 0,
                 weth: (await ethers.getContractAt('TestERC20', weth.address, s1)) as TestERC20,
                 dai: (await ethers.getContractAt('TestERC20', dai.address, s1)) as TestERC20,
+                testNft: (await ethers.getContractAt('TestNFT', testNft.address, s1)) as TestNFT,
             },
             s2: {
                 address: s2,
@@ -165,6 +187,7 @@ export const setupUsersDefault = async ({
                 sharesInitial: 0,
                 weth: (await ethers.getContractAt('TestERC20', weth.address, s2)) as TestERC20,
                 dai: (await ethers.getContractAt('TestERC20', dai.address, s2)) as TestERC20,
+                testNft: (await ethers.getContractAt('TestNFT', testNft.address, s2)) as TestNFT,
             },
             s3: {
                 address: s3,
@@ -201,7 +224,7 @@ export const baalSetup = deployments.createFixture<BaalSetupType, BaalSetupOpts>
     const { deployer } = await getNamedAccounts();
     const [summoner, applicant, shaman] = await getUnnamedAccounts();
 
-    await deployments.fixture(['Infra', 'TributeMinion', 'BaalSummoner', ...(options?.fixtureTags || [])]); // Deployment Tags
+    await deployments.fixture(['Infra', 'TributeMinion', 'NFTTributeMinion', 'BaalSummoner', ...(options?.fixtureTags || [])]); // Deployment Tags
 
     console.log('baalSetup fixture', options);
     // console.log('deployments', Object.keys(await deployments.all()));
@@ -216,6 +239,7 @@ export const baalSetup = deployments.createFixture<BaalSetupType, BaalSetupOpts>
     const baalSummoner = (await ethers.getContract('BaalSummoner', deployer)) as BaalSummoner;
     const poster = (await ethers.getContract('Poster', deployer)) as Poster
     const tributeMinion = (await ethers.getContract('TributeMinion', deployer)) as TributeMinion;
+    const nftTributeMinion = (await ethers.getContract('NFTTributeMinion', deployer)) as NFTTributeMinion;
 
     const summonerDist = {
         shares: shares * 2,
@@ -266,6 +290,7 @@ export const baalSetup = deployments.createFixture<BaalSetupType, BaalSetupOpts>
     const {
         dai,
         weth,
+        testNft,
         signers,
     } = options?.setupUsersOverride
         ? await options.setupUsersOverride({ addresses, baal, hre })
@@ -282,8 +307,10 @@ export const baalSetup = deployments.createFixture<BaalSetupType, BaalSetupOpts>
         MultiSend: (await ethers.getContract('MultiSend', deployer)) as MultiSend,
         // Poster: poster,
         TributeMinion: tributeMinion,
+        NFTTributeMinion: nftTributeMinion,
         WETH: weth,
         DAI: dai,
+        TestNFT: testNft,
         signers,
         helpers: {
             setShamanProposal: (baal, multisend, shamanAddress, permission) => {
@@ -294,6 +321,9 @@ export const baalSetup = deployments.createFixture<BaalSetupType, BaalSetupOpts>
             },
             submitAndProcessTributeProposal(params) {
                 return submitAndProcessTributeProposal({ ...params, daoSettings });
+            },
+            submitAndProcessNFTTributeProposal(params) {
+                return submitAndProcessNFTTributeProposal({ ...params, daoSettings });
             },
         }
     };
